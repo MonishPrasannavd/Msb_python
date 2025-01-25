@@ -421,14 +421,14 @@ class _SignUpPageState extends State<SignUpPage> {
                         const CountryStateDropdown(),
                         const SizedBox(height: 15),
                         TextFormField(
-                          controller: stateController,
+                          controller: cityController,
                           decoration: kTextFieldDecoration.copyWith(
-                            labelText: "State",
-                            hintText: "Enter State",
+                            labelText: "City",
+                            hintText: "Enter city",
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'State is required';
+                              return 'City is required';
                             }
                             return null;
                           },
@@ -461,7 +461,6 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         const SizedBox(height: 15),
 
-                        const SizedBox(height: 15),
 
                         // School selection dropdown
                         DropdownSearch<School>(
