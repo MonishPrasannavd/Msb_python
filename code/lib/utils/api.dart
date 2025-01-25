@@ -17,3 +17,13 @@ class ApiConfig {
     _headers['Cookie'] = cookie;
   }
 }
+class AppUrl {
+  static const String BASE_URL = 'https://msb.instabee.pro/pre';
+  static const String AUTHENTICATION = '/login';
+  static const String GET_PATIENT_BY_ID = '/PatientData/GetPatientByID';
+  static const String PATIENT_ID = 'patientID';
+  static const String SUBMIT_SPOT_CHECK = '/SpotCheck/SubmitSpotCheck';
+  static const String GET_DEVICE_INFO = '/DeviceData/GetSpotCheckDeviceInfo';
+  static const String GET_SPOTCHECK_DEVICE_DATA =
+      '/DeviceData/GetSpotCheckDeviceData';
+}

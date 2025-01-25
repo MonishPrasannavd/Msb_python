@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/forget_password/forget_password.dart';
+import 'package:msb_app/components/loading.dart';
+import 'package:msb_app/models/msbuser.dart' as msb;
+import 'package:msb_app/providers/user_auth_provider.dart';
+import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/utils/extention_text.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // Import FlutterToast for toast messages
@@ -29,6 +34,8 @@ class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _validate = false;
 
+  late UserAuthProvider userAuth;
+
   @override
   void dispose() {
     super.dispose();
@@ -48,10 +55,47 @@ class _SignInScreenState extends State<SignInScreen> {
       textColor: Colors.white,
     );
   }
+   void _validateLoginDetails() {
+    tryLoggingIn();
+   }
+
+    void tryLoggingIn() async {
+    final Future<Map<String, dynamic>> successfulMessage =
+        userAuth.login(emailController.text, passwordController.text);
+    DialogBuilder(context).showLoadingIndicator('');
+    successfulMessage.then((response) async {
+      var errorMessage = response['message'].toString();
+      if (response['status'] == true) {
+        DialogBuilder(context).hideOpenDialog();
+        msb.MsbUser user = response['user'];
+        Provider.of<UserProvider>(context, listen: false).setUser(user);
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                                      prefs.setString("userId", user.user.id.toString());
+                                      prefs.setString("nameEmail", user.user.email.toString());
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(
+                duration: Duration(seconds: 1),
+                content: Text("Successfully logged in"),
+                backgroundColor: AppColors.primary))
+            .closed
+            .then((value) =>Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const DashboardSetup()),
+                                            (route) => false,
+                                      ));
+      } else {
+                DialogBuilder(context).hideOpenDialog();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Login failed'), backgroundColor: Colors.red));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
+        userAuth = Provider.of<UserAuthProvider>(context);
+
     return Scaffold(
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
@@ -150,17 +194,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   });
                                   if (_formKey.currentState!.validate()) {
                                     try {
-                                      final user = await _auth.signInWithEmailAndPassword(
-                                          email: emailController.text, password: passwordController.text);
-                                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                                      prefs.setString("userId", user.user!.uid);
-                                      prefs.setString("nameEmail", user!.user!.email.toString());
-
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const DashboardSetup()),
-                                            (route) => false,
-                                      );
+                                     _validateLoginDetails();
                                     } on FirebaseAuthException catch (e) {
                                       String errorMessage;
                                       switch (e.code) {

@@ -3,11 +3,14 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
+import 'package:msb_app/providers/user_auth_provider.dart';
+import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +20,7 @@ import 'Screens/dashboard/dashboard_setup.dart';
 import 'Screens/profile/post_details_screen.dart';
 import 'Screens/school/school_screen.dart';
 import 'package:is_first_run/is_first_run.dart';
-
+import 'package:provider/provider.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
@@ -49,7 +52,12 @@ class MyApp extends StatelessWidget {
   @override
 
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => UserAuthProvider()),
+      ],
+    child: MaterialApp(
       navigatorKey: navigatorKey,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -57,6 +65,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: IsLoginCheckPage(),
+    ),
     );
   }
 }
