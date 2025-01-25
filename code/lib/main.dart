@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
+import 'package:msb_app/providers/master/master_api_provider.dart';
+import 'package:msb_app/providers/master/master_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/utils/colours.dart';
@@ -21,6 +23,7 @@ import 'Screens/profile/post_details_screen.dart';
 import 'Screens/school/school_screen.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
@@ -31,15 +34,13 @@ void main() async {
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
   await FirebaseAppCheck.instance.activate(
-    androidProvider:
-        AndroidProvider.debug, // Use debug for Android in development
+    androidProvider: AndroidProvider.debug, // Use debug for Android in development
     appleProvider: AppleProvider.debug, // Use debug for iOS in development
   );
 
   ///init Branch.io for deeplink.
   await FlutterBranchSdk.init();
-SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     runApp(MyApp(firestore: fireStore));
   });
 }
@@ -50,22 +51,25 @@ class MyApp extends StatelessWidget {
   const MyApp({required this.firestore, super.key});
 
   @override
-
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => UserAuthProvider()),
+
+        // master provider
+        ChangeNotifierProvider(create: (_) => MasterProvider()),
+        ChangeNotifierProvider(create: (_) => MasterApiProvider()),
       ],
-    child: MaterialApp(
-      navigatorKey: navigatorKey,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        scaffoldBackgroundColor: AppColors.white,
-        useMaterial3: true,
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          scaffoldBackgroundColor: AppColors.white,
+          useMaterial3: true,
+        ),
+        home: IsLoginCheckPage(),
       ),
-      home: IsLoginCheckPage(),
-    ),
     );
   }
 }
@@ -91,14 +95,12 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
     if (savedVersion == null || savedVersion != currentVersion) {
       // App version has changed or no version is stored
       await prefs.clear(); // Clear all saved preferences (logs out the user)
-      await prefs.setString(
-          'app_version', currentVersion); // Save new app version
+      await prefs.setString('app_version', currentVersion); // Save new app version
       print("User logged out due to app update.");
     } else {
       print("App version is up-to-date.");
     }
   }
-
 
   Future<bool> checkUserLogin(BuildContext context) async {
     bool firstCall = await IsFirstRun.isFirstCall();
@@ -161,8 +163,7 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PostDetailScreen(
-                    postId: postId, title: title, description: description),
+                builder: (context) => PostDetailScreen(postId: postId, title: title, description: description),
               ));
           // Navigator.pushReplacementNamed(navigatorKey.currentContext??context, '/home',  arguments: [false, postId]);
         }

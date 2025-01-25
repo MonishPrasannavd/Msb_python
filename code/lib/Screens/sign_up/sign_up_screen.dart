@@ -14,9 +14,12 @@ import 'package:msb_app/Screens/otp_sent/otp_sent_screen.dart';
 import 'package:msb_app/constants/navigation.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/master/master_api_provider.dart';
+import 'package:msb_app/providers/master/master_provider.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/utils/constants.dart';
 import 'package:msb_app/utils/extention_text.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/button_builder.dart';
@@ -75,6 +78,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final SchoolUserRepository schoolUserRepository = SchoolUserRepository();
 
+  late MasterApiProvider masterApiProvider;
+
   final _formKey = GlobalKey<FormState>();
   bool _validate = false;
   SchoolUser? selectedSchool;
@@ -93,6 +98,24 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       print("Error fetching schools: $e");
     }
+  }
+
+  void fetchMaster () {
+
+    var masterProvider = Provider.of<MasterProvider>(context, listen: false);
+    masterApiProvider.getMasterData().then((result) {
+      if (result['status']) {
+        print("Master data fetched successfully.");
+        masterProvider.countries = result['countries'];
+        masterProvider.states = result['states'];
+        masterProvider.schools = result['schools'];
+        masterProvider.grades = result['grades'];
+      }
+
+      print(masterProvider.grades);
+    }).catchError((error) {
+      print("Error fetching master data: $error");
+    });
   }
 
   Future<void> _showTermsDialog() async {
@@ -154,6 +177,12 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState() {
     super.initState();
+
+    // Ensure Provider is available for initialization
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      masterApiProvider = Provider.of<MasterApiProvider>(context, listen: false);
+      fetchMaster();
+    });
 
     if (isTest) {
       nameController.text = "Vishwesh Shukla";
@@ -232,6 +261,8 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
+    masterApiProvider = Provider.of<MasterApiProvider>(context);
+
     return Scaffold(
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,

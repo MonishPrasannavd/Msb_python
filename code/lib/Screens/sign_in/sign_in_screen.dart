@@ -55,11 +55,12 @@ class _SignInScreenState extends State<SignInScreen> {
       textColor: Colors.white,
     );
   }
-   void _validateLoginDetails() {
-    tryLoggingIn();
-   }
 
-    void tryLoggingIn() async {
+  void _validateLoginDetails() {
+    tryLoggingIn();
+  }
+
+  void tryLoggingIn() async {
     final Future<Map<String, dynamic>> successfulMessage =
         userAuth.login(emailController.text, passwordController.text);
     DialogBuilder(context).showLoadingIndicator('');
@@ -69,24 +70,24 @@ class _SignInScreenState extends State<SignInScreen> {
         DialogBuilder(context).hideOpenDialog();
         msb.MsbUser user = response['user'];
         Provider.of<UserProvider>(context, listen: false).setUser(user);
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                                      prefs.setString("userId", user.user.id.toString());
-                                      prefs.setString("nameEmail", user.user.email.toString());
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("userId", user.user.id.toString());
+        prefs.setString("nameEmail", user.user.email.toString());
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(
                 duration: Duration(seconds: 1),
                 content: Text("Successfully logged in"),
                 backgroundColor: AppColors.primary))
             .closed
-            .then((value) =>Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const DashboardSetup()),
-                                            (route) => false,
-                                      ));
+            .then((value) => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DashboardSetup()),
+                  (route) => false,
+                ));
       } else {
-                DialogBuilder(context).hideOpenDialog();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Login failed'), backgroundColor: Colors.red));
+        DialogBuilder(context).hideOpenDialog();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Login failed'), backgroundColor: Colors.red));
       }
     });
   }
@@ -94,7 +95,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
-        userAuth = Provider.of<UserAuthProvider>(context);
+    userAuth = Provider.of<UserAuthProvider>(context);
 
     return Scaffold(
       body: ModalProgressHUD(
@@ -194,7 +195,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                   });
                                   if (_formKey.currentState!.validate()) {
                                     try {
-                                     _validateLoginDetails();
+                                      _validateLoginDetails();
                                     } on FirebaseAuthException catch (e) {
                                       String errorMessage;
                                       switch (e.code) {
