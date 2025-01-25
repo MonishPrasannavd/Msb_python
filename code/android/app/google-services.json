@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "931041863253",
+    "project_id": "mysuperbrain-ddec7",
+    "storage_bucket": "mysuperbrain-ddec7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931041863253:android:2885e551d7e009a94496dc",
+        "android_client_info": {
+          "package_name": "com.grapplesoft.msb_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "109165931672124207281",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrBTxz58haFRnYUS3rjK2iJsepiTsncvk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "109165931672124207281",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
