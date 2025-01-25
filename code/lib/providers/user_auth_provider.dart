@@ -56,7 +56,7 @@ class UserAuthProvider with ChangeNotifier {
       "country_id": int.parse(countryId),
       "state_id": int.parse(stateId),
       "city": city,
-      "school_id": schoolId != null ? int.parse(schoolId) : null,
+      "school_id": (schoolId != null && schoolId.isNotEmpty) ? int.tryParse(schoolId) : null,
       "school_name": schoolName,
       "dob": dob
     };
