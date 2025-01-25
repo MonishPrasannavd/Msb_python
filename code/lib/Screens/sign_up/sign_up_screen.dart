@@ -386,38 +386,6 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         const SizedBox(height: 15),
 
-                        // CSCPicker(
-                        //   layout: Layout.vertical,
-                        //   showCities: false,
-                        //   disableCountry: true,
-                        //   dropdownDecoration: BoxDecoration(
-                        //     border: Border.all(
-                        //         color: AppColors.fontHint,
-                        //         width: 1), // Border color and width
-                        //     borderRadius:
-                        //         BorderRadius.circular(8.0), // Border radius
-                        //   ),
-                        //   disabledDropdownDecoration: BoxDecoration(
-                        //     border:
-                        //         Border.all(color: AppColors.fontHint, width: 1),
-                        //     borderRadius: BorderRadius.circular(8.0),
-                        //   ),
-                        //   onCountryChanged: (val) {
-                        //     setState(() {
-                        //       countryController.text = val;
-                        //     });
-                        //   },
-                        //   onCityChanged: (val) {
-                        //     setState(() {
-                        //       cityController.text = val ?? '';
-                        //     });
-                        //   },
-                        //   onStateChanged: (val) {
-                        //     setState(() {
-                        //       stateController.text = val ?? '';
-                        //     });
-                        //   },
-                        // ),
                         const CountryStateDropdown(),
                         const SizedBox(height: 15),
                         TextFormField(
@@ -447,14 +415,6 @@ class _SignUpPageState extends State<SignUpPage> {
                             if (value == null || value.isEmpty) {
                               return 'Date of Birth is required';
                             }
-                            // final DateTime selectedDate = DateTime.parse(value);
-                            // final DateTime today = DateTime.now();
-                            // final int age = today.year -
-                            //     selectedDate.year -
-                            //     (today.isBefore(DateTime(today.year, selectedDate.month, selectedDate.day)) ? 1 : 0);
-                            // if (age < 18) {
-                            //   return 'You must be at least 18 years old';
-                            // }
                             return null;
                           },
                           onTap: () => _selectDate(context), // Trigger the picker
@@ -499,7 +459,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                 onTap: () async {
                                   var newSchool = School(name: searchEntry);
                                   setState(() {
-                                    masterProvider.schools.add(newSchool);
+                                    masterProvider.addToSchools(newSchool);
+                                    selectedSchool = newSchool;
                                   });
                                   Navigator.of(context).pop(); // Close the dropdown popup
                                   // showAddSchoolDialog(searchEntry); // Show the add school dialog

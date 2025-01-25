@@ -31,6 +31,11 @@ class MasterProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addToSchools(School school) {
+    _schools.add(school);
+    notifyListeners();
+  }
+
   List<Grade> get grades => _grades;
 
   set grades(List<Grade> value) {
