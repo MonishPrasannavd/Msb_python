@@ -22,6 +22,7 @@ class ApiConfig {
 class AppUrl {
   static const String BASE_URL = 'https://msb.instabee.pro';
   static const String AUTHENTICATION = '/pre/login';
+  static const String SIGNUP = '/pre/register';
   static const String GET_PATIENT_BY_ID = '/PatientData/GetPatientByID';
   static const String PATIENT_ID = 'patientID';
   static const String SUBMIT_SPOT_CHECK = '/SpotCheck/SubmitSpotCheck';

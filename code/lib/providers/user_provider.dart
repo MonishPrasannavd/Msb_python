@@ -1,5 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:msb_app/models/grade.dart';
+import 'package:msb_app/models/msb_state.dart';
 import 'package:msb_app/models/msbuser.dart';
+import 'package:msb_app/models/msb_country.dart';
+import 'package:msb_app/models/school.dart';
 
 class UserProvider with ChangeNotifier {
   MsbUser _user = MsbUser(
@@ -28,7 +32,7 @@ class UserProvider with ChangeNotifier {
       score: 0,
       likes: 0,
       createdAt: '',
-      country: Country(
+      country: MsbCountry(
         id: 0,
         name: '',
         createdBy: null,
@@ -43,7 +47,7 @@ class UserProvider with ChangeNotifier {
         name: '',
         createdBy: 0,
       ),
-      state: State(
+      state: MsbState(
         id: 0,
         name: '',
         countryId: 0,
@@ -55,6 +59,22 @@ class UserProvider with ChangeNotifier {
   );
 
   MsbUser get user => _user;
+  MsbCountry? _selectedCountry;
+  MsbState? _selectedState;
+
+  // country get set
+  MsbCountry? get selectedCountry => _selectedCountry;
+  set selectedCountry(MsbCountry? country) {
+    _selectedCountry = country;
+    notifyListeners();
+  }
+
+  // msb state get set
+  MsbState? get selectedState => _selectedState;
+  set selectedState(MsbState? state) {
+    _selectedState = state;
+    notifyListeners();
+  }
 
   void setUser(MsbUser user) {
     _user = user;

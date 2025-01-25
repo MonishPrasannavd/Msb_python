@@ -1,9 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'country.g.dart';
+part 'msb_country.g.dart';
 
 @JsonSerializable()
-class Country {
+class MsbCountry {
   @JsonKey(name: "created_by")
   dynamic createdBy;
   @JsonKey(name: "name")
@@ -11,24 +11,24 @@ class Country {
   @JsonKey(name: "id")
   int? id;
 
-  Country({
+  MsbCountry({
     this.createdBy,
     this.name,
     this.id,
   });
 
-  Country copyWith({
+  MsbCountry copyWith({
     dynamic createdBy,
     String? name,
     int? id,
   }) =>
-      Country(
+      MsbCountry(
         createdBy: createdBy ?? this.createdBy,
         name: name ?? this.name,
         id: id ?? this.id,
       );
 
-  factory Country.fromJson(Map<String, dynamic> json) => _$CountryFromJson(json);
+  factory MsbCountry.fromJson(Map<String, dynamic> json) => _$MsbCountryFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CountryToJson(this);
+  Map<String, dynamic> toJson() => _$MsbCountryToJson(this);
 }

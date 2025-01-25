@@ -1,7 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:msb_app/models/grade.dart';
+import 'package:msb_app/models/msb_country.dart';
+import 'package:msb_app/models/msb_state.dart';
+import 'package:msb_app/models/school.dart';
 
 class MsbUser {
-  final User user;
+  final User? user;
   final Student student;
   final String accessToken;
   final String tokenType;
@@ -14,8 +18,18 @@ class MsbUser {
   });
 
   factory MsbUser.fromJson(Map<String, dynamic> json) {
+    User? getUserFromJson(Map<String, dynamic> json) {
+      if (json['user'] != null) {
+        return User.fromJson(json['user']);
+      } else if (json['student'] != null && json['student']['user'] != null) {
+        return User.fromJson(json['student']['user']);
+      } else {
+        return null;
+      }
+    }
+
     return MsbUser(
-      user: User.fromJson(json['user']),
+      user: getUserFromJson(json),
       student: Student.fromJson(json['student']),
       accessToken: json['access_token'],
       tokenType: json['token_type'],
@@ -24,7 +38,7 @@ class MsbUser {
 
   Map<String, dynamic> toJson() {
     return {
-      'user': user.toJson(),
+      'user': user?.toJson(),
       'student': student.toJson(),
       'access_token': accessToken,
       'token_type': tokenType,
@@ -41,7 +55,7 @@ class User {
   final int score;
   final String? profileUrl;
   final int roleId;
-  final String roleName;
+  final String? roleName;
 
   User({
     required this.id,
@@ -52,7 +66,7 @@ class User {
     required this.score,
     this.profileUrl,
     required this.roleId,
-    required this.roleName,
+    this.roleName,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -60,9 +74,9 @@ class User {
       id: json['id'],
       name: json['name'],
       email: json['email'],
-      points: json['points'],
-      likes: json['likes'],
-      score: json['score'],
+      points: json['points'] ?? 0,
+      likes: json['likes'] ?? 0,
+      score: json['score'] ?? 0,
       profileUrl: json['profile_url'],
       roleId: json['role_id'],
       roleName: json['role_name'],
@@ -98,10 +112,10 @@ class Student {
   final int score;
   final int likes;
   final String createdAt;
-  final Country country;
-  final Grade grade;
-  final School school;
-  final State state;
+  final MsbCountry? country;
+  final Grade? grade;
+  final School? school;
+  final MsbState? state;
 
   Student({
     required this.id,
@@ -138,10 +152,10 @@ class Student {
       score: json['score'],
       likes: json['likes'],
       createdAt: json['created_at'],
-      country: Country.fromJson(json['country']),
-      grade: Grade.fromJson(json['grade']),
-      school: School.fromJson(json['school']),
-      state: State.fromJson(json['state']),
+      country: json['country'] != null ? MsbCountry.fromJson(json['country']) : null,
+      grade: json['grade'] != null ? Grade.fromJson(json['grade']) : null,
+      school: json['school'] != null ? School.fromJson(json['school']) : null,
+      state: json['state'] != null ? MsbState.fromJson(json['state']) : null,
     );
   }
 
@@ -160,126 +174,12 @@ class Student {
       'score': score,
       'likes': likes,
       'created_at': createdAt,
-      'country': country.toJson(),
-      'grade': grade.toJson(),
-      'school': school.toJson(),
-      'state': state.toJson(),
+      'country': country?.toJson(),
+      'grade': grade?.toJson(),
+      'school': school?.toJson(),
+      'state': state?.toJson(),
     };
   }
 }
 
-class Country {
-  final int id;
-  final String name;
-  final dynamic createdBy;
 
-  Country({
-    required this.id,
-    required this.name,
-    this.createdBy,
-  });
-
-  factory Country.fromJson(Map<String, dynamic> json) {
-    return Country(
-      id: json['id'],
-      name: json['name'],
-      createdBy: json['created_by'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'created_by': createdBy,
-    };
-  }
-}
-
-class Grade {
-  final int id;
-  final String name;
-  final dynamic createdBy;
-
-  Grade({
-    required this.id,
-    required this.name,
-    this.createdBy,
-  });
-
-  factory Grade.fromJson(Map<String, dynamic> json) {
-    return Grade(
-      id: json['id'],
-      name: json['name'],
-      createdBy: json['created_by'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'created_by': createdBy,
-    };
-  }
-}
-
-class School {
-  final int id;
-  final String name;
-  final int createdBy;
-
-  School({
-    required this.id,
-    required this.name,
-    required this.createdBy,
-  });
-
-  factory School.fromJson(Map<String, dynamic> json) {
-    return School(
-      id: json['id'],
-      name: json['name'],
-      createdBy: json['created_by'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'created_by': createdBy,
-    };
-  }
-}
-
-class State {
-  final int id;
-  final String name;
-  final int countryId;
-  final dynamic createdBy;
-
-  State({
-    required this.id,
-    required this.name,
-    required this.countryId,
-    this.createdBy,
-  });
-
-  factory State.fromJson(Map<String, dynamic> json) {
-    return State(
-      id: json['id'],
-      name: json['name'],
-      countryId: json['country_id'],
-      createdBy: json['created_by'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'country_id': countryId,
-      'created_by': createdBy,
-    };
-  }
-}

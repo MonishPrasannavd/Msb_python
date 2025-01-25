@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:msb_app/models/country.dart';
+import 'package:msb_app/models/msb_country.dart';
 import 'package:msb_app/models/grade.dart';
 import 'package:msb_app/models/msb_state.dart';
 import 'package:msb_app/models/school.dart';
 
 class MasterProvider extends ChangeNotifier {
-  List<Country> _countries = [];
+  List<MsbCountry> _countries = [];
   List<MsbState> _states = [];
   List<School> _schools = [];
   List<Grade> _grades = [];
 
-  List<Country> get countries => _countries;
+  List<MsbCountry> get countries => _countries;
 
-  set countries(List<Country> value) {
+  set countries(List<MsbCountry> value) {
     _countries = value;
     notifyListeners();
   }

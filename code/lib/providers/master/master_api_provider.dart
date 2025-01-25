@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:msb_app/models/country.dart';
+import 'package:msb_app/models/msb_country.dart';
 import 'package:msb_app/models/grade.dart';
 import 'package:msb_app/models/school.dart';
 import 'package:msb_app/models/msb_state.dart';
@@ -24,7 +24,7 @@ class MasterApiProvider extends ChangeNotifier {
       var encodedString = jsonDecode(response.body.toString());
 
       List<Grade> grades = List.castFrom(encodedString['grades']).map((e) => Grade.fromJson(e)).toList();
-      List<Country> countries = List.castFrom(encodedString['countries']).map((e) => Country.fromJson(e)).toList();
+      List<MsbCountry> countries = List.castFrom(encodedString['countries']).map((e) => MsbCountry.fromJson(e)).toList();
       List<MsbState> states = List.castFrom(encodedString['states']).map((e) => MsbState.fromJson(e)).toList();
       List<School> schools = List.castFrom(encodedString['schools']).map((e) => School.fromJson(e)).toList();
 
