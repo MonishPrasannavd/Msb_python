@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:msb_app/models/grade.dart';
 import 'package:msb_app/models/msb_country.dart';
 import 'package:msb_app/models/msb_state.dart';
@@ -16,6 +15,20 @@ class MsbUser {
     required this.accessToken,
     required this.tokenType,
   });
+
+  MsbUser copyWith({
+    User? user,
+    Student? student,
+    String? accessToken,
+    String? tokenType,
+  }) {
+    return MsbUser(
+      user: user ?? this.user,
+      student: student ?? this.student,
+      accessToken: accessToken ?? this.accessToken,
+      tokenType: tokenType ?? this.tokenType,
+    );
+  }
 
   factory MsbUser.fromJson(Map<String, dynamic> json) {
     User? getUserFromJson(Map<String, dynamic> json) {
@@ -68,6 +81,30 @@ class User {
     required this.roleId,
     this.roleName,
   });
+
+  User copyWith({
+    int? id,
+    String? name,
+    String? email,
+    int? points,
+    int? likes,
+    int? score,
+    String? profileUrl,
+    int? roleId,
+    String? roleName,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      points: points ?? this.points,
+      likes: likes ?? this.likes,
+      score: score ?? this.score,
+      profileUrl: profileUrl ?? this.profileUrl,
+      roleId: roleId ?? this.roleId,
+      roleName: roleName ?? this.roleName,
+    );
+  }
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -137,6 +174,46 @@ class Student {
     required this.state,
   });
 
+  Student copyWith({
+    int? id,
+    int? gradeId,
+    int? countryId,
+    String? dob,
+    int? points,
+    dynamic createdBy,
+    String? updatedAt,
+    int? userId,
+    int? schoolId,
+    int? stateId,
+    int? score,
+    int? likes,
+    String? createdAt,
+    MsbCountry? country,
+    Grade? grade,
+    School? school,
+    MsbState? state,
+  }) {
+    return Student(
+      id: id ?? this.id,
+      gradeId: gradeId ?? this.gradeId,
+      countryId: countryId ?? this.countryId,
+      dob: dob ?? this.dob,
+      points: points ?? this.points,
+      createdBy: createdBy ?? this.createdBy,
+      updatedAt: updatedAt ?? this.updatedAt,
+      userId: userId ?? this.userId,
+      schoolId: schoolId ?? this.schoolId,
+      stateId: stateId ?? this.stateId,
+      score: score ?? this.score,
+      likes: likes ?? this.likes,
+      createdAt: createdAt ?? this.createdAt,
+      country: country ?? this.country,
+      grade: grade ?? this.grade,
+      school: school ?? this.school,
+      state: state ?? this.state,
+    );
+  }
+
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
       id: json['id'],
@@ -181,5 +258,3 @@ class Student {
     };
   }
 }
-
-
