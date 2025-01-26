@@ -28,8 +28,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController(text: "monishvd@gmail.com");
+  TextEditingController passwordController = TextEditingController(text: "1234567890");
 
   final _formKey = GlobalKey<FormState>();
   bool _validate = false;

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,9 +11,14 @@ import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
 import 'package:msb_app/Screens/home/tab_3_public.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
 import 'package:msb_app/components/button_builder.dart';
+import 'package:msb_app/components/loading.dart';
 import 'package:msb_app/enums/post_feed_type.dart';
+import 'package:msb_app/models/dashboard.dart' as dashboard;
+import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/dash.dart';
+import 'package:msb_app/providers/student_dashboard_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
@@ -19,8 +26,7 @@ import 'package:msb_app/services/points_system.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
-import 'package:msb_app/utils/helpers.dart';
-import 'package:msb_app/utils/progress_dialog_utils.dart';
+import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -36,13 +42,15 @@ class HomeTabState extends State<HomeTab> {
   late UserRepository userRepository;
   int totalUsersCount = 0;
   int totalSchoolsCounts = 0;
-  List<MsbUser> topStudents = [];
-  List<MsbUser> top3Students = [];
-  List<MsbUser> remainingTopStudents = [];
+  List<TopScoreStudents> topStudents = [];
+  List<TopScoreStudents> top3Students = [];
+  List<TopScoreStudents> remainingTopStudents = [];
   late Future<void> _fetchDataFuture;
   double progress = 0.0;
   bool isFirstTimeLoading = false;
 
+  late StudentDashboardProvider studentDashboardProvider;
+  late Dash _dash;
   @override
   void initState() {
     super.initState();
@@ -53,6 +61,54 @@ class HomeTabState extends State<HomeTab> {
             FirebaseFirestore.instance.collection(FirestoreCollections.users));
 
     _fetchDataFuture = fetchData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
+      _dash = Provider.of<Dash>(context, listen: false);
+      getDashboard();
+    });
+  }
+
+  Future<void> getDashboard() async {
+    var dashboardData = await studentDashboardProvider.getStudentDashboard();
+    print('user dashboard: $dashboardData');
+    final Future<Map<String, dynamic>> successfulMessage =
+    studentDashboardProvider.getStudentDashboard();
+
+
+    successfulMessage.then((response){
+      if(response['status'] == true){
+
+        dashboard.DashboardResponse dashboardData = response['data'];
+
+        Provider.of<Dash>(context, listen: false).setDash(dashboardData);
+        Provider.of<Dash>(context, listen: false).students(dashboardData.topScoreStudents ?? []);
+        Provider.of<Dash>(context, listen: false).category(dashboardData.futureCategories ?? []);
+
+        totalUsersCount = _dash.dashboardResponse.totalStudent ?? 0;
+        totalSchoolsCounts =_dash.dashboardResponse.totalSchools ?? 0;
+        topStudents = _dash.tsStudents!;
+
+
+        print("111111111111111 ${_dash.dbResponse}");
+        print("111111111111111 ${_dash.tsStudents}");
+        print("2222222222222222 ${_dash.ftCategories}");
+        print("3333333333333333 ${_dash.subCate}");
+
+          setState(() {
+            if(_dash.tsStudents!.isNotEmpty){
+              top3Students = topStudents.length >= 3
+                  ? topStudents.sublist(0, 3)
+                  : topStudents.sublist(0, topStudents.length);
+              remainingTopStudents =
+              topStudents.length > 3 ? topStudents.sublist(3) : [];
+            } else {
+              top3Students = [];
+              remainingTopStudents = [];
+            }
+          });
+      }
+    });
   }
 
   void refetchData() {
@@ -65,7 +121,7 @@ class HomeTabState extends State<HomeTab> {
     await fetchSchoolsData();
     await fetchUsersData();
     //if (isFirstTimeLoading) {
-    fetchUsersPostsData();
+    //fetchUsersPostsData();
     //   isFirstTimeLoading = false;
     // }
     setState(() {
@@ -73,12 +129,12 @@ class HomeTabState extends State<HomeTab> {
     });
   }
 
-  Future<void> fetchUsersPostsData() async {
+  /*Future<void> fetchUsersPostsData() async {
     for (var student in topStudents) {
       var posts = await postRepository.getPostsByUserId(student.id!);
       PointsSystem.initialUserPointsUpdate(userId: student.id!, posts: posts);
     }
-  }
+  }*/
 
   Future<void> fetchSchoolsData() async {
     var fetchedSchoolsCount = await schoolUserRepository.getTotalSchoolCount();
@@ -95,22 +151,6 @@ class HomeTabState extends State<HomeTab> {
     });
     var fetchedTopUsers = await userRepository.getTopUsersByPoints();
     setState(() {
-      totalUsersCount = fetchedTotalCount;
-      topStudents = fetchedTopUsers;
-      if (topStudents.isNotEmpty) {
-        // Check if topStudents has at least 3 students
-        top3Students = topStudents.length >= 3
-            ? topStudents.sublist(0, 3)
-            : topStudents.sublist(0, topStudents.length);
-
-        // Handle remaining students if there are more than 3
-        remainingTopStudents =
-            topStudents.length > 3 ? topStudents.sublist(3) : [];
-      } else {
-        // If topStudents is empty, assign empty lists
-        top3Students = [];
-        remainingTopStudents = [];
-      }
       progress = 0.83;
     });
   }
@@ -473,7 +513,7 @@ class HomeTabState extends State<HomeTab> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        UserProfileScreen(id: student.id!),
+                                        UserProfileScreen(id: student.id.toString()),
                                   ),
                                 ).then((val) => refetchData());
                               },
@@ -511,7 +551,7 @@ class HomeTabState extends State<HomeTab> {
                                               alignment: Alignment.centerLeft,
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                "${index + 1}. ${student.name ?? "Anonymous"}",
+                                                "${index + 1}. ${student.user!.name ?? "Anonymous"}",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -530,7 +570,7 @@ class HomeTabState extends State<HomeTab> {
                                               alignment: Alignment.centerLeft,
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                student.schoolName ??
+                                                student.city ??
                                                     "Unknown School",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white70,
@@ -542,7 +582,7 @@ class HomeTabState extends State<HomeTab> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            "Score: ${student.totalPoints}",
+                                            "Score: ${student.points}",
                                             style: GoogleFonts.poppins(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -560,11 +600,10 @@ class HomeTabState extends State<HomeTab> {
                                         ),
                                         child: CircleAvatar(
                                           radius: 30,
-                                          backgroundImage: student
-                                                      .profileImageUrl !=
+                                          backgroundImage: student.user!.imageUrl !=
                                                   null
                                               ? NetworkImage(
-                                                  student.profileImageUrl!)
+                                              student.user!.imageUrl!)
                                               : const AssetImage(
                                                       'assets/images/profile1.png')
                                                   as ImageProvider,
@@ -580,11 +619,10 @@ class HomeTabState extends State<HomeTab> {
                                         ),
                                         child: CircleAvatar(
                                           radius: 30,
-                                          backgroundImage: student
-                                                      .profileImageUrl !=
+                                          backgroundImage: student.user!.imageUrl !=
                                                   null
                                               ? NetworkImage(
-                                                  student.profileImageUrl!)
+                                              student.user!.imageUrl!)
                                               : const AssetImage(
                                                       'assets/images/profile1.png')
                                                   as ImageProvider,
@@ -604,7 +642,7 @@ class HomeTabState extends State<HomeTab> {
                                               alignment: Alignment.centerLeft,
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                "${index + 1}. ${student.name ?? "Anonymous"}",
+                                                "${index + 1}. ${student.user!.name ?? "Anonymous"}",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -623,7 +661,7 @@ class HomeTabState extends State<HomeTab> {
                                               fit: BoxFit.scaleDown,
                                               alignment: Alignment.centerRight,
                                               child: Text(
-                                                student.schoolName ??
+                                                student.schoolId.toString() ??
                                                     "Unknown School",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white70,
@@ -635,7 +673,7 @@ class HomeTabState extends State<HomeTab> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            "Score: ${student.totalPoints}",
+                                            "Score: ${student.points}",
                                             style: GoogleFonts.poppins(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -672,7 +710,7 @@ class HomeTabState extends State<HomeTab> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        UserProfileScreen(id: student.id!),
+                                        UserProfileScreen(id: student.id.toString()),
                                   )).then((val) => refetchData());
                             },
                             child: Padding(
@@ -691,14 +729,14 @@ class HomeTabState extends State<HomeTab> {
                                   child: Row(
                                     children: [
                                       Text(
-                                          "$currentIncrement. ${student.name ?? "Anonymous"}",
+                                          "$currentIncrement. ${student.user!.name ?? "Anonymous"}",
                                           style: GoogleFonts.poppins(
                                               color: const Color(0xFF151414),
                                               fontWeight: FontWeight.w500,
                                               fontSize: 16)),
                                       const Spacer(),
                                       Text(
-                                          student.totalPoints?.toString() ??
+                                          student.points?.toString() ??
                                               "0",
                                           style: GoogleFonts.poppins(
                                               color: const Color(0xFF6A6262),

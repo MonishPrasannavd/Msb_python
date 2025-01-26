@@ -34,6 +34,8 @@ class AppUrl {
   static const String LOGOUT = '/auth/logout';
   static const String UPDATE_USER = '/auth/me/update-profile';
 
+  static const String DASHBOARD_USER = '/auth/student/dashboard';
+
   /// Private headers map
   static final Map<String, String> _headers = {
     'accept': 'application/json',
