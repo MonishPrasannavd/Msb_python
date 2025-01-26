@@ -58,7 +58,7 @@ class _DashboardSetupState extends State<DashboardSetup> {
         schoolScreenKey.currentState?.fetchData();
         schoolScreenKey.currentState?.refetchData();
       } else if (index == 4) {
-        profileScreenKey.currentState?.loadUserId();
+        profileScreenKey.currentState?.loadUser();
       }
     }
   }

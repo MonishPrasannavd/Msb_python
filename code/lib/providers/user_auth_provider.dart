@@ -92,7 +92,7 @@ class UserAuthProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> getUserMe() async {
+  Future<Map<String, dynamic>> getUserMe(MsbUser existingUser) async {
     Map<String, dynamic> result;
 
     try {
@@ -103,7 +103,7 @@ class UserAuthProvider with ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
-        MsbUser user = MsbUser.fromJson(encodedString);
+        MsbUser user = MsbUser.fromJson(encodedString, existingUser: existingUser);
         notifyListeners();
         result = {'status': true, 'message': 'Successful', 'user': user};
       } else {
@@ -190,7 +190,7 @@ class UserAuthProvider with ChangeNotifier {
       request.fields['grade_id'] = gradeId.toString();
 
       // Add file if it exists
-      if (profileImage != null) {
+      if (profileImage != null && await profileImage.exists()) {
         request.files.add(
           await MultipartFile.fromPath(
             'profile_image', // Field name for the image
@@ -198,6 +198,8 @@ class UserAuthProvider with ChangeNotifier {
             contentType: MediaType('image', 'jpeg'), // Adjust the content type if needed
           ),
         );
+      } else {
+        // request.fields['profile_image'] = null; // Explicitly set null
       }
 
       // Send the request
@@ -206,9 +208,10 @@ class UserAuthProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
-        var user = MsbUser.fromJson(encodedString);
+        // var user = MsbUser.fromJson(encodedString);
         notifyListeners();
-        result = {'status': true, 'message': 'Successful', 'user': user};
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Successful'};
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];
@@ -222,5 +225,4 @@ class UserAuthProvider with ChangeNotifier {
 
     return result;
   }
-
 }

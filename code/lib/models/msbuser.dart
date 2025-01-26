@@ -30,7 +30,7 @@ class MsbUser {
     );
   }
 
-  factory MsbUser.fromJson(Map<String, dynamic> json) {
+  factory MsbUser.fromJson(Map<String, dynamic> json, {MsbUser? existingUser}) {
     User? getUserFromJson(Map<String, dynamic> json) {
       if (json['user'] != null) {
         return User.fromJson(json['user']);
@@ -44,8 +44,8 @@ class MsbUser {
     return MsbUser(
       user: getUserFromJson(json),
       student: Student.fromJson(json['student']),
-      accessToken: json['access_token'],
-      tokenType: json['token_type'],
+      accessToken: json['access_token'] ?? existingUser?.accessToken,
+      tokenType: json['token_type'] ?? existingUser?.tokenType,
     );
   }
 

@@ -83,7 +83,7 @@ class UserProvider with ChangeNotifier {
 
   void updateUserAndSchool({
     User? updatedUser,
-    School? updatedSchool,
+    Student? updatedStudent,
   }) {
     if (updatedUser != null) {
       _user = _user.copyWith(
@@ -91,11 +91,9 @@ class UserProvider with ChangeNotifier {
       );
     }
 
-    if (updatedSchool != null) {
+    if (updatedStudent != null) {
       _user = _user.copyWith(
-        student: _user.student.copyWith(
-          school: updatedSchool,
-        ),
+        student: updatedStudent
       );
     }
 
