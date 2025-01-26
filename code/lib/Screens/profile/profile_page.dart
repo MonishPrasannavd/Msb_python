@@ -14,11 +14,6 @@ import 'package:msb_app/models/msbuser.dart';
 import 'package:msb_app/providers/master/master_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
-import 'package:msb_app/repository/comment_repository.dart';
-import 'package:msb_app/repository/posts_repository.dart';
-import 'package:msb_app/repository/user_repository.dart';
-import 'package:msb_app/utils/auth.dart';
-import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/user.dart';
 import 'package:provider/provider.dart';
 import '../../components/button_builder.dart';
@@ -66,6 +61,7 @@ class ProfileScreenState extends State<ProfileScreen> {
       _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
       _masterProvider = Provider.of<MasterProvider>(context, listen: false);
       print('user :: ${_userProvider.user.user?.email}');
+
     });
   }
 

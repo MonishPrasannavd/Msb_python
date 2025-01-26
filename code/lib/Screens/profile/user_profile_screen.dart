@@ -4,6 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/Screens/profile/post_details_screen.dart';
 import 'package:msb_app/models/school_user.dart';
+import 'package:msb_app/models/submission.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
+import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/repository/comment_repository.dart';
@@ -18,6 +21,7 @@ import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/post.dart';
+import 'package:msb_app/utils/post_v2.dart';
 import 'package:provider/provider.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -50,6 +54,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   late UserAuthProvider _authProvider;
   late UserProvider _userProvider;
+  late SubmissionProvider _submissionProvider;
+  late SubmissionApiProvider _submissionApiProvider;
 
   @override
   void initState() {
@@ -68,9 +74,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
       _userProvider = Provider.of<UserProvider>(context, listen: false);
+      _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+      _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
 
-    getUser();
+      // getUser();
+      loadAllSubmissions();
     });
+  }
+
+  void loadAllSubmissions() async {
+    var response = await _submissionApiProvider.getAllSubmissions();
+    _submissionProvider.submissions = response['submissions'] as List<Submission>;
   }
 
   Future<void> getUser() async {
@@ -319,23 +333,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       child: ListView.builder(
         // shrinkWrap: true,
         padding: const EdgeInsets.all(8.0),
-        itemCount: posts.length,
+        itemCount: _submissionProvider.submissions.length,
         itemBuilder: (BuildContext context, int index) {
-          PostFeed post = posts[index];
+          Submission post = _submissionProvider.submissions[index];
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PostDetailScreen(post: post),
-                ),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => PostDetailScreen(post: post),
+              //   ),
+              // );
             },
-            child: PostUiUtils.buildPostTile(
+            child: PostUiUtilsV2.buildPostTile(
               context,
               index,
               post,
-              (postId) async {
+                  (postId) async {
                 await CommentBottomSheet.show(context, postId: postId);
                 if (widget.type == "user") {
                   _userFuture =
@@ -346,13 +360,56 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
                 }
               },
-              () => onLike(post, index: index),
+                  () => {
+                // onLike(post, index: index)
+              },
             ),
           );
         },
-      ),
+      )
     );
   }
+
+  // Widget _buildPostsGrid(List<PostFeed> posts) {
+  //   return SizedBox(
+  //     height: MediaQuery.of(context).size.height * 0.7, // Example height
+  //     child: ListView.builder(
+  //       // shrinkWrap: true,
+  //       padding: const EdgeInsets.all(8.0),
+  //       itemCount: posts.length,
+  //       itemBuilder: (BuildContext context, int index) {
+  //         PostFeed post = posts[index];
+  //         return GestureDetector(
+  //           onTap: () {
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (context) => PostDetailScreen(post: post),
+  //               ),
+  //             );
+  //           },
+  //           child: PostUiUtils.buildPostTile(
+  //             context,
+  //             index,
+  //             post,
+  //                 (postId) async {
+  //               await CommentBottomSheet.show(context, postId: postId);
+  //               if (widget.type == "user") {
+  //                 _userFuture =
+  //                     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
+  //                 _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+  //               } else if (widget.type == "school") {
+  //                 _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
+  //                 _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
+  //               }
+  //             },
+  //                 () => onLike(post, index: index),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   Future<void> onLike(PostFeed post, {required int index}) async {
     final userId = await PrefsService.getUserId();
