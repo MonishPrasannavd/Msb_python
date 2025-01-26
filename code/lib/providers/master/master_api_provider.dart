@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:msb_app/models/msb_country.dart';
@@ -15,7 +14,7 @@ class MasterApiProvider extends ChangeNotifier {
     notifyListeners();
 
     final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.GET_MASTERDATA);
-    Response response = await post(
+    Response response = await get(
       uri,
       headers: AppUrl.headers,
     );
@@ -24,12 +23,20 @@ class MasterApiProvider extends ChangeNotifier {
       var encodedString = jsonDecode(response.body.toString());
 
       List<Grade> grades = List.castFrom(encodedString['grades']).map((e) => Grade.fromJson(e)).toList();
-      List<MsbCountry> countries = List.castFrom(encodedString['countries']).map((e) => MsbCountry.fromJson(e)).toList();
+      List<MsbCountry> countries =
+          List.castFrom(encodedString['countries']).map((e) => MsbCountry.fromJson(e)).toList();
       List<MsbState> states = List.castFrom(encodedString['states']).map((e) => MsbState.fromJson(e)).toList();
       List<School> schools = List.castFrom(encodedString['schools']).map((e) => School.fromJson(e)).toList();
 
       notifyListeners();
-      result = {'status': true, 'message': 'Successful', 'grades': grades, 'countries': countries, 'states': states, 'schools': schools};
+      result = {
+        'status': true,
+        'message': 'Successful',
+        'grades': grades,
+        'countries': countries,
+        'states': states,
+        'schools': schools
+      };
     } else {
       final Map<String, dynamic> responseData = json.decode(response.body);
       var message = responseData['detail'];

@@ -147,38 +147,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Firestore instance
-
-  // Future<void> createFirestoreRecord(String uid) async {
-  //   try {
-  //     MsbUser newUser = MsbUser(
-  //       id: uid,
-  //       name: nameController.text,
-  //       email: emailController.text,
-  //       phone: null,
-  //       profileImageUrl: null,
-  //       grade: selectedGrade?.id.toString(),
-  //       schoolName: selectedSchool != null
-  //           ? schools
-  //               .firstWhere(
-  //                   (school) => school.schoolId == selectedSchool?.id.toString())
-  //               .schoolName
-  //           : null,
-  //       schoolId: selectedSchool?.id.toString(),
-  //       city: cityController.text,
-  //       country: countryController.text,
-  //       state: stateController.text,
-  //       dob: dobController.text,
-  //     );
-  //
-  //     await _firestore.collection('users').doc(uid).set(newUser.toJson());
-  //
-  //     schoolUserRepository.updateSchoolAverageOnUserAddOrUpdate(newUser, 0.0);
-  //   } catch (e) {
-  //     print('Error creating Firestore record: $e');
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -227,11 +195,6 @@ class _SignUpPageState extends State<SignUpPage> {
     return FormBuilderDropdown<T>(
       name: hint,
       initialValue: selectedValue,
-      // validator: (value) {
-      //   if (value == null) {
-      //     return 'Grade is required';
-      //   }
-      // },
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
         border: OutlineInputBorder(

@@ -28,11 +28,33 @@ class AppUrl {
   static const String SUBMIT_SPOT_CHECK = '/SpotCheck/SubmitSpotCheck';
   static const String GET_DEVICE_INFO = '/DeviceData/GetSpotCheckDeviceInfo';
   static const String GET_SPOTCHECK_DEVICE_DATA = '/DeviceData/GetSpotCheckDeviceData';
-  static const String GET_MASTERDATA = '/masters/master';
+  static const String GET_MASTERDATA = '/masters/all';
+  static const String GET_USERME = '/users/me';
+  static const String GET_USER = '/users/get-user';
+  static const String LOGOUT = '/auth/logout';
+  static const String UPDATE_USER = '/auth/me/update-profile';
 
-  /// Headers
-  static const headers = {
+  /// Private headers map
+  static final Map<String, String> _headers = {
     'accept': 'application/json',
     'Content-Type': 'application/json',
   };
+
+  /// Getter for headers
+  static Map<String, String> get headers => Map.unmodifiable(_headers);
+
+  /// Add or update a header
+  static void addHeader(String key, String value) {
+    _headers[key] = value;
+  }
+
+  /// Remove a header
+  static void removeHeader(String key) {
+    _headers.remove(key);
+  }
+
+  /// Clear all headers
+  static void clearHeaders() {
+    _headers.clear();
+  }
 }

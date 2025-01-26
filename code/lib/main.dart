@@ -37,6 +37,7 @@ void main() async {
     androidProvider: AndroidProvider.debug, // Use debug for Android in development
     appleProvider: AppleProvider.debug, // Use debug for iOS in development
   );
+  FirebaseFirestore.setLoggingEnabled(false);
 
   ///init Branch.io for deeplink.
   await FlutterBranchSdk.init();
@@ -83,6 +84,17 @@ class IsLoginCheckPage extends StatefulWidget {
 
 class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   StreamSubscription<Map>? streamSubscriptionDeepLink;
+  late MasterApiProvider _masterApiProvider;
+  late MasterProvider _masterProvider;
+
+  void fetchMaster() async {
+    var result = await _masterApiProvider.getMasterData();
+    print('result when fetching master data: $result');
+    _masterProvider.countries = result['countries'];
+    _masterProvider.states = result['states'];
+    _masterProvider.schools = result['schools'];
+    _masterProvider.grades = result['grades'];
+  }
 
   Future<void> checkAppVersion(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -140,6 +152,12 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   void initState() {
     super.initState();
     listenDeepLinkData(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _masterApiProvider = Provider.of<MasterApiProvider>(context, listen: false);
+      _masterProvider = Provider.of<MasterProvider>(context, listen: false);
+
+      fetchMaster();
+    });
   }
 
   @override

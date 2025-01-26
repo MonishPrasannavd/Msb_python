@@ -73,6 +73,7 @@ class _SignInScreenState extends State<SignInScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("userId", user.user?.id.toString() ?? "");
         prefs.setString("nameEmail", user.user?.email.toString() ?? "");
+
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(
                 duration: Duration(seconds: 1),

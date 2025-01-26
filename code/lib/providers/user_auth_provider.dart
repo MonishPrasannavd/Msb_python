@@ -32,6 +32,8 @@ class UserAuthProvider with ChangeNotifier {
       //Map<String, dynamic> jsonMap = jsonDecode(encodedString);
       MsbUser user = MsbUser.fromJson(encodedString);
 
+      AppUrl.addHeader('Authorization', 'Bearer ${user.accessToken}');
+
       notifyListeners();
 
       result = {'status': true, 'message': 'Successful', 'user': user};
@@ -79,6 +81,117 @@ class UserAuthProvider with ChangeNotifier {
         var message = responseData['detail'];
         notifyListeners();
         result = {'status': false, 'message': message, 'user': null};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> getUserMe() async {
+    Map<String, dynamic> result;
+
+    try {
+      final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.GET_USERME);
+      Response response = await get(
+        uri,
+        headers: AppUrl.headers,
+      );
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        MsbUser user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'user': user};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message, 'user': null};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> logout() async {
+    Map<String, dynamic> result;
+
+    try {
+      final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.LOGOUT);
+      Response response = await get(
+        uri,
+        headers: AppUrl.headers,
+      );
+      if (response.statusCode == 200) {
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful'};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> getUser(String id) async {
+    Map<String, dynamic> result;
+
+    try {
+      final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_USER}?id=$id");
+      Response response = await get(
+        uri,
+        headers: AppUrl.headers,
+      );
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        notifyListeners();
+        // TODO : implement parsing json
+        result = {'status': true, 'message': 'Successful'};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> updateProfile(String name, int gradeId) async {
+    Map<String, dynamic> result;
+
+    try {
+      var body = {"name": name, "grade_id": gradeId, "profile_image": null};
+      final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.UPDATE_USER}");
+      Response response = await put(
+        uri,
+        headers: AppUrl.headers,
+        body: jsonEncode(body),
+      );
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful'};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
       }
     } catch (e) {
       notifyListeners();
