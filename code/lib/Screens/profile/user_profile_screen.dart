@@ -4,8 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/Screens/profile/post_details_screen.dart';
 import 'package:msb_app/models/school_user.dart';
-import 'package:msb_app/providers/user_auth_provider.dart';
-import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/repository/comment_repository.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
@@ -18,7 +16,6 @@ import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/post.dart';
-import 'package:provider/provider.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String id;
@@ -39,46 +36,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   late Future<SchoolUser?> _schoolFuture;
   late Future<List<PostFeed>> _postsFuture;
   late PostFeedRepository postFeedRepository;
-  final CommentRepository commentRepository =
-      CommentRepository(commentCollection: FirebaseFirestore.instance.collection(FirestoreCollections.comments));
+  final CommentRepository commentRepository = CommentRepository(
+      commentCollection:
+          FirebaseFirestore.instance.collection(FirestoreCollections.comments));
   late SchoolUserRepository schoolUserRepository;
   bool isLoadingPosts = true; // Loading indicator for posts
   List<PostFeed> posts = [];
-  late MsbUser currentUser;
-  UserRepository userRepository =
-      UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
-
-  late UserAuthProvider _authProvider;
-  late UserProvider _userProvider;
-
-  @override
+late MsbUser currentUser;
+  UserRepository userRepository = UserRepository(
+      usersCollection:
+          FirebaseFirestore.instance.collection(FirestoreCollections.users));  @override
   void initState() {
     super.initState();
     postFeedRepository = PostFeedRepository();
     schoolUserRepository = SchoolUserRepository();
     if (widget.type == "user") {
-      _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-      _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+      _userFuture = UserRepository(
+              usersCollection: FirebaseFirestore.instance.collection('users'))
+          .getOne(widget.id);
+      _fetchPosts(() =>
+          postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
     } else if (widget.type == "school") {
       _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-      _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
+      _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id,
+          includeHidden: false));
     }
     loadUser();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
-      _userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    getUser();
-    });
   }
 
-  Future<void> getUser() async {
-    var user = await _authProvider.getUser('51');
-    print('user: $user');
-  }
-
-  Future<void> loadUser() async {
+    Future<void> loadUser() async {
     setState(() async {
       currentUser = (await userRepository.getOne(widget.id))!;
     });
@@ -101,12 +87,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return _buildPostsGrid(posts);
   }
 
-  Future<void> _fetchPosts(Future<List<PostFeed>> Function() fetchFunction) async {
+  Future<void> _fetchPosts(
+      Future<List<PostFeed>> Function() fetchFunction) async {
     try {
       final fetchedPosts = await fetchFunction();
       for (var post in fetchedPosts) {
         var comments = await commentRepository.getCommentsByPost(post.id!);
-        fetchedPosts[fetchedPosts.indexOf(post)] = post.copyWith(comments: comments);
+        fetchedPosts[fetchedPosts.indexOf(post)] =
+            post.copyWith(comments: comments);
       }
       setState(() {
         posts = fetchedPosts;
@@ -133,7 +121,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             decoration: const BoxDecoration(
                 // color: AppColors.primary,
                 color: AppColors.purpleDark,
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(25.0),
+                    bottomLeft: Radius.circular(25.0))),
             child: Column(
               children: [
                 // SafeArea(
@@ -146,7 +136,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 //     ),
                 //   ),
                 // ),
-                SafeArea(child: widget.type == "user" ? _buildUserProfile() : _buildSchoolProfile()),
+                SafeArea(
+                    child: widget.type == "user"
+                        ? _buildUserProfile()
+                        : _buildSchoolProfile()),
               ],
             ),
           ),
@@ -258,7 +251,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(height: 4),
                   Text(
                     user.grade!,
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.white54,
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -338,12 +334,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               (postId) async {
                 await CommentBottomSheet.show(context, postId: postId);
                 if (widget.type == "user") {
-                  _userFuture =
-                      UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-                  _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+                  _userFuture = UserRepository(
+                          usersCollection:
+                              FirebaseFirestore.instance.collection('users'))
+                      .getOne(widget.id);
+                  _fetchPosts(() => postFeedRepository
+                      .getPostsByUserId(widget.id, includeHidden: false));
                 } else if (widget.type == "school") {
-                  _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-                  _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
+                  _schoolFuture =
+                      schoolUserRepository.findBySchoolId(widget.id);
+                  _fetchPosts(() => postFeedRepository
+                      .getPostsBySchoolId(widget.id, includeHidden: false));
                 }
               },
               () => onLike(post, index: index),
@@ -465,7 +466,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         image: DecorationImage(
           image: post.mediaUrls != null && post.mediaUrls!.isNotEmpty
               ? CachedNetworkImageProvider(post.mediaUrls!.first)
-              : const AssetImage("assets/images/image_placeholder.png") as ImageProvider,
+              : const AssetImage("assets/images/image_placeholder.png")
+                  as ImageProvider,
           fit: BoxFit.cover,
         ),
       ),
@@ -481,7 +483,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
     }
 
-    final initials = name != null ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase() : '';
+    final initials = name != null
+        ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        : '';
 
     return CircleAvatar(
       radius: 40,

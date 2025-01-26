@@ -7,10 +7,12 @@ import 'package:msb_app/utils/firestore_collections.dart';
 
 class PointsSystem {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static final SchoolUserRepository schoolUserRepository = SchoolUserRepository();
+  static final SchoolUserRepository schoolUserRepository =
+      SchoolUserRepository();
   static final PostFeedRepository postFeedRepository = PostFeedRepository();
 
-  static double getTotalScore({double? averagePoints = 0.0, int? studentCount = 0}) {
+  static double getTotalScore(
+      {double? averagePoints = 0.0, int? studentCount = 0}) {
     return (averagePoints ?? 0.0) * (studentCount ?? 0);
   }
 
@@ -24,7 +26,10 @@ class PointsSystem {
   }) async {
     try {
       // Fetch current user document
-      DocumentSnapshot userDoc = await _firestore.collection(FirestoreCollections.users).doc(userId).get();
+      DocumentSnapshot userDoc = await _firestore
+          .collection(FirestoreCollections.users)
+          .doc(userId)
+          .get();
 
       if (userDoc.exists) {
         MsbUser user = MsbUser.fromJson(userDoc.data() as Map<String, dynamic>);
@@ -45,7 +50,8 @@ class PointsSystem {
               List<int> quizGradeRange = _extractGradeRange(quizGrade);
 
               // Check if user's grade falls within the quiz grade range
-              if (userGradeInt >= quizGradeRange[0] && userGradeInt <= quizGradeRange[1]) {
+              if (userGradeInt >= quizGradeRange[0] &&
+                  userGradeInt <= quizGradeRange[1]) {
                 // Add points for each correct answer
                 if (correctAnswers != null) {
                   totalQuizPoints += correctAnswers;
@@ -74,10 +80,14 @@ class PointsSystem {
         }
 
         // Calculate total points
-        int totalPoints = totalPostPoints + (totalLikePoints * 2) + totalQuizPoints;
+        int totalPoints =
+            totalPostPoints + (totalLikePoints * 2) + totalQuizPoints;
 
         // Update the Firestore document
-        await _firestore.collection(FirestoreCollections.users).doc(userId).update({
+        await _firestore
+            .collection(FirestoreCollections.users)
+            .doc(userId)
+            .update({
           'totalPostPoints': totalPostPoints,
           'totalLikePoints': totalLikePoints,
           'totalQuizPoints': totalQuizPoints,
@@ -86,14 +96,19 @@ class PointsSystem {
 
         // Update the school average points
         if (user.schoolId != null && user.totalPoints != null) {
-          await schoolUserRepository.updateStudentPoints(user, totalPoints, pointType);
+          await schoolUserRepository.updateStudentPoints(
+              user, totalPoints, pointType);
         }
       } else {
         // If the document doesn't exist, create a new one with the provided points
-        await _firestore.collection(FirestoreCollections.users).doc(userId).set({
+        await _firestore
+            .collection(FirestoreCollections.users)
+            .doc(userId)
+            .set({
           'totalPostPoints': pointType == PointType.postSubmission ? 20 : 0,
           'totalLikePoints': pointType == PointType.postLike ? 1 : 0,
-          'totalQuizPoints': pointType == PointType.quiz ? (correctAnswers ?? 0) : 0,
+          'totalQuizPoints':
+              pointType == PointType.quiz ? (correctAnswers ?? 0) : 0,
           'totalPoints': (correctAnswers ?? 0) +
               (pointType == PointType.postSubmission ? 20 : 0) +
               (pointType == PointType.postLike ? 2 : 0) +
@@ -118,7 +133,8 @@ class PointsSystem {
     return parts.map((part) => int.parse(part.split(' ').last)).toList();
   }
 
-  static Future<void> initialUserPointsUpdate({required String userId, required var posts}) async {
+  static Future<void> initialUserPointsUpdate(
+      {required String userId, required var posts}) async {
     int totalPostPoints = 0;
     int totalLikePoints = 0;
     totalPostPoints = posts.length * 20;
@@ -128,14 +144,10 @@ class PointsSystem {
     }
     int totalPoints = totalPostPoints + (totalLikePoints * 2);
     // Update the Firestore document
-    try {
-      await _firestore.collection(FirestoreCollections.users).doc(userId).update({
-        'totalPostPoints': totalPostPoints,
-        'totalLikePoints': totalLikePoints,
-        'totalPoints': totalPoints,
-      });
-    } catch (e) {
-      print('Error updating points: $e');
-    }
+    await _firestore.collection(FirestoreCollections.users).doc(userId).update({
+      'totalPostPoints': totalPostPoints,
+      'totalLikePoints': totalLikePoints,
+      'totalPoints': totalPoints,
+    });
   }
 }

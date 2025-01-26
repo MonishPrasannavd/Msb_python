@@ -130,7 +130,7 @@ class _DashboardSetupState extends State<DashboardSetup> {
           currentIndex: _currentIndex,
           onTap: (index) {
             _onItemTapped(index);
-            // _pageController.jumpToPage(index);
+            _pageController.jumpToPage(index);
           },
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppColors.primary,

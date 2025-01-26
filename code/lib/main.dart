@@ -9,9 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
-import 'package:msb_app/providers/master/master_api_provider.dart';
-import 'package:msb_app/providers/master/master_provider.dart';
-import 'package:msb_app/providers/user_auth_provider.dart';
+import 'package:msb_app/providers/competitions_provider.dart';
+import 'package:msb_app/providers/user_data_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -34,14 +33,15 @@ void main() async {
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
   await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.debug, // Use debug for Android in development
+    androidProvider:
+        AndroidProvider.debug, // Use debug for Android in development
     appleProvider: AppleProvider.debug, // Use debug for iOS in development
   );
-  FirebaseFirestore.setLoggingEnabled(false);
 
   ///init Branch.io for deeplink.
   await FlutterBranchSdk.init();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
     runApp(MyApp(firestore: fireStore));
   });
 }
@@ -56,11 +56,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => UserAuthProvider()),
-
-        // master provider
-        ChangeNotifierProvider(create: (_) => MasterProvider()),
-        ChangeNotifierProvider(create: (_) => MasterApiProvider()),
+        ChangeNotifierProvider(create: (_) => UserDataProvider()),
+        ChangeNotifierProvider(create: (_) => CompetitionsProvider()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -84,17 +81,6 @@ class IsLoginCheckPage extends StatefulWidget {
 
 class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   StreamSubscription<Map>? streamSubscriptionDeepLink;
-  late MasterApiProvider _masterApiProvider;
-  late MasterProvider _masterProvider;
-
-  void fetchMaster() async {
-    var result = await _masterApiProvider.getMasterData();
-    print('result when fetching master data: $result');
-    _masterProvider.countries = result['countries'];
-    _masterProvider.states = result['states'];
-    _masterProvider.schools = result['schools'];
-    _masterProvider.grades = result['grades'];
-  }
 
   Future<void> checkAppVersion(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -107,7 +93,8 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
     if (savedVersion == null || savedVersion != currentVersion) {
       // App version has changed or no version is stored
       await prefs.clear(); // Clear all saved preferences (logs out the user)
-      await prefs.setString('app_version', currentVersion); // Save new app version
+      await prefs.setString(
+          'app_version', currentVersion); // Save new app version
       print("User logged out due to app update.");
     } else {
       print("App version is up-to-date.");
@@ -152,12 +139,6 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   void initState() {
     super.initState();
     listenDeepLinkData(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _masterApiProvider = Provider.of<MasterApiProvider>(context, listen: false);
-      _masterProvider = Provider.of<MasterProvider>(context, listen: false);
-
-      fetchMaster();
-    });
   }
 
   @override
@@ -181,7 +162,8 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PostDetailScreen(postId: postId, title: title, description: description),
+                builder: (context) => PostDetailScreen(
+                    postId: postId, title: title, description: description),
               ));
           // Navigator.pushReplacementNamed(navigatorKey.currentContext??context, '/home',  arguments: [false, postId]);
         }
