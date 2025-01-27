@@ -59,7 +59,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     super.dispose();
   }
 
-  void loadComments() async {
+  Future<void> loadComments() async {
     Map<String, dynamic> response = await _submissionApiProvider.getComments(widget.postId);
     List<Comment> comments = response['comments'];
     if (comments.isNotEmpty) {
@@ -142,6 +142,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     prefixIcon: const Text(""),
                     suffixIcon: IconButton(
                       onPressed: () async {
+                        await _submissionApiProvider.addComment(widget.postId, commentController.text);
                         // var fetchedUserId = await PrefsService.getUserId();
                         // var fetchedUserNameEmail = await PrefsService.getUserNameEmail();
                         // var commentRecord = CommentPost(

@@ -431,45 +431,48 @@ class _PublicTabState extends State<PublicTab> {
                         ],
                       ),
                     ),
-                    if(_submissionProvider.submissions.isNotEmpty)...[
-                      Expanded(
-                        child: ListView.separated(
-                          padding: EdgeInsets.zero,
-                          itemCount: _submissionProvider.submissions.length,
-                          itemBuilder: (context, index) {
-                            return PostUiUtilsV2.buildPostTile(
-                              context,
-                              index,
-                              _submissionProvider.submissions[index],
-                                  (postId) => CommentBottomSheet.show(
-                                context,
-                                postId: _submissionProvider.submissions[index].id!,
-                              ),
-                                  () => onLike(index: index),
-                              followUser: () => onFollow(
-                                index: index,
-                              ),
-                              writerUser: postUser[index].user,
-                              currentUser: user,
-                              onSchoolTap: (schoolId) {
-                                filter = PostFilter.other;
-                                customSchoolId = schoolId;
-                                customGrade = null;
-                                fetchUserPosts();
-                              },
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) {
-                            return const SizedBox(height: 15);
-                          },
-                        ),
-                      ),
+                    if (_submissionProvider.submissions.isNotEmpty) ...[
+                      Consumer<SubmissionProvider>(builder: (ctxt, provider, _) {
+                        return Expanded(
+                          child: ListView.separated(
+                            padding: EdgeInsets.zero,
+                            itemCount: _submissionProvider.submissions.length,
+                            itemBuilder: (context, index) {
+                              var post = _submissionProvider.submissions[index];
 
+                              return PostUiUtilsV2.buildPostTile(
+                                context,
+                                index,
+                                post,
+                                (postId) => CommentBottomSheet.show(
+                                  context,
+                                  postId: post.id!,
+                                ),
+                                () => onLike(index: index),
+                                followUser: () => onFollow(
+                                  index: index,
+                                ),
+                                // writerUser: postUser[index].user,
+                                currentUser: user,
+                                onSchoolTap: (schoolId) {
+                                  filter = PostFilter.other;
+                                  customSchoolId = schoolId;
+                                  customGrade = null;
+                                  fetchUserPosts();
+                                },
+                              );
+                            },
+                            separatorBuilder: (BuildContext context, int index) {
+                              return const SizedBox(height: 15);
+                            },
+                          ),
+                        );
+                      })
                     ] else ...[
                       Expanded(
                         child: Center(
                           child: Text(
-                            "No posts found",
+                            "Loading...",
                             style: GoogleFonts.poppins(
                               color: AppColors.black,
                               fontWeight: FontWeight.w500,
@@ -523,29 +526,19 @@ class _PublicTabState extends State<PublicTab> {
   }
 
   Future<void> onLike({required int index}) async {
-    final post = postUser[index].post;
-    final userHasLiked = post.likedBy.contains(userId);
-    final likes = List<String>.from(post.likedBy);
+    var post = _submissionProvider.submissions[index];
+    var user = post.user;
+    var userHasLiked = post.isLiked!;
 
-    setState(() {
-      postUser[index] = (
-        post: post.copyWith(
-          likedBy: userHasLiked
-              ? (likes..remove(userId))
-              : (likes
-                ..add(
-                  userId!,
-                )),
-        ),
-        user: postUser[index].user,
-      );
-    });
+    post.isLiked = !userHasLiked;
+    if(userHasLiked){
+      post.likesCount = post.likesCount! - 1;
+    } else {
+      post.likesCount = post.likesCount! + 1;
+    }
+    _submissionProvider.updateSubmission(post);
 
-    postFeedRepository.addLikedByForPost(
-      post.id!,
-      userId ?? '',
-      userHasLiked,
-    );
+    _submissionApiProvider.toggleLike(post.id!);
   }
 
   Future<void> onFollow({required int index}) async {

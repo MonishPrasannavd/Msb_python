@@ -15,4 +15,10 @@ class SubmissionProvider extends ChangeNotifier {
     _submissions.add(submission);
     notifyListeners();
   }
+
+  void updateSubmission(Submission submission) {
+    var retSubmission = _submissions.firstWhere((e) => e.id == submission.id);
+    _submissions[_submissions.indexOf(retSubmission)] = submission;
+    notifyListeners();
+  }
 }

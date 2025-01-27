@@ -179,7 +179,7 @@ class SubmissionApiProvider extends ChangeNotifier {
     Map<String, dynamic> result;
 
     notifyListeners();
-    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_COMMENTS}?submission_id=$submissionId&limit=$limit&page=$page");
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_COMMENTS}/$submissionId?limit=$limit&page=$page");
     try {
       var response = await get(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
