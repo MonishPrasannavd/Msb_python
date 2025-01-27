@@ -36,7 +36,7 @@ class PostUiUtilsV2 {
       BuildContext context,
       int index,
       Submission post,
-      Function(String) onCommentButtonPressed,
+      Function(int) onCommentButtonPressed,
       Function() onLike, {
         Widget? sideMenu,
         MsbUser? writerUser,
@@ -58,7 +58,7 @@ class PostUiUtilsV2 {
         Widget Function(
             BuildContext context,
             Submission post,
-            Function(String) onCommentButtonPressed,
+            Function(int) onCommentButtonPressed,
             Function() onLike, {
             MsbUser? writerUser,
             MsbUser? currentUser,
@@ -117,145 +117,6 @@ class PostUiUtilsV2 {
           );
   }
 
-  // Method to build the header section of the post (e.g., title, uploader, time)
-  static Widget buildPostFooterIndependent(
-    BuildContext context,
-    PostFeed post,
-    Function(String) onCommentButtonPressed,
-    Function() onLike, {
-    MsbUser? writerUser,
-    MsbUser? currentUser,
-    Function()? followUser,
-  }) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                /// liked by counter and toggle
-                GestureDetector(
-                  onTap: onLike,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: post.likedBy.contains(FirebaseAuth.instance.currentUser?.uid)
-                          ? AppColors.primary.withOpacity(0.2)
-                          : null,
-                      borderRadius: BorderRadius.circular(50.0),
-                      border: Border.all(
-                        color: const Color(0xFFCECACA),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            post.likedBy.contains(FirebaseAuth.instance.currentUser?.uid)
-                                ? "assets/svg/like.svg"
-                                : "assets/svg/unLike.svg",
-                            height: 15,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            post.likedBy.length.toString(),
-                            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // if (writerUser != null) ...[
-                //   const SizedBox(width: 10),
-                //   _buildIconText(
-                //     writerUser.follower.contains(currentUser?.id) ? Icons.person : Icons.person_outline,
-                //     writerUser.follower.length.toString(),
-                //     onClick: followUser,
-                //   ),
-                // ],
-
-                /// comments counter and bottomsheet
-                if (post.commentsEnabled) ...[
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      onCommentButtonPressed(post.id!); // Properly call the function when comment is pressed
-                    },
-                    child: _buildIconText(
-                      Icons.comment_outlined,
-                      post.comments.length.toString() ?? "0",
-                    ),
-                  ),
-                ],
-              ],
-            ),
-
-            // share
-            GestureDetector(
-              child: const Icon(Icons.share, color: AppColors.purple),
-              onTap: () {
-                if (post.id != null) {
-                  sharePost(postId: post.id!, post: post);
-                }
-              },
-            )
-          ],
-        ),
-
-        // 2 comments display
-        if (post.comments.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Ensures everything aligns to the left
-              children: post.comments.take(2).map(
-                (comment) {
-                  return Row(
-                    // Use Row to keep text inline and aligned
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Text(
-                            //   extractUserNameOrFirstName(comment.nameOrEmail) ?? "Anonymous",
-                            //   style: GoogleFonts.poppins(
-                            //     color: AppColors.black,
-                            //     fontWeight: FontWeight.w600,
-                            //     fontSize: 12,
-                            //   ),
-                            // ),
-                            // const SizedBox(height: 2), // Reduced spacing
-                            Text(
-                              comment.comment,
-                              style: GoogleFonts.poppins(
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 13,
-                              ),
-                            ),
-                            const SizedBox(height: 2), // Reduced spacing
-                            Text(
-                              DateFormat('d MMM y, hh:mm a').format(comment.createdAt),
-                              style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ).toList(),
-            ),
-          ),
-        ]
-      ],
-    );
-  }
 
   static Widget _buildPostHeader(
     BuildContext context,
@@ -662,7 +523,7 @@ class PostUiUtilsV2 {
   static Widget _buildPostFooter(
     BuildContext context,
     Submission post,
-    Function(String) onCommentButtonPressed,
+    Function(int) onCommentButtonPressed,
     Function() onLike, {
     MsbUser? writerUser,
     MsbUser? currentUser,
@@ -681,10 +542,9 @@ class PostUiUtilsV2 {
                   onTap: onLike,
                   child: Container(
                     decoration: BoxDecoration(
-                      // color: post.likedBy
-                      //     .contains(FirebaseAuth.instance.currentUser?.uid)
-                      //     ? AppColors.primary.withOpacity(0.2)
-                      //     : null,
+                      color: (post.isLiked != null && post.isLiked!)
+                          ? AppColors.primary.withOpacity(0.2)
+                          : null,
                       borderRadius: BorderRadius.circular(50.0),
                       border: Border.all(
                         color: const Color(0xFFCECACA),
@@ -695,11 +555,9 @@ class PostUiUtilsV2 {
                       child: Row(
                         children: [
                           SvgPicture.asset(
-                            "assets/svg/unLike.svg",
-                            // post.likedBy.contains(
-                            //     FirebaseAuth.instance.currentUser?.uid)
-                            //     ? "assets/svg/like.svg"
-                            //     : "assets/svg/unLike.svg",
+                            (post.isLiked != null && post.isLiked!)
+                                ? "assets/svg/like.svg"
+                                : "assets/svg/unLike.svg",
                             height: 15,
                           ),
                           const SizedBox(width: 5),
@@ -722,6 +580,16 @@ class PostUiUtilsV2 {
                 // ],
 
                 /// comments counter and bottomsheet
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () {
+                      onCommentButtonPressed(post.id!); // Properly call the function when comment is pressed
+                    },
+                    child: _buildIconText(
+                      Icons.comment_outlined,
+                      "0",
+                    ),
+                  ),
                 // if (post.commentsEnabled) ...[
                 //   const SizedBox(width: 10),
                 //   GestureDetector(

@@ -443,7 +443,7 @@ class _PublicTabState extends State<PublicTab> {
                               _submissionProvider.submissions[index],
                                   (postId) => CommentBottomSheet.show(
                                 context,
-                                postId: postId,
+                                postId: _submissionProvider.submissions[index].id!,
                               ),
                                   () => onLike(index: index),
                               followUser: () => onFollow(

@@ -94,9 +94,9 @@ class Submission {
         isLiked: isLiked ?? this.isLiked,
       );
 
-  factory Submission.fromJson(Map<String, dynamic> json) => _$SchoolFromJson(json);
+  factory Submission.fromJson(Map<String, dynamic> json) => _$SubmissionFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SchoolToJson(this);
+  Map<String, dynamic> toJson() => _$SubmissionToJson(this);
 }
 
 @JsonSerializable()

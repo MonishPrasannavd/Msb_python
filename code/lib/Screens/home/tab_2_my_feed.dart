@@ -179,63 +179,64 @@ class _MyFeedTabState extends State<MyFeedTab> {
                 padding: const EdgeInsets.only(top: 20),
                 itemCount: userPosts.length,
                 itemBuilder: (context, index) {
-                  return PostUiUtils.buildPostTile(
-                    context,
-                    index,
-                    userPosts[index],
-                    (postId) => CommentBottomSheet.show(
-                      context,
-                      postId: postId,
-                    ),
-                    () => onLike(userPosts[index], index: index),
-                    currentUser: user,
-                    sideMenu: Transform.rotate(
-                      angle: pi / 2,
-                      child: PopupMenuButton<String>(
-                        onSelected: (String item) {
-                          switch (item) {
-                            case 'showPost':
-                              {
-                                setState(() {
-                                  userPosts[index].isHidden =
-                                      !userPosts[index].isHidden;
-                                });
-                                postFeedRepository.toggleIsHidden(
-                                    userPosts[index].id.toString());
-                              }
-                              break;
-                            case 'toogleComment':
-                              {
-                                setState(() {
-                                  userPosts[index].commentsEnabled =
-                                      !userPosts[index].commentsEnabled;
-                                });
-                                postFeedRepository.toggleCommentsEnabled(
-                                    userPosts[index].id.toString());
-                              }
-                              break;
-                            default:
-                              break;
-                          }
-                        },
-                        itemBuilder: (BuildContext context) =>
-                            <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            value: 'showPost',
-                            child: Text(
-                              '${userPosts[index].isHidden ? 'Show Post' : 'Hide Post'}',
-                            ),
-                          ),
-                          PopupMenuItem<String>(
-                            value: 'toogleComment',
-                            child: Text(
-                              '${userPosts[index].commentsEnabled ? 'Hide Comment' : 'Show Comment'}',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return const SizedBox.shrink();
+                  // return PostUiUtils.buildPostTile(
+                  //   context,
+                  //   index,
+                  //   userPosts[index],
+                  //   (postId) => CommentBottomSheet.show(
+                  //     context,
+                  //     postId: postId,
+                  //   ),
+                  //   () => onLike(userPosts[index], index: index),
+                  //   currentUser: user,
+                  //   sideMenu: Transform.rotate(
+                  //     angle: pi / 2,
+                  //     child: PopupMenuButton<String>(
+                  //       onSelected: (String item) {
+                  //         switch (item) {
+                  //           case 'showPost':
+                  //             {
+                  //               setState(() {
+                  //                 userPosts[index].isHidden =
+                  //                     !userPosts[index].isHidden;
+                  //               });
+                  //               postFeedRepository.toggleIsHidden(
+                  //                   userPosts[index].id.toString());
+                  //             }
+                  //             break;
+                  //           case 'toogleComment':
+                  //             {
+                  //               setState(() {
+                  //                 userPosts[index].commentsEnabled =
+                  //                     !userPosts[index].commentsEnabled;
+                  //               });
+                  //               postFeedRepository.toggleCommentsEnabled(
+                  //                   userPosts[index].id.toString());
+                  //             }
+                  //             break;
+                  //           default:
+                  //             break;
+                  //         }
+                  //       },
+                  //       itemBuilder: (BuildContext context) =>
+                  //           <PopupMenuEntry<String>>[
+                  //         PopupMenuItem<String>(
+                  //           value: 'showPost',
+                  //           child: Text(
+                  //             '${userPosts[index].isHidden ? 'Show Post' : 'Hide Post'}',
+                  //           ),
+                  //         ),
+                  //         PopupMenuItem<String>(
+                  //           value: 'toogleComment',
+                  //           child: Text(
+                  //             '${userPosts[index].commentsEnabled ? 'Hide Comment' : 'Show Comment'}',
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // );
                 },
                 separatorBuilder: (BuildContext context, int index) {
                   return const SizedBox(height: 15);

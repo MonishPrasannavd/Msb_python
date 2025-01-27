@@ -6,7 +6,7 @@ part of 'submission.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Submission _$SchoolFromJson(Map<String, dynamic> json) => Submission(
+Submission _$SubmissionFromJson(Map<String, dynamic> json) => Submission(
       id: (json['id'] as num?)?.toInt(),
       categoryId: (json['category_id'] as num?)?.toInt(),
       subCategoryId: (json['sub_category_id'] as num?)?.toInt(),
@@ -31,7 +31,8 @@ Submission _$SchoolFromJson(Map<String, dynamic> json) => Submission(
       isLiked: json['is_liked'] as bool?,
     );
 
-Map<String, dynamic> _$SchoolToJson(Submission instance) => <String, dynamic>{
+Map<String, dynamic> _$SubmissionToJson(Submission instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'category_id': instance.categoryId,
       'sub_category_id': instance.subCategoryId,

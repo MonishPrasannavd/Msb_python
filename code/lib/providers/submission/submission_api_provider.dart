@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:msb_app/models/comment_v2.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/utils/api.dart';
 
@@ -183,10 +184,11 @@ class SubmissionApiProvider extends ChangeNotifier {
       var response = await get(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
+        List<Comment> comments = List.castFrom(encodedString['data']).map((e) => Comment.fromJson(e)).toList();
         // var user = MsbUser.fromJson(encodedString);
         notifyListeners();
         // result = {'status': true, 'message': 'Successful', 'user': user};
-        result = {'status': true, 'message': 'Successful', 'comments': encodedString['data']};
+        result = {'status': true, 'message': 'Successful', 'comments': comments};
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];
