@@ -91,4 +91,113 @@ class SubmissionApiProvider extends ChangeNotifier {
 
     return result;
   }
+
+  Future<Map<String, dynamic>> toggleLike(int submissionId) async {
+    Map<String, dynamic> result;
+
+    notifyListeners();
+
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.TOGGLE_LIKE}?submission_id=$submissionId");
+    try {
+      var response = await post(uri, headers: AppUrl.headers);
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        // var user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Successful'};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> addComment(int submissionId, String comment) async {
+    Map<String, dynamic> result;
+
+    notifyListeners();
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.ADD_COMMENT}?submission_id=$submissionId&comment=$comment");
+    try {
+      var response = await post(uri, headers: AppUrl.headers);
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        // var user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Successful'};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> removeComment(int submissionId, int commentId) async {
+    Map<String, dynamic> result;
+
+    notifyListeners();
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.REMOVE_COMMENT}?submission_id=$submissionId&comment_id=$commentId");
+    try {
+      var response = await post(uri, headers: AppUrl.headers);
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        // var user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Successful'};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> getComments(int submissionId, {int limit = 10, int? page= 1}) async {
+    Map<String, dynamic> result;
+
+    notifyListeners();
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_COMMENTS}?submission_id=$submissionId&limit=$limit&page=$page");
+    try {
+      var response = await get(uri, headers: AppUrl.headers);
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        // var user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Successful', 'comments': encodedString['data']};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
 }

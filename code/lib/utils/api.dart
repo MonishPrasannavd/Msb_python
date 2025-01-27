@@ -35,6 +35,10 @@ class AppUrl {
   static const String UPDATE_USER = '/auth/me/update-profile';
   static const String CREATE_SUBMISSION = "/submission/submissions";
   static const String GET_ALL_SUBMISSIONS = "/submission/all";
+  static const String TOGGLE_LIKE = "/auth/submissions/like";
+  static const String ADD_COMMENT = "/auth/submissions/comment";
+  static const String REMOVE_COMMENT = "/auth/submissions/comment/remove";
+  static const String GET_COMMENTS = "/submission/comments";
 
   /// Private headers map
   static final Map<String, String> _headers = {
