@@ -53,7 +53,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
 
   late UserAuthProvider _authProvider;
-  late UserProvider _userProvider;
   late SubmissionProvider _submissionProvider;
   late SubmissionApiProvider _submissionApiProvider;
 
@@ -73,7 +72,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
-      _userProvider = Provider.of<UserProvider>(context, listen: false);
       _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
       _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
 
@@ -85,11 +83,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void loadAllSubmissions() async {
     var response = await _submissionApiProvider.getAllSubmissions();
     _submissionProvider.submissions = response['submissions'] as List<Submission>;
-  }
-
-  Future<void> getUser() async {
-    var user = await _authProvider.getUser('51');
-    print('user: $user');
   }
 
   Future<void> loadUser() async {
