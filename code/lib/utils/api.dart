@@ -43,6 +43,7 @@ class AppUrl {
   static const String GET_COMMENTS = "/submission/comments";
 
   static const String DASHBOARD_USER = '/auth/student/dashboard';
+  static const String POST_FEED_ALL = '/submission/by_sub_category';
 
   /// Private headers map
   static final Map<String, String> _headers = {

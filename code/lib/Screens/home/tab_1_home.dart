@@ -86,11 +86,6 @@ class HomeTabState extends State<HomeTab> {
         totalSchoolsCounts = _dash.dashboardResponse.totalSchools ?? 0;
         topStudents = _dash.tsStudents!;
 
-        print("111111111111111 ${_dash.dbResponse}");
-        print("111111111111111 ${_dash.tsStudents}");
-        print("2222222222222222 ${_dash.ftCategories}");
-        print("3333333333333333 ${_dash.subCate}");
-
         setState(() {
           if (_dash.tsStudents!.isNotEmpty) {
             top3Students =
@@ -718,24 +713,16 @@ class HomeTabState extends State<HomeTab> {
                           child: Column(
                             children: [
                               Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: const RadialGradient(
-                                          colors: [Color(0xFFE1C7FA), AppColors.white30],
-                                          center: Alignment.bottomCenter,
-                                          radius: 1.0),
-                                      border: Border.all(color: const Color(0xFFE1C7FA), width: 5)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: CachedNetworkImage(
-                                      imageUrl: menuItem?.iconUrl ?? "",
-                                      placeholder: (context, url) =>
-                                      const Center(child: CircularProgressIndicator()),
-                                      errorWidget: (context, url, error) =>
-                                      const Center(child: Icon(Icons.error)),
-                                      fit: BoxFit.contain,
-                                    ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(0.0),
+                                  child: CachedNetworkImage(
+                                    imageUrl: menuItem?.iconUrl ?? "",
+
+                                    placeholder: (context, url) =>
+                                    const Center(child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) =>
+                                    const Center(child: Icon(Icons.error)),
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
