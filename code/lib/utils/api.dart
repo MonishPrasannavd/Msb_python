@@ -42,6 +42,8 @@ class AppUrl {
   static const String REMOVE_COMMENT = "/auth/submissions/comment/remove";
   static const String GET_COMMENTS = "/submission/comments";
 
+  static const String DASHBOARD_USER = '/auth/student/dashboard';
+
   /// Private headers map
   static final Map<String, String> _headers = {
     'accept': 'application/json',

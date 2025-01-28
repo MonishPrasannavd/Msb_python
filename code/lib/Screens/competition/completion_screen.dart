@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:msb_app/Screens/competition/post%20story/post_feed_screen.dart';
 import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
+import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/utils/post.dart';
 
 import '../../models/competition_data.dart';
@@ -17,9 +18,10 @@ import 'completion_details_list_screen.dart';
 
 class CompletionScreen extends StatefulWidget {
   String categoryName;
+  List<Subcategories>? subcategories;
   String? contentType;
 
-   CompletionScreen({required this.categoryName, required this.contentType, super.key});
+   CompletionScreen({required this.categoryName, required this.contentType, super.key, this.subcategories });
 
   @override
   State<CompletionScreen> createState() => _CompletionScreenState();
@@ -108,141 +110,119 @@ class _CompletionScreenState extends State<CompletionScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 18),
             ),
-            FutureBuilder<List<CompetitionType>?>(
-                future: _completionFuture,
-                builder: (context, completionSnapshot) {
-                  if (completionSnapshot.connectionState == ConnectionState.waiting) {
-                    return const Center (child: CircularProgressIndicator());
-                  } else if (completionSnapshot.hasError || completionSnapshot.data == null) {
-                    return Center(child: Text('Error loading user data', style: GoogleFonts.poppins(
-                        color: AppColors.primary,
-                        fontSize: 12),));
-                  }
-                return FutureBuilder<List<PostFeed>?>(
-                    future: _postsFuture,
-                    builder: (context, userSnapshot) {
-                      if (userSnapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (userSnapshot.hasError || userSnapshot.data == null) {
-                        return Center(child: Text('Error loading user data', style: GoogleFonts.poppins(
-                            color: AppColors.primary,
-                            fontSize: 12),));
-                      }
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.only(top: 10),
+            shrinkWrap: true,
+            //physics: const NeverScrollableScrollPhysics(),
+            itemCount: widget.subcategories?.length ?? 0,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  // next(index);
+                  PostUiUtils.videoControllers = {};
 
-                    return Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(top: 10),
-                        shrinkWrap: true,
-                        //physics: const NeverScrollableScrollPhysics(),
-                        itemCount: completionSnapshot.data?.length??0,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              // next(index);
-                              PostUiUtils.videoControllers = {};
-
-                              Navigator.of(context, rootNavigator: false).push(MaterialPageRoute(
-                                  builder: (_) => CompletionDetailsListScreen(categoryName: widget.categoryName,
-                                      postCompilation: index.toString(),
-                                      contentType: widget.contentType, postsFuture: getPostListForCompletionIndex(userSnapshot.data, index: index),)),
-                              ).then((value){
-                                fetchData();
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Container(
-                                height: 110,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3), // Shadow color
-                                      blurRadius: 6.0, // Softness of the shadow
-                                      offset: const Offset(0, 3), // Vertical offset
-                                    ),
-                                  ],// Card background color
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                      child: Text(
-                                        completionSnapshot.data![index].competitionNames,
-                                        style: GoogleFonts.poppins(
-                                          color: AppColors.black87,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "Total Submissions: ${getTotalSubmissionForCompletionIndex(userSnapshot.data, index: index)}",
-                                            style: GoogleFonts.poppins(
-                                              color: AppColors.black54,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          Text(
-                                            "Grade 10", // Hardcoded Grade 10
-                                            style: GoogleFonts.poppins(
-                                              color: AppColors.black54,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Container(
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFF003366), // Blue background for submission date row
-                                        borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(8.0),
-                                          bottomRight: Radius.circular(8.0),
-                                        ),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            "Submission Date: ${DateFormat('d MMM, y, hh:mm a').format(DateTime.parse(completionSnapshot.data![index].competitionLastDate))}",
-                                            style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          SvgPicture.asset(
-                                            "assets/svg/right.svg",
-                                            height: 20,
-                                            color: Colors.white, // Icon color matches the row background
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                  Navigator.of(context, rootNavigator: false).push(MaterialPageRoute(
+                      builder: (_) => CompletionDetailsListScreen(categoryName: widget.categoryName,
+                        postCompilation: index.toString(),
+                        contentType: widget.contentType,
+                        postsFuture: getPostListForCompletionIndex([], index: index),)),
+                        //todo: Add list of competition
+                        //postsFuture: getPostListForCompletionIndex(userSnapshot.data, index: index),)),
+                  ).then((value){
+                    fetchData();
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Container(
+                    height: 110,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3), // Shadow color
+                          blurRadius: 6.0, // Softness of the shadow
+                          offset: const Offset(0, 3), // Vertical offset
+                        ),
+                      ],// Card background color
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: Text(
+                            widget.subcategories?[index].name ?? "",
+                            style: GoogleFonts.poppins(
+                              color: AppColors.black87,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Total Submissions: ${getTotalSubmissionForCompletionIndex(null, index: index)}",
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.black54,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
                                 ),
                               ),
+                              Text(
+                                "Grade 10", // Hardcoded Grade 10
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.black54,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF003366), // Blue background for submission date row
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(8.0),
+                              bottomRight: Radius.circular(8.0),
                             ),
-                          );
-                        },
-                      ),
-                    );
-                  }
-                );
-              }
-            ),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Submission Date: ${DateFormat('d MMM, y, hh:mm a').format(DateTime.parse(DateTime.now().toString()))}",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              SvgPicture.asset(
+                                "assets/svg/right.svg",
+                                height: 20,
+                                color: Colors.white, // Icon color matches the row background
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
           ],
         )
       ),

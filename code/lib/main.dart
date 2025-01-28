@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
+import 'package:msb_app/providers/dash.dart';
 import 'package:msb_app/providers/master/master_api_provider.dart';
 import 'package:msb_app/providers/master/master_provider.dart';
+import 'package:msb_app/providers/student_dashboard_provider.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
@@ -63,10 +65,8 @@ class MyApp extends StatelessWidget {
         // master provider
         ChangeNotifierProvider(create: (_) => MasterProvider()),
         ChangeNotifierProvider(create: (_) => MasterApiProvider()),
-
-        // Submission Provider
-        ChangeNotifierProvider(create: (_) => SubmissionProvider()),
-        ChangeNotifierProvider(create: (_) => SubmissionApiProvider()),
+        ChangeNotifierProvider(create: (_) => StudentDashboardProvider()),
+        ChangeNotifierProvider(create: (_) => Dash()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,

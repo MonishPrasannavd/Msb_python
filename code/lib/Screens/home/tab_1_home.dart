@@ -1,17 +1,25 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:msb_app/Screens/competition/completion_screen.dart';
 import 'package:msb_app/Screens/competition/post%20story/post_feed_screen.dart';
 import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
 import 'package:msb_app/Screens/home/tab_3_public.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
 import 'package:msb_app/components/button_builder.dart';
+import 'package:msb_app/components/loading.dart';
 import 'package:msb_app/enums/post_feed_type.dart';
+import 'package:msb_app/models/dashboard.dart' as dashboard;
+import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/dash.dart';
+import 'package:msb_app/providers/student_dashboard_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
@@ -19,8 +27,7 @@ import 'package:msb_app/services/points_system.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
-import 'package:msb_app/utils/helpers.dart';
-import 'package:msb_app/utils/progress_dialog_utils.dart';
+import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -36,23 +43,66 @@ class HomeTabState extends State<HomeTab> {
   late UserRepository userRepository;
   int totalUsersCount = 0;
   int totalSchoolsCounts = 0;
-  List<MsbUser> topStudents = [];
-  List<MsbUser> top3Students = [];
-  List<MsbUser> remainingTopStudents = [];
+  List<TopScoreStudents> topStudents = [];
+  List<TopScoreStudents> top3Students = [];
+  List<TopScoreStudents> remainingTopStudents = [];
   late Future<void> _fetchDataFuture;
   double progress = 0.0;
   bool isFirstTimeLoading = false;
+
+  late StudentDashboardProvider studentDashboardProvider;
+  late Dash _dash;
 
   @override
   void initState() {
     super.initState();
     isFirstTimeLoading = true;
     schoolUserRepository = SchoolUserRepository();
-    userRepository = UserRepository(
-        usersCollection:
-            FirebaseFirestore.instance.collection(FirestoreCollections.users));
+    userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
 
     _fetchDataFuture = fetchData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
+      _dash = Provider.of<Dash>(context, listen: false);
+      getDashboard();
+    });
+  }
+
+  Future<void> getDashboard() async {
+    var dashboardData = await studentDashboardProvider.getStudentDashboard();
+    print('user dashboard: $dashboardData');
+    final Future<Map<String, dynamic>> successfulMessage = studentDashboardProvider.getStudentDashboard();
+
+    successfulMessage.then((response) {
+      if (response['status'] == true) {
+        dashboard.DashboardResponse dashboardData = response['data'];
+
+        Provider.of<Dash>(context, listen: false).setDash(dashboardData);
+        Provider.of<Dash>(context, listen: false).students(dashboardData.topScoreStudents ?? []);
+        Provider.of<Dash>(context, listen: false).category(dashboardData.futureCategories ?? []);
+
+        totalUsersCount = _dash.dashboardResponse.totalStudent ?? 0;
+        totalSchoolsCounts = _dash.dashboardResponse.totalSchools ?? 0;
+        topStudents = _dash.tsStudents!;
+
+        print("111111111111111 ${_dash.dbResponse}");
+        print("111111111111111 ${_dash.tsStudents}");
+        print("2222222222222222 ${_dash.ftCategories}");
+        print("3333333333333333 ${_dash.subCate}");
+
+        setState(() {
+          if (_dash.tsStudents!.isNotEmpty) {
+            top3Students =
+                topStudents.length >= 3 ? topStudents.sublist(0, 3) : topStudents.sublist(0, topStudents.length);
+            remainingTopStudents = topStudents.length > 3 ? topStudents.sublist(3) : [];
+          } else {
+            top3Students = [];
+            remainingTopStudents = [];
+          }
+        });
+      }
+    });
   }
 
   void refetchData() {
@@ -65,7 +115,7 @@ class HomeTabState extends State<HomeTab> {
     await fetchSchoolsData();
     await fetchUsersData();
     //if (isFirstTimeLoading) {
-    fetchUsersPostsData();
+    //fetchUsersPostsData();
     //   isFirstTimeLoading = false;
     // }
     setState(() {
@@ -73,12 +123,12 @@ class HomeTabState extends State<HomeTab> {
     });
   }
 
-  Future<void> fetchUsersPostsData() async {
+  /*Future<void> fetchUsersPostsData() async {
     for (var student in topStudents) {
       var posts = await postRepository.getPostsByUserId(student.id!);
       PointsSystem.initialUserPointsUpdate(userId: student.id!, posts: posts);
     }
-  }
+  }*/
 
   Future<void> fetchSchoolsData() async {
     var fetchedSchoolsCount = await schoolUserRepository.getTotalSchoolCount();
@@ -95,34 +145,12 @@ class HomeTabState extends State<HomeTab> {
     });
     var fetchedTopUsers = await userRepository.getTopUsersByPoints();
     setState(() {
-      totalUsersCount = fetchedTotalCount;
-      topStudents = fetchedTopUsers;
-      if (topStudents.isNotEmpty) {
-        // Check if topStudents has at least 3 students
-        top3Students = topStudents.length >= 3
-            ? topStudents.sublist(0, 3)
-            : topStudents.sublist(0, topStudents.length);
-
-        // Handle remaining students if there are more than 3
-        remainingTopStudents =
-            topStudents.length > 3 ? topStudents.sublist(3) : [];
-      } else {
-        // If topStudents is empty, assign empty lists
-        top3Students = [];
-        remainingTopStudents = [];
-      }
       progress = 0.83;
     });
   }
 
   // List of moods
-  final List<String> moods = [
-    'Terrible',
-    'Bad',
-    'Neutral',
-    'Good',
-    'Excellent'
-  ];
+  final List<String> moods = ['Terrible', 'Bad', 'Neutral', 'Good', 'Excellent'];
 
   String? updateMood = "";
   int _currentIndex = 0;
@@ -151,28 +179,17 @@ class HomeTabState extends State<HomeTab> {
     const Color(0xFF1C8727),
   ];
 
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "title": "Dance",
-      "icon": 'assets/images/trending.png',
-      "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
-    },
-    {
-      "title": "Art & Crafts",
-      "icon": 'assets/images/art.png',
-      "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
-    },
-    {
-      "title": "Quiz",
-      "icon": 'assets/images/quiz.png',
-      "route": const QuizScreen()
-    },
-    {
-      "title": "Story Telling",
-      "icon": 'assets/images/story.png',
-      "route": PostFeeds("Story Telling", contentType: PostFeedType.image.value)
-    },
-  ];
+  // void _handleRedirection(int id){
+  //   if(id == 1 ){
+  //     PostFeeds("Dance", contentType: PostFeedType.video.value);
+  //   }else if(id ==2){
+  //     PostFeeds("Art & Crafts", contentType: PostFeedType.image.value);
+  //   }else if(id ==3 ){
+  //     const QuizScreen();
+  //   }else {
+  //     PostFeeds("Story Telling", contentType: PostFeedType.image.value);
+  //   }
+  // }
   final List<Map<String, String>> slides = [
     {
       "title": "GET READY FOR ACADEMIC YEAR",
@@ -200,16 +217,14 @@ class HomeTabState extends State<HomeTab> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            width: _currentIndex == entry.key
-                ? 20.0
-                : 8.0, // Longer width for active indicator
-            height: 8.0, // Fixed height for capsule shape
+            width: _currentIndex == entry.key ? 20.0 : 8.0,
+            // Longer width for active indicator
+            height: 8.0,
+            // Fixed height for capsule shape
             margin: const EdgeInsets.symmetric(horizontal: 4.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0), // Capsule shape
-              color: _currentIndex == entry.key
-                  ? Colors.grey
-                  : Colors.grey.shade400,
+              color: _currentIndex == entry.key ? Colors.grey : Colors.grey.shade400,
             ),
           ),
         );
@@ -233,7 +248,8 @@ class HomeTabState extends State<HomeTab> {
               },
               options: CarouselOptions(
                 autoPlay: true,
-                height: 250, // Adjust for better visibility
+                height: 250,
+                // Adjust for better visibility
                 viewportFraction: 1.0,
                 enlargeCenterPage: true,
                 onPageChanged: (index, reason) {
@@ -253,26 +269,18 @@ class HomeTabState extends State<HomeTab> {
                   children: [
                     TextSpan(
                       text: 'I\'m Feeling ',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
                       text: moods[_selectedMood], // Display the selected mood
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors
-                                    .msbMain500, // Highlight the mood in purple
-                              ),
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.msbMain500, // Highlight the mood in purple
+                          ),
                     ),
                     TextSpan(
                       text: ' Today',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -366,23 +374,17 @@ class HomeTabState extends State<HomeTab> {
                               width: query.width,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12.0),
-                                  image: const DecorationImage(
-                                      image: AssetImage(
-                                          "assets/images/back.png"))),
+                                  image: const DecorationImage(image: AssetImage("assets/images/back.png"))),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(totalSchoolsCounts.toString(),
                                       style: GoogleFonts.poppins(
-                                          color: const Color(0xFF540D96),
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 24)),
+                                          color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 24)),
                                   Text("Total Schools",
                                       style: GoogleFonts.poppins(
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16)),
+                                          color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
                                 ],
                               ),
                             ),
@@ -394,23 +396,17 @@ class HomeTabState extends State<HomeTab> {
                               width: query.width,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12.0),
-                                  image: const DecorationImage(
-                                      image: AssetImage(
-                                          "assets/images/back.png"))),
+                                  image: const DecorationImage(image: AssetImage("assets/images/back.png"))),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(totalUsersCount.toString(),
                                       style: GoogleFonts.poppins(
-                                          color: const Color(0xFF540D96),
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 24)),
+                                          color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 24)),
                                   Text("Total Students",
                                       style: GoogleFonts.poppins(
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16)),
+                                          color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
                                 ],
                               ),
                             ),
@@ -427,23 +423,17 @@ class HomeTabState extends State<HomeTab> {
                       text: TextSpan(
                         text: "Our ",
                         style: GoogleFonts.poppins(
-                            color: const Color(0xFF212121),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 22),
+                            color: const Color(0xFF212121), fontWeight: FontWeight.w600, fontSize: 22),
                         children: [
                           TextSpan(
                             text: "Top 10  ",
                             style: GoogleFonts.poppins(
-                                color: const Color(0xFF540D96),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 22),
+                                color: const Color(0xFF540D96), fontWeight: FontWeight.w600, fontSize: 22),
                           ),
                           TextSpan(
                             text: "Leader Board",
                             style: GoogleFonts.poppins(
-                                color: const Color(0xFF212121),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 22),
+                                color: const Color(0xFF212121), fontWeight: FontWeight.w600, fontSize: 22),
                           ),
                         ],
                       ),
@@ -458,11 +448,9 @@ class HomeTabState extends State<HomeTab> {
                         itemCount: top3Students.length,
                         itemBuilder: (context, index) {
                           var student = top3Students[index];
-                          bool isOdd =
-                              index % 2 != 0; // Corrected logic for odd-even
+                          bool isOdd = index % 2 != 0; // Corrected logic for odd-even
                           var backgroundColor = colors[index % colors.length];
-                          var borderColor =
-                              colorsBorder[index % colorsBorder.length];
+                          var borderColor = colorsBorder[index % colorsBorder.length];
 
                           return Padding(
                             padding: const EdgeInsets.all(5.0),
@@ -472,8 +460,7 @@ class HomeTabState extends State<HomeTab> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        UserProfileScreen(id: student.id!),
+                                    builder: (context) => UserProfileScreen(id: student.id.toString()),
                                   ),
                                 ).then((val) => refetchData());
                               },
@@ -483,14 +470,10 @@ class HomeTabState extends State<HomeTab> {
                                   color: backgroundColor,
                                   borderRadius: BorderRadius.only(
                                     // Correctly alternate shapes based on isOdd condition
-                                    topRight:
-                                        Radius.circular(isOdd ? 60.0 : 12.0),
-                                    topLeft:
-                                        Radius.circular(isOdd ? 12.0 : 60.0),
-                                    bottomLeft:
-                                        Radius.circular(isOdd ? 12.0 : 60.0),
-                                    bottomRight:
-                                        Radius.circular(isOdd ? 60.0 : 12.0),
+                                    topRight: Radius.circular(isOdd ? 60.0 : 12.0),
+                                    topLeft: Radius.circular(isOdd ? 12.0 : 60.0),
+                                    bottomLeft: Radius.circular(isOdd ? 12.0 : 60.0),
+                                    bottomRight: Radius.circular(isOdd ? 60.0 : 12.0),
                                   ),
                                 ),
                                 child: Row(
@@ -499,19 +482,15 @@ class HomeTabState extends State<HomeTab> {
                                     if (isOdd) ...[
                                       // Profile image appears on the right for odd indexes
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7, // Adjust width as needed
+                                            width: MediaQuery.of(context).size.width * 0.7, // Adjust width as needed
                                             child: FittedBox(
                                               alignment: Alignment.centerLeft,
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                "${index + 1}. ${student.name ?? "Anonymous"}",
+                                                "${index + 1}. ${student.user!.name ?? "Anonymous"}",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -522,16 +501,12 @@ class HomeTabState extends State<HomeTab> {
                                           ),
                                           const SizedBox(height: 4),
                                           SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7, // Adjust width as needed
+                                            width: MediaQuery.of(context).size.width * 0.7, // Adjust width as needed
                                             child: FittedBox(
                                               alignment: Alignment.centerLeft,
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                student.schoolName ??
-                                                    "Unknown School",
+                                                student.city ?? "Unknown School",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white70,
                                                   fontWeight: FontWeight.w400,
@@ -542,7 +517,7 @@ class HomeTabState extends State<HomeTab> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            "Score: ${student.totalPoints}",
+                                            "Score: ${student.points}",
                                             style: GoogleFonts.poppins(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -555,19 +530,13 @@ class HomeTabState extends State<HomeTab> {
                                       Container(
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: borderColor, width: 5),
+                                          border: Border.all(color: borderColor, width: 5),
                                         ),
                                         child: CircleAvatar(
                                           radius: 30,
-                                          backgroundImage: student
-                                                      .profileImageUrl !=
-                                                  null
-                                              ? NetworkImage(
-                                                  student.profileImageUrl!)
-                                              : const AssetImage(
-                                                      'assets/images/profile1.png')
-                                                  as ImageProvider,
+                                          backgroundImage: student.user!.imageUrl != null
+                                              ? NetworkImage(student.user!.imageUrl!)
+                                              : const AssetImage('assets/images/profile1.png') as ImageProvider,
                                         ),
                                       ),
                                     ] else ...[
@@ -575,36 +544,26 @@ class HomeTabState extends State<HomeTab> {
                                       Container(
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: borderColor, width: 5),
+                                          border: Border.all(color: borderColor, width: 5),
                                         ),
                                         child: CircleAvatar(
                                           radius: 30,
-                                          backgroundImage: student
-                                                      .profileImageUrl !=
-                                                  null
-                                              ? NetworkImage(
-                                                  student.profileImageUrl!)
-                                              : const AssetImage(
-                                                      'assets/images/profile1.png')
-                                                  as ImageProvider,
+                                          backgroundImage: student.user!.imageUrl != null
+                                              ? NetworkImage(student.user!.imageUrl!)
+                                              : const AssetImage('assets/images/profile1.png') as ImageProvider,
                                         ),
                                       ),
                                       const Spacer(),
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
                                           SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7, // Adjust width as needed
+                                            width: MediaQuery.of(context).size.width * 0.7, // Adjust width as needed
                                             child: FittedBox(
                                               alignment: Alignment.centerLeft,
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                "${index + 1}. ${student.name ?? "Anonymous"}",
+                                                "${index + 1}. ${student.user!.name ?? "Anonymous"}",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -615,16 +574,12 @@ class HomeTabState extends State<HomeTab> {
                                           ),
                                           const SizedBox(height: 4),
                                           SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7, // Adjust width as needed
+                                            width: MediaQuery.of(context).size.width * 0.7, // Adjust width as needed
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               alignment: Alignment.centerRight,
                                               child: Text(
-                                                student.schoolName ??
-                                                    "Unknown School",
+                                                student.schoolId.toString() ?? "Unknown School",
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white70,
                                                   fontWeight: FontWeight.w400,
@@ -635,7 +590,7 @@ class HomeTabState extends State<HomeTab> {
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
-                                            "Score: ${student.totalPoints}",
+                                            "Score: ${student.points}",
                                             style: GoogleFonts.poppins(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -664,42 +619,33 @@ class HomeTabState extends State<HomeTab> {
                         itemCount: remainingTopStudents.length,
                         itemBuilder: (context, index) {
                           var student = remainingTopStudents[index];
-                          var currentIncrement =
-                              top3Students.length + index + 1;
+                          var currentIncrement = top3Students.length + index + 1;
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        UserProfileScreen(id: student.id!),
+                                    builder: (context) => UserProfileScreen(id: student.id.toString()),
                                   )).then((val) => refetchData());
                             },
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
                               child: Container(
                                 height: 60,
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8.0),
-                                    border: Border.all(
-                                        width: 2,
-                                        color: const Color(0xFFCECACA))),
+                                    border: Border.all(width: 2, color: const Color(0xFFCECACA))),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 18.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
                                   child: Row(
                                     children: [
-                                      Text(
-                                          "$currentIncrement. ${student.name ?? "Anonymous"}",
+                                      Text("$currentIncrement. ${student.user!.name ?? "Anonymous"}",
                                           style: GoogleFonts.poppins(
                                               color: const Color(0xFF151414),
                                               fontWeight: FontWeight.w500,
                                               fontSize: 16)),
                                       const Spacer(),
-                                      Text(
-                                          student.totalPoints?.toString() ??
-                                              "0",
+                                      Text(student.points?.toString() ?? "0",
                                           style: GoogleFonts.poppins(
                                               color: const Color(0xFF6A6262),
                                               fontWeight: FontWeight.w400,
@@ -731,17 +677,12 @@ class HomeTabState extends State<HomeTab> {
             RichText(
               text: TextSpan(
                 text: "Showcase ",
-                style: GoogleFonts.poppins(
-                    color: const Color(0xFF212121),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 22),
+                style: GoogleFonts.poppins(color: const Color(0xFF212121), fontWeight: FontWeight.w600, fontSize: 22),
                 children: [
                   TextSpan(
                     text: "your talents in",
-                    style: GoogleFonts.poppins(
-                        color: const Color(0xFF540D96),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 22),
+                    style:
+                        GoogleFonts.poppins(color: const Color(0xFF540D96), fontWeight: FontWeight.w600, fontSize: 22),
                   ),
                 ],
               ),
@@ -750,58 +691,64 @@ class HomeTabState extends State<HomeTab> {
             // carousel
             SizedBox(
               height: query.height / 8,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: menuItems.length,
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                itemBuilder: (BuildContext context, int index) {
-                  final menuItem = menuItems[index];
-                  return GestureDetector(
-                    onTap: () {
-                      //callNextScreen(context, const QuizScreen());
-                      Navigator.of(context, rootNavigator: false).push(
-                        MaterialPageRoute(builder: (_) => menuItem["route"]),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Column(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: const RadialGradient(
-                                        colors: [
-                                          Color(0xFFE1C7FA),
-                                          AppColors.white30
-                                        ],
-                                        center: Alignment.bottomCenter,
-                                        radius: 1.0),
-                                    border: Border.all(
-                                        color: const Color(0xFFE1C7FA),
-                                        width: 5)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Image.asset(
-                                    menuItem['icon'],
+              child: ChangeNotifierProvider.value(
+                value: studentDashboardProvider,
+                child: Consumer<StudentDashboardProvider>(builder: (context, value, child) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: (value.dashboardCategoryList?.length ?? 0),
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    itemBuilder: (BuildContext context, int index) {
+                      final FutureCategories? menuItem = value.dashboardCategoryList?[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CompletionScreen(
+                                  subcategories: menuItem?.subcategories,
+                                  categoryName: menuItem?.name ?? "",
+                                  contentType: 'menuItem["route"]',
+                                ),
+                              ));
+                        },
+                        child:Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: const RadialGradient(
+                                          colors: [Color(0xFFE1C7FA), AppColors.white30],
+                                          center: Alignment.bottomCenter,
+                                          radius: 1.0),
+                                      border: Border.all(color: const Color(0xFFE1C7FA), width: 5)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: CachedNetworkImage(
+                                      imageUrl: menuItem?.iconUrl ?? "",
+                                      placeholder: (context, url) =>
+                                      const Center(child: CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) =>
+                                      const Center(child: Icon(Icons.error)),
+                                      fit: BoxFit.contain,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Text(menuItem['title'],
-                                style: GoogleFonts.poppins(
-                                    color: AppColors.black,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14)),
-                          ],
+                              Text(menuItem?.name ?? "",
+                                  style: GoogleFonts.poppins(
+                                      color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14)),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 5),
-                      ],
-                    ),
+                      );
+                    },
                   );
-                },
+                }),
               ),
             ),
             const SizedBox(height: 5),
@@ -818,14 +765,10 @@ class HomeTabState extends State<HomeTab> {
                       ));
                 },
                 style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(AppColors.primary),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0)))),
-                textStyle: GoogleFonts.poppins(
-                    color: AppColors.white,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16)),
+                    backgroundColor: MaterialStateProperty.all(AppColors.primary),
+                    shape:
+                        MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)))),
+                textStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16)),
             const SizedBox(height: 15),
           ],
         ),
@@ -856,8 +799,7 @@ class HomeTabState extends State<HomeTab> {
   Widget getUserImage(String? profileImageUrl) {
     return CircleAvatar(
       radius: 40, // Radius of the circle
-      backgroundColor:
-          Colors.transparent, // Transparent background to focus on the image
+      backgroundColor: Colors.transparent, // Transparent background to focus on the image
       child: ClipOval(
         child: Container(
           decoration: BoxDecoration(
@@ -912,16 +854,12 @@ class HomeTabState extends State<HomeTab> {
           LayoutBuilder(
             builder: (context, constraints) {
               return Container(
-                width: constraints.maxWidth *
-                    progress, // Adjust the width based on progress
+                width: constraints.maxWidth * progress, // Adjust the width based on progress
                 height: 12, // Height of the progress bar
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10), // Rounded corners
                   gradient: const LinearGradient(
-                    colors: [
-                      Colors.greenAccent,
-                      Colors.blueAccent
-                    ], // Gradient from green to blue
+                    colors: [Colors.greenAccent, Colors.blueAccent], // Gradient from green to blue
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -951,8 +889,6 @@ class HomeTabState extends State<HomeTab> {
   }
 
   Color _getMoodColor(int index) {
-    return _selectedMood == index
-        ? AppColors.msbMain500
-        : AppColors.transparent;
+    return _selectedMood == index ? AppColors.msbMain500 : AppColors.transparent;
   }
 }
