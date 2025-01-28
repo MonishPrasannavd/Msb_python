@@ -395,7 +395,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                   child: ButtonBuilder(
                                     text: 'My entries',
                                     onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => UserProfileScreen(id: userId!),
+                                      builder: (context) => UserProfileScreen(id: _userProvider.user.user!.id.toString()),
                                     ))
                                     // .then((val) async => await loadUserProfile()),
                                     ,
