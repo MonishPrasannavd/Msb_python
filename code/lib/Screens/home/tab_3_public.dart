@@ -9,11 +9,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/school_user.dart';
+import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
+import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/post.dart';
+import 'package:msb_app/utils/post_v2.dart';
+import 'package:provider/provider.dart';
 
 import '../../enums/post_feed_type.dart';
 import '../../models/comment.dart';
@@ -50,9 +55,10 @@ class _PublicTabState extends State<PublicTab> {
   late UserRepository userRepository;
   List<CommentPost> commentList = [];
 
-  CollectionReference collectionReference =
-      FirebaseFirestore.instance.collection(FirestoreCollections.comments);
+  CollectionReference collectionReference = FirebaseFirestore.instance.collection(FirestoreCollections.comments);
   late PostFeedRepository postFeedRepository;
+  late SubmissionProvider _submissionProvider;
+  late SubmissionApiProvider _submissionApiProvider;
 
   bool isSwitched = false;
   MsbUser? user;
@@ -73,6 +79,11 @@ class _PublicTabState extends State<PublicTab> {
       fetchUserPosts(); // Fetch posts once userId is available
       user = await userRepository.getOne(userId!);
     }
+  }
+
+  Future<void> loadAllSubmissions() async {
+    var response = await _submissionApiProvider.getAllSubmissions();
+    _submissionProvider.submissions = response['submissions'] as List<Submission>;
   }
 
   String? customSchoolId;
@@ -112,14 +123,20 @@ class _PublicTabState extends State<PublicTab> {
   void initState() {
     super.initState();
     loadUserId();
-    commentRepository =
-        CommentRepository(commentCollection: collectionReference);
+    commentRepository = CommentRepository(commentCollection: collectionReference);
     postFeedRepository = PostFeedRepository();
     schoolUserRepository = SchoolUserRepository();
-    userRepository = UserRepository(
-        usersCollection: FirebaseFirestore.instance.collection('users'));
+    userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'));
 
     fetchSchool();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+      _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+
+      // getUser();
+      loadAllSubmissions();
+    });
   }
 
   List<SchoolUser> schoolList = [];
@@ -134,18 +151,14 @@ class _PublicTabState extends State<PublicTab> {
     return showModalBottomSheet(
         context: context,
         builder: (builder) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
+          return StatefulBuilder(builder: (BuildContext context, StateSetter setModalState) {
             return SingleChildScrollView(
               child: Container(
                   decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          topRight: Radius.circular(10.0))),
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0))),
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 16.0, right: 16.0, top: 10, bottom: 0),
+                    padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 10, bottom: 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -155,15 +168,12 @@ class _PublicTabState extends State<PublicTab> {
                               Container(
                                 height: 4,
                                 width: 50,
-                                decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0)),
+                                decoration:
+                                    BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(15.0)),
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                customSchoolId == null
-                                    ? "Select School"
-                                    : "Select Class",
+                                customSchoolId == null ? "Select School" : "Select Class",
                                 style: GoogleFonts.poppins(
                                   color: AppColors.black,
                                   fontWeight: FontWeight.w500,
@@ -178,10 +188,8 @@ class _PublicTabState extends State<PublicTab> {
                           height: 280,
                           child: ListView.separated(
                             shrinkWrap: true,
-                            itemCount:
-                                customSchoolId == null ? schoolList.length : 13,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(
+                            itemCount: customSchoolId == null ? schoolList.length : 13,
+                            separatorBuilder: (context, index) => const SizedBox(
                               height: 10,
                             ),
                             itemBuilder: (context, index) {
@@ -298,11 +306,7 @@ class _PublicTabState extends State<PublicTab> {
       "icon": 'assets/images/art.png',
       "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
     },
-    {
-      "title": "Quiz",
-      "icon": 'assets/images/quiz.png',
-      "route": const QuizScreen()
-    },
+    {"title": "Quiz", "icon": 'assets/images/quiz.png', "route": const QuizScreen()},
     {
       "title": "Painting",
       "icon": 'assets/images/painting.png',
@@ -343,75 +347,6 @@ class _PublicTabState extends State<PublicTab> {
         padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
         child: Column(
           children: [
-            // Card(
-            //   elevation: 5,
-            //   child: Container(
-            //     width: query.width,
-            //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.0)),
-            //     child: Padding(
-            //       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 5),
-            //       child: Column(
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: [
-            //           Text("🔥 trending",
-            //               style:
-            //                   GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
-            //           const SizedBox(height: 10),
-            //           SizedBox(
-            //             height: query.height * 0.15,
-            //             child: ListView.builder(
-            //                 scrollDirection: Axis.horizontal,
-            //                 itemCount: menuItems.length,
-            //                 itemBuilder: (context, index) {
-            //                   final menuItem = menuItems[index];
-            //                   return Padding(
-            //                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            //                     child: GestureDetector(
-            //                       onTap: () {
-            //                         Navigator.of(context, rootNavigator: false).push(
-            //                           MaterialPageRoute(
-            //                             builder: (_) => menuItem["route"],
-            //                           ),
-            //                         );
-            //                       },
-            //                       child: Column(
-            //                         children: [
-            //                           Container(
-            //                             height: query.height / 9,
-            //                             decoration: BoxDecoration(
-            //                                 shape: BoxShape.circle,
-            //                                 // Circular container
-            //                                 gradient: const RadialGradient(
-            //                                   colors: [
-            //                                     Color(0xFFE1C7FA),
-            //                                     AppColors.white30,
-            //                                   ],
-            //                                   center: Alignment.bottomCenter,
-            //                                   radius: 1.0,
-            //                                 ),
-            //                                 border: Border.all(color: const Color(0xFFE1C7FA), width: 5)),
-            //                             child: Padding(
-            //                               padding: const EdgeInsets.all(25.0),
-            //                               child: Image.asset(menuItem['icon']),
-            //                             ),
-            //                           ),
-            //                           const SizedBox(height: 10),
-            //                           Text(
-            //                             menuItem['title'],
-            //                             style: GoogleFonts.poppins(
-            //                                 color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16),
-            //                           )
-            //                         ],
-            //                       ),
-            //                     ),
-            //                   );
-            //                 }),
-            //           )
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -428,8 +363,7 @@ class _PublicTabState extends State<PublicTab> {
                             child: FlexibleText(
                               text: switch (filter) {
                                 PostFilter.myClass => "Class ${user?.grade}",
-                                PostFilter.mySchool =>
-                                  "${user?.schoolName?.split(',').first}",
+                                PostFilter.mySchool => "${user?.schoolName?.split(',').first}",
                                 PostFilter.other =>
                                   '${schoolList.firstWhereOrNull((e) => e.schoolId == customSchoolId)?.schoolName?.split(',').first}${[
                                     '0',
@@ -461,21 +395,16 @@ class _PublicTabState extends State<PublicTab> {
                               return PostFilter.values.map((PostFilter choice) {
                                 return PopupMenuItem<PostFilter>(
                                   value: choice,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 7),
+                                  padding: const EdgeInsets.symmetric(horizontal: 7),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 2.0),
+                                    padding: const EdgeInsets.symmetric(vertical: 2.0),
                                     child: Container(
                                       width: query.width,
                                       height: 50,
                                       decoration: BoxDecoration(
                                         color: AppColors.white,
-                                        border: Border.all(
-                                            color: const Color(0xFFE2DFDF),
-                                            width: 1),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
+                                        border: Border.all(color: const Color(0xFFE2DFDF), width: 1),
+                                        borderRadius: BorderRadius.circular(8.0),
                                       ),
                                       child: Row(
                                         children: [
@@ -483,9 +412,7 @@ class _PublicTabState extends State<PublicTab> {
                                           Text(
                                             choice.name
                                                 .split(RegExp(r'(?=[A-Z])'))
-                                                .map((e) =>
-                                                    e[0].toUpperCase() +
-                                                    e.substring(1))
+                                                .map((e) => e[0].toUpperCase() + e.substring(1))
                                                 .join(' '),
                                             style: GoogleFonts.poppins(
                                               color: AppColors.black,
@@ -504,38 +431,90 @@ class _PublicTabState extends State<PublicTab> {
                         ],
                       ),
                     ),
-                    Expanded(
-                      child: ListView.separated(
-                        padding: EdgeInsets.zero,
-                        itemCount: postUser.length,
-                        itemBuilder: (context, index) {
-                          return PostUiUtils.buildPostTile(
-                            context,
-                            index,
-                            postUser[index].post,
-                            (postId) => CommentBottomSheet.show(
-                              context,
-                              postId: postId,
-                            ),
-                            () => onLike(index: index),
-                            followUser: () => onFollow(
-                              index: index,
-                            ),
-                            writerUser: postUser[index].user,
-                            currentUser: user,
-                            onSchoolTap: (schoolId) {
-                              filter = PostFilter.other;
-                              customSchoolId = schoolId;
-                              customGrade = null;
-                              fetchUserPosts();
+                    if (_submissionProvider.submissions.isNotEmpty) ...[
+                      Consumer<SubmissionProvider>(builder: (ctxt, provider, _) {
+                        return Expanded(
+                          child: ListView.separated(
+                            padding: EdgeInsets.zero,
+                            itemCount: _submissionProvider.submissions.length,
+                            itemBuilder: (context, index) {
+                              var post = _submissionProvider.submissions[index];
+
+                              return PostUiUtilsV2.buildPostTile(
+                                context,
+                                index,
+                                post,
+                                (postId) => CommentBottomSheet.show(
+                                  context,
+                                  postId: post.id!,
+                                ),
+                                () => onLike(index: index),
+                                followUser: () => onFollow(
+                                  index: index,
+                                ),
+                                // writerUser: postUser[index].user,
+                                currentUser: user,
+                                onSchoolTap: (schoolId) {
+                                  filter = PostFilter.other;
+                                  customSchoolId = schoolId;
+                                  customGrade = null;
+                                  fetchUserPosts();
+                                },
+                              );
                             },
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const SizedBox(height: 15);
-                        },
+                            separatorBuilder: (BuildContext context, int index) {
+                              return const SizedBox(height: 15);
+                            },
+                          ),
+                        );
+                      })
+                    ] else ...[
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "Loading...",
+                            style: GoogleFonts.poppins(
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
                       ),
-                    )
+                    ]
+
+                    // Expanded(
+                    //   child: ListView.separated(
+                    //     padding: EdgeInsets.zero,
+                    //     itemCount: postUser.length,
+                    //     itemBuilder: (context, index) {
+                    //       return PostUiUtils.buildPostTile(
+                    //         context,
+                    //         index,
+                    //         postUser[index].post,
+                    //         (postId) => CommentBottomSheet.show(
+                    //           context,
+                    //           postId: postId,
+                    //         ),
+                    //         () => onLike(index: index),
+                    //         followUser: () => onFollow(
+                    //           index: index,
+                    //         ),
+                    //         writerUser: postUser[index].user,
+                    //         currentUser: user,
+                    //         onSchoolTap: (schoolId) {
+                    //           filter = PostFilter.other;
+                    //           customSchoolId = schoolId;
+                    //           customGrade = null;
+                    //           fetchUserPosts();
+                    //         },
+                    //       );
+                    //     },
+                    //     separatorBuilder: (BuildContext context, int index) {
+                    //       return const SizedBox(height: 15);
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -547,29 +526,19 @@ class _PublicTabState extends State<PublicTab> {
   }
 
   Future<void> onLike({required int index}) async {
-    final post = postUser[index].post;
-    final userHasLiked = post.likedBy.contains(userId);
-    final likes = List<String>.from(post.likedBy);
+    var post = _submissionProvider.submissions[index];
+    var user = post.user;
+    var userHasLiked = post.isLiked!;
 
-    setState(() {
-      postUser[index] = (
-        post: post.copyWith(
-          likedBy: userHasLiked
-              ? (likes..remove(userId))
-              : (likes
-                ..add(
-                  userId!,
-                )),
-        ),
-        user: postUser[index].user,
-      );
-    });
+    post.isLiked = !userHasLiked;
+    if(userHasLiked){
+      post.likesCount = post.likesCount! - 1;
+    } else {
+      post.likesCount = post.likesCount! + 1;
+    }
+    _submissionProvider.updateSubmission(post);
 
-    postFeedRepository.addLikedByForPost(
-      post.id!,
-      userId ?? '',
-      userHasLiked,
-    );
+    _submissionApiProvider.toggleLike(post.id!);
   }
 
   Future<void> onFollow({required int index}) async {
@@ -581,9 +550,7 @@ class _PublicTabState extends State<PublicTab> {
     setState(() {
       postUser[index] = (
         user: writterUser.copyWith(
-            follower: follower.contains(user!.id!)
-                ? (follower..remove(userId))
-                : (follower..add(userId!))),
+            follower: follower.contains(user!.id!) ? (follower..remove(userId)) : (follower..add(userId!))),
         post: postUser[index].post,
       );
     });

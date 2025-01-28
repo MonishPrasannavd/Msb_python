@@ -29,10 +29,16 @@ class AppUrl {
   static const String GET_DEVICE_INFO = '/DeviceData/GetSpotCheckDeviceInfo';
   static const String GET_SPOTCHECK_DEVICE_DATA = '/DeviceData/GetSpotCheckDeviceData';
   static const String GET_MASTERDATA = '/masters/all';
-  static const String GET_USERME = '/users/me';
+  static const String GET_USERME = '/auth/me';
   static const String GET_USER = '/users/get-user';
   static const String LOGOUT = '/auth/logout';
   static const String UPDATE_USER = '/auth/me/update-profile';
+  static const String CREATE_SUBMISSION = "/submission/submissions";
+  static const String GET_ALL_SUBMISSIONS = "/submission/all";
+  static const String TOGGLE_LIKE = "/auth/submissions/like";
+  static const String ADD_COMMENT = "/auth/submissions/comment";
+  static const String REMOVE_COMMENT = "/auth/submissions/comment/remove";
+  static const String GET_COMMENTS = "/submission/comments";
 
   static const String DASHBOARD_USER = '/auth/student/dashboard';
 

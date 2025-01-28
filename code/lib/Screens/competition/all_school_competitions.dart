@@ -9,11 +9,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/school_user.dart';
+import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
+import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/post.dart';
+import 'package:msb_app/utils/post_v2.dart';
+import 'package:provider/provider.dart';
 
 import '../../enums/post_feed_type.dart';
 import '../../models/comment.dart';
@@ -80,6 +85,9 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
   String? customSchoolId;
   String? customGrade;
 
+  late SubmissionProvider _submissionProvider;
+  late SubmissionApiProvider _submissionApiProvider;
+
   Future<void> fetchUserPosts() async {
     try {
       final userPosts = await postFeedRepository.getPostsBySchoolId(widget.schoolId);
@@ -112,9 +120,23 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
     userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'));
 
     fetchSchool();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+      _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+    });
   }
 
+  List<Submission> submissions = [];
+
   List<SchoolUser> schoolList = [];
+
+  void loadSubmissions() async {
+    var response = await _submissionApiProvider.getAllSubmissions();
+    setState(() {
+      submissions = response['submissions'] as List<Submission>;
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -233,36 +255,36 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
                   Expanded(
                     child: ListView.separated(
                       padding: EdgeInsets.zero,
-                      itemCount: postUser.length,
+                      itemCount: submissions.length,
                       itemBuilder: (context, index) {
-                        return PostUiUtils.buildPostTile(
-                          context,
-                          index,
-                          postUser[index].post,
-                          (postId) async {
-                            await CommentBottomSheet.show(
-                              context,
-                              postId: postId,
-                            );
+                        var post = submissions[index];
+                        return PostUiUtilsV2.buildPostTile(
+                            context,
+                            index,
+                            post,
+                            (postId) async {
+                              await CommentBottomSheet.show(
+                                context,
+                                postId: postId,
+                              );
 
-                            fetchUserPosts();
-                          },
-                          () => onLike(index: index),
-                          followUser: () => onFollow(
-                            index: index,
-                          ),
-                          writerUser: postUser[index].user,
-                          currentUser: user,
-                          onSchoolTap: (schoolId) {
-                            filter = PostFilter.other;
-                            customSchoolId = schoolId;
-                            customGrade = null;
-                            fetchUserPosts();
-                          },
-                          onNavigateBack: () {
-                            fetchUserPosts();
-                          }
-                        );
+                              fetchUserPosts();
+                            },
+                            () => onLike(index: index),
+                            followUser: () => onFollow(
+                                  index: index,
+                                ),
+                            writerUser: postUser[index].user,
+                            currentUser: user,
+                            onSchoolTap: (schoolId) {
+                              filter = PostFilter.other;
+                              customSchoolId = schoolId;
+                              customGrade = null;
+                              fetchUserPosts();
+                            },
+                            onNavigateBack: () {
+                              fetchUserPosts();
+                            });
                       },
                       separatorBuilder: (BuildContext context, int index) {
                         return const SizedBox(height: 15);

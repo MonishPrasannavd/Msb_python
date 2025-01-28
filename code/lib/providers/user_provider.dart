@@ -80,4 +80,24 @@ class UserProvider with ChangeNotifier {
     _user = user;
     notifyListeners();
   }
+
+  void updateUserAndSchool({
+    User? updatedUser,
+    Student? updatedStudent,
+  }) {
+    if (updatedUser != null) {
+      _user = _user.copyWith(
+        user: updatedUser,
+      );
+    }
+
+    if (updatedStudent != null) {
+      _user = _user.copyWith(
+        student: updatedStudent
+      );
+    }
+
+    notifyListeners();
+  }
+
 }
