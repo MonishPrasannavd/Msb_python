@@ -6,6 +6,9 @@ import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/utils/api.dart';
 
 class StudentDashboardProvider with ChangeNotifier {
+  List<FutureCategories>? dashboardCategoryList ;
+  DashboardResponse? dashboardResponseData;
+
   Future<Map<String, dynamic>> getStudentDashboard() async {
     Map<String, dynamic> result;
 
@@ -17,7 +20,8 @@ class StudentDashboardProvider with ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
-        DashboardResponse dashboardResponseData = DashboardResponse.fromJson(encodedString);
+        dashboardResponseData = DashboardResponse.fromJson(encodedString);
+        dashboardCategoryList = dashboardResponseData?.futureCategories;
         notifyListeners();
 
         result = {'status': true, 'message': 'Successful', 'data': dashboardResponseData};

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,8 +29,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  TextEditingController emailController = TextEditingController(text: "monishvd@gmail.com");
-  TextEditingController passwordController = TextEditingController(text: "1234567890");
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   bool _validate = false;
@@ -61,6 +62,7 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void tryLoggingIn() async {
+
     final Future<Map<String, dynamic>> successfulMessage =
         userAuth.login(emailController.text, passwordController.text);
     DialogBuilder(context).showLoadingIndicator('');
@@ -190,10 +192,15 @@ class _SignInScreenState extends State<SignInScreen> {
                                 text: 'Sign in',
                                 onPressed: () async {
                                   FocusManager.instance.primaryFocus?.unfocus();
+                                  if(kDebugMode){
+                                    emailController.text = "monishvd@gmail.com";
+                                    passwordController.text = "1234567890";
+                                  }
                                   setState(() {
                                     _validate = true;
                                     showSpinner = _formKey.currentState!.validate() ? true : false;
                                   });
+
                                   if (_formKey.currentState!.validate()) {
                                     try {
                                       _validateLoginDetails();
