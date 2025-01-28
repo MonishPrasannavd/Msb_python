@@ -81,8 +81,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void loadAllSubmissions() async {
-    var response = await _submissionApiProvider.getAllSubmissions();
-    _submissionProvider.submissions = response['submissions'] as List<Submission>;
+    Map<String, dynamic> response = {};
+    if (widget.type == "user") {
+      response = await _submissionApiProvider.getSubmissionsByUserId(int.parse(widget.id));
+    } else if (widget.type == "school") {
+      response = await _submissionApiProvider.getSubmissionsBySchool(int.parse(widget.id));
+    }
+    _submissionProvider.clearSubmissions();
+    _submissionProvider.addSubmissions(response['submissions'] as List<Submission>);
   }
 
   Future<void> loadUser() async {
@@ -99,13 +105,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Helper to build post list for user or school
   Widget _buildPostList() {
-    if (isLoadingPosts) {
-      return const Center(child: CircularProgressIndicator());
-    } else if (posts.isEmpty) {
-      return const Center(child: Text('No posts available'));
+    // if (isLoadingPosts) {
+    //   return const Center(child: CircularProgressIndicator());
+    // } else if (posts.isEmpty) {
+    //   return const Center(child: Text('No posts available'));
+    // }
+
+    if(_submissionProvider.submissions.isNotEmpty) {
+        return const Center(child: CircularProgressIndicator());
     }
 
-    return _buildPostsGrid(posts);
+    return _buildPostsGrid();
   }
 
   Future<void> _fetchPosts(Future<List<PostFeed>> Function() fetchFunction) async {
@@ -320,47 +330,48 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   // }
 
   // Helper to build the posts grid
-  Widget _buildPostsGrid(List<PostFeed> posts) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7, // Example height
-      child: ListView.builder(
-        // shrinkWrap: true,
-        padding: const EdgeInsets.all(8.0),
-        itemCount: _submissionProvider.submissions.length,
-        itemBuilder: (BuildContext context, int index) {
-          Submission post = _submissionProvider.submissions[index];
-          return GestureDetector(
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => PostDetailScreen(post: post),
-              //   ),
-              // );
-            },
-            child: PostUiUtilsV2.buildPostTile(
-              context,
-              index,
-              post,
+  Widget _buildPostsGrid() {
+    return Consumer<SubmissionProvider>(builder: (context, ref, child) {
+      return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.7, // Example height
+          child: ListView.builder(
+            // shrinkWrap: true,
+            padding: const EdgeInsets.all(8.0),
+            itemCount: _submissionProvider.submissions.length,
+            itemBuilder: (BuildContext context, int index) {
+              Submission post = _submissionProvider.submissions[index];
+              return GestureDetector(
+                onTap: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => PostDetailScreen(post: post),
+                  //   ),
+                  // );
+                },
+                child: PostUiUtilsV2.buildPostTile(
+                  context,
+                  index,
+                  post,
                   (postId) async {
-                await CommentBottomSheet.show(context, postId: postId);
-                if (widget.type == "user") {
-                  _userFuture =
-                      UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-                  _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-                } else if (widget.type == "school") {
-                  _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-                  _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
-                }
-              },
+                    await CommentBottomSheet.show(context, postId: postId);
+                    if (widget.type == "user") {
+                      _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'))
+                          .getOne(widget.id);
+                      _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+                    } else if (widget.type == "school") {
+                      _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
+                      _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
+                    }
+                  },
                   () => {
-                // onLike(post, index: index)
-              },
-            ),
-          );
-        },
-      )
-    );
+                    // onLike(post, index: index)
+                  },
+                ),
+              );
+            },
+          ));
+    });
   }
 
   // Widget _buildPostsGrid(List<PostFeed> posts) {

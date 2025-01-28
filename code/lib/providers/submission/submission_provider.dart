@@ -11,6 +11,16 @@ class SubmissionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearSubmissions() {
+    _submissions = [];
+    notifyListeners();
+  }
+
+  void addSubmissions(List<Submission> submissions) {
+    _submissions.addAll(submissions);
+    notifyListeners();
+  }
+
   void addSubmission(Submission submission) {
     _submissions.add(submission);
     notifyListeners();

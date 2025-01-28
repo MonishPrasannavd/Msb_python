@@ -202,4 +202,61 @@ class SubmissionApiProvider extends ChangeNotifier {
 
     return result;
   }
+
+
+  Future<Map<String, dynamic>> getSubmissionsByUserId(int userId) async {
+    Map<String, dynamic> result;
+    notifyListeners();
+
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_USER_ID}/${userId.toString()}");
+    try {
+      var response = await get(uri, headers: AppUrl.headers);
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        List<Submission> submissions = List.castFrom(encodedString['data']).map((e) => Submission.fromJson(e)).toList();
+        // var user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Successful', 'submissions': submissions};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> getSubmissionsBySchool(int schoolId) async {
+    Map<String, dynamic> result;
+    notifyListeners();
+
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_SCHOOL_ID}/${schoolId.toString()}");
+    try {
+      var response = await get(uri, headers: AppUrl.headers);
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        List<Submission> submissions = List.castFrom(encodedString['data']).map((e) => Submission.fromJson(e)).toList();
+        // var user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Successful', 'submissions': submissions};
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
 }
