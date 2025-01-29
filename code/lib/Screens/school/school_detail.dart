@@ -13,9 +13,12 @@ import 'package:msb_app/components/msb_carousel.dart';
 import 'package:msb_app/components/msb_post_carousel.dart';
 import 'package:msb_app/components/text_builder.dart';
 import 'package:msb_app/models/post_feed.dart';
+import 'package:msb_app/models/school_dashboard.dart';
+import 'package:msb_app/models/school_rank.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/ui/carousel_slides.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/school/school_api_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
@@ -23,6 +26,7 @@ import 'package:msb_app/services/points_system.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/loaders.dart';
 import 'package:msb_app/utils/user.dart';
+import 'package:provider/provider.dart';
 
 import '../../components/button_builder.dart';
 import '../../enums/post_feed_type.dart';
@@ -32,8 +36,9 @@ import '../competition/quiz/quiz_screen.dart';
 
 class SchoolDetailPage extends StatefulWidget {
   final String schoolId;
+  final SchoolRank? schoolRank;
 
-  const SchoolDetailPage({super.key, required this.schoolId});
+  const SchoolDetailPage({super.key, required this.schoolId, this.schoolRank});
 
   @override
   State<SchoolDetailPage> createState() => _SchoolDetailPageState();
@@ -55,6 +60,9 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
   List<PostFeed> popularPosts = [];
   List<MsbUser> otherUsers = [];
   int? schoolRank;
+  SchoolDashboard? schoolDashboard;
+
+  late SchoolApiProvider _schoolApiProvider;
 
   @override
   void initState() {
@@ -62,8 +70,13 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
     setState(() {
       progress = 0.0;
     });
-    fetchDataFuture = fetchScreenData();
-    fetchScreenData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _schoolApiProvider = Provider.of<SchoolApiProvider>(context, listen: false);
+
+      fetchDataFuture = fetchScreenData();
+      fetchScreenData();
+
+    } );
   }
 
   Future<void> fetchScreenData() {
@@ -73,8 +86,16 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
       fetchRecentPosts(),
       fetchPopularPosts(),
       fetchOtherUsers(),
-      fetchSchoolRank()
+      fetchSchoolRank(),
+      getSchoolDashboard()
     ]);
+  }
+
+  Future<void> getSchoolDashboard() async {
+    Map<String, dynamic> response = await _schoolApiProvider.getSchoolDashboard(int.parse(widget.schoolId));
+    setState(() {
+      schoolDashboard = response['dashboard'];
+    });
   }
 
   Future<void> fetchSchoolRank() async {
@@ -357,7 +378,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
               Expanded(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(school?.schoolName ?? "School Name",
+                  child: Text(widget.schoolRank?.name ?? "School Name",
                       style: GoogleFonts.poppins(
                           color: const Color(0xFF212121),
                           fontWeight: FontWeight.w600)),
@@ -388,23 +409,6 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                       fontSize: 16)),
             ),
           ],
-          // SizedBox(
-          //   width: query.width,
-          //   height: 50,
-          //   child: ButtonBuilder(
-          //       text: 'View All Competitions',
-          //       onPressed: () {
-          //         Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //               builder: (context) => AllSchoolCompetitions(schoolId: widget.schoolId),
-          //             ));
-          //       },
-          //       style: ButtonStyle(
-          //           backgroundColor: MaterialStateProperty.all(const Color(0xFFF50000)),
-          //           shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
-          //       textStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16)),
-          // ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -422,7 +426,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(school?.studentCount.toString() ?? "0",
+                      Text(schoolDashboard?.studentsCount?.toString() ?? "0",
                           style: GoogleFonts.poppins(
                               color: const Color(0xFF540D96),
                               fontWeight: FontWeight.w700,
@@ -449,7 +453,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(school?.totalSubmissions.toString() ?? "0",
+                      Text(schoolDashboard?.submissionsCount.toString() ?? "0",
                           style: GoogleFonts.poppins(
                               color: const Color(0xFF540D96),
                               fontWeight: FontWeight.w700,
@@ -482,7 +486,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(school?.averagePoints.toStringAsFixed(2) ?? '0',
+                      Text(schoolDashboard?.submissionsCount.toString() ?? '0',
                           // PointsSystem.getTotalScore(
                           //   averagePoints: school?.averagePoints,
                           //   studentCount: school?.studentCount,
@@ -513,7 +517,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(schoolTotalLikes.toString(),
+                      Text(schoolDashboard?.topSubmissionsLikes.toString() ?? "0",
                           style: GoogleFonts.poppins(
                               color: const Color(0xFF540D96),
                               fontWeight: FontWeight.w700,

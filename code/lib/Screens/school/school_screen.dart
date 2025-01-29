@@ -49,19 +49,18 @@ class SchoolScreenState extends State<SchoolScreen> {
     searchController.dispose();
     super.dispose();
   }
-  
+
   late SchoolApiProvider _schoolApiProvider;
 
   @override
   void initState() {
     super.initState();
-    userRepository = UserRepository(
-        usersCollection: FirebaseFirestore.instance.collection('users'));
+    userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'));
     setState(() {
       progress = 0.0;
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) { 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _schoolApiProvider = Provider.of<SchoolApiProvider>(context, listen: false);
 
       _fetchDataFuture = fetchData();
@@ -74,9 +73,8 @@ class SchoolScreenState extends State<SchoolScreen> {
     await fetchUsersData();
     await fetchTopSchools();
   }
-  
-  
-  Future<void> fetchTopSchools() async { 
+
+  Future<void> fetchTopSchools() async {
     Map<String, dynamic> response = await _schoolApiProvider.getTopSchools();
     setState(() {
       topSchools = response['topSchools'] ?? [];
@@ -170,11 +168,7 @@ class SchoolScreenState extends State<SchoolScreen> {
       "icon": 'assets/images/art.png',
       "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
     },
-    {
-      "title": "Quiz",
-      "icon": 'assets/images/quiz.png',
-      "route": const QuizScreen()
-    },
+    {"title": "Quiz", "icon": 'assets/images/quiz.png', "route": const QuizScreen()},
     {
       "title": "Story Telling",
       "icon": 'assets/images/story.png',
@@ -186,14 +180,12 @@ class SchoolScreenState extends State<SchoolScreen> {
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor:  AppColors.black12,
+      backgroundColor: AppColors.black12,
       body: DecoratedBox(
         // BoxDecoration takes the image
         decoration: const BoxDecoration(
           // Image set to background of the body
-          image: DecorationImage(
-              image: AssetImage("assets/images/profile_frame copy.png"),
-              fit: BoxFit.cover),
+          image: DecorationImage(image: AssetImage("assets/images/profile_frame copy.png"), fit: BoxFit.cover),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -203,9 +195,8 @@ class SchoolScreenState extends State<SchoolScreen> {
                 width: query.width,
                 decoration: const BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(25.0),
-                        bottomLeft: Radius.circular(25.0))),
+                    borderRadius:
+                        BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -220,14 +211,10 @@ class SchoolScreenState extends State<SchoolScreen> {
                           children: [
                             Text("Hey Superstar",
                                 style: GoogleFonts.poppins(
-                                    color: AppColors.white,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 12)),
+                                    color: AppColors.white, fontWeight: FontWeight.w300, fontSize: 12)),
                             Text(fetchFirstName(user?.name) ?? "User",
                                 style: GoogleFonts.poppins(
-                                    color: AppColors.white,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 24)),
+                                    color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 24)),
                           ],
                         ),
                         const Spacer(),
@@ -236,8 +223,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                             await PrefsService.clear();
                             widget.onLogout();
                           },
-                          child: const Icon(Icons.logout,
-                              color: Color(0xFFCDA1F7), size: 28),
+                          child: const Icon(Icons.logout, color: Color(0xFFCDA1F7), size: 28),
                         ),
                         // SvgPicture.asset(
                         //   "assets/svg/chat.svg",
@@ -256,8 +242,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ProfileScreen(
-                                          onLogout:
-                                              AuthUtils.handleLogout(context),
+                                          onLogout: AuthUtils.handleLogout(context),
                                         )));
                           },
                           child: Container(
@@ -268,11 +253,9 @@ class SchoolScreenState extends State<SchoolScreen> {
                                   bottomLeft: Radius.circular(50.0),
                                 )),
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 5.0, top: 5.0, bottom: 5.0, right: 5.0),
+                              padding: const EdgeInsets.only(left: 5.0, top: 5.0, bottom: 5.0, right: 5.0),
                               child: user != null
-                                  ? _buildProfileImage(
-                                      user!.name, user!.profileImageUrl)
+                                  ? _buildProfileImage(user!.name, user!.profileImageUrl)
                                   : Image.asset(
                                       "assets/images/profile.png",
                                       height: 40,
@@ -311,8 +294,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                     FutureBuilder(
                       future: _fetchDataFuture,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -346,23 +328,17 @@ class SchoolScreenState extends State<SchoolScreen> {
                               text: TextSpan(
                                 text: "Our ",
                                 style: GoogleFonts.poppins(
-                                    color: const Color(0xFF212121),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 20),
+                                    color: const Color(0xFF212121), fontWeight: FontWeight.w600, fontSize: 20),
                                 children: [
                                   TextSpan(
                                     text: "Schools ",
                                     style: GoogleFonts.poppins(
-                                        color: const Color(0xFF540D96),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 20),
+                                        color: const Color(0xFF540D96), fontWeight: FontWeight.w600, fontSize: 20),
                                   ),
                                   TextSpan(
                                     text: "List",
                                     style: GoogleFonts.poppins(
-                                        color: const Color(0xFF212121),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 20),
+                                        color: const Color(0xFF212121), fontWeight: FontWeight.w600, fontSize: 20),
                                   ),
                                 ],
                               ),
@@ -378,8 +354,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                     decoration: BoxDecoration(
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.peachLight
-                                              .withOpacity(0.50),
+                                          color: AppColors.peachLight.withOpacity(0.50),
                                           spreadRadius: 0,
                                           blurRadius: 8,
                                           offset: Offset(0, 4),
@@ -388,29 +363,20 @@ class SchoolScreenState extends State<SchoolScreen> {
                                       gradient: LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.transparent,
-                                          Colors.black45
-                                        ],
+                                        colors: [Colors.transparent, Colors.black45],
                                       ),
                                       borderRadius: BorderRadius.circular(20.0),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(totalSchoolsCounts.toString(),
                                             style: GoogleFonts.poppins(
-                                                color: AppColors.white,
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 24)),
+                                                color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 24)),
                                         Text("Total Schools",
                                             style: GoogleFonts.poppins(
-                                                color: AppColors.black,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 16)),
+                                                color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
                                       ],
                                     ),
                                   ),
@@ -423,8 +389,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                     decoration: BoxDecoration(
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.peachLight
-                                              .withOpacity(0.50),
+                                          color: AppColors.peachLight.withOpacity(0.50),
                                           spreadRadius: 0,
                                           blurRadius: 8,
                                           offset: Offset(0, 4),
@@ -433,29 +398,20 @@ class SchoolScreenState extends State<SchoolScreen> {
                                       gradient: LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.transparent,
-                                          Colors.black45
-                                        ],
+                                        colors: [Colors.transparent, Colors.black45],
                                       ),
                                       borderRadius: BorderRadius.circular(20.0),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Text(totalUsersCount.toString(),
                                             style: GoogleFonts.poppins(
-                                                color: AppColors.white,
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 24)),
+                                                color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 24)),
                                         Text("Total Students",
                                             style: GoogleFonts.poppins(
-                                                color: AppColors.black,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 16)),
+                                                color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
                                       ],
                                     ),
                                   ),
@@ -472,18 +428,13 @@ class SchoolScreenState extends State<SchoolScreen> {
                                     gradient: const LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
-                                      colors: [
-                                        Colors.black12,
-                                        Colors.black12,
-                                        Colors.blueGrey
-                                      ],
+                                      colors: [Colors.black12, Colors.black12, Colors.blueGrey],
                                     ),
                                     borderRadius: BorderRadius.circular(20.0),
                                   ),
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       RichText(
                                         text: TextSpan(
@@ -496,15 +447,12 @@ class SchoolScreenState extends State<SchoolScreen> {
                                             TextSpan(
                                               text: "Top 5 ",
                                               style: GoogleFonts.poppins(
-                                                  color: AppColors.msbGold,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 20),
+                                                  color: AppColors.msbGold, fontWeight: FontWeight.w600, fontSize: 20),
                                             ),
                                             TextSpan(
                                               text: "Leader Board",
                                               style: GoogleFonts.poppins(
-                                                  color:
-                                                      const Color(0xFF212121),
+                                                  color: const Color(0xFF212121),
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 20),
                                             ),
@@ -513,8 +461,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                       ),
                                       const SizedBox(height: 16),
                                       ListView.builder(
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
+                                        physics: const NeverScrollableScrollPhysics(),
                                         // Prevent internal scrolling
                                         shrinkWrap: true,
                                         // Adjust size dynamically
@@ -524,22 +471,19 @@ class SchoolScreenState extends State<SchoolScreen> {
                                         itemBuilder: (context, index) {
                                           var school = topSchools[index];
                                           return Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 10.0),
+                                            padding: const EdgeInsets.symmetric(vertical: 10.0),
                                             child: Container(
                                               padding: const EdgeInsets.all(16),
                                               decoration: BoxDecoration(
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.50),
+                                                    color: Colors.black.withOpacity(0.50),
                                                     spreadRadius: 0,
                                                     blurRadius: 8,
                                                     offset: Offset(0, 4),
                                                   ),
                                                   BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.50),
+                                                    color: Colors.black.withOpacity(0.50),
                                                     spreadRadius: 0,
                                                     blurRadius: 8,
                                                     offset: Offset(0, 4),
@@ -548,45 +492,30 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                 gradient: const LinearGradient(
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
-                                                  colors: [
-                                                    Colors.transparent,
-                                                    Colors.blueGrey
-                                                  ],
+                                                  colors: [Colors.transparent, Colors.blueGrey],
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(20.0),
+                                                borderRadius: BorderRadius.circular(20.0),
                                               ),
                                               child: GestureDetector(
                                                 onTap: () => Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              SchoolDetailPage(
-                                                            schoolId: school
-                                                                .id!.toString(),
-                                                          ),
-                                                        ))
-                                                    .then((val) => val
-                                                        ? refetchData()
-                                                        : null),
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => SchoolDetailPage(
+                                                        schoolId: school.id!.toString(),
+                                                        schoolRank: school,
+                                                      ),
+                                                    )).then((val) => val ? refetchData() : null),
                                                 child: Row(
                                                   children: [
                                                     Container(
                                                       width: 50,
                                                       height: 50,
-                                                      alignment:
-                                                          Alignment.center,
+                                                      alignment: Alignment.center,
                                                       child: Text(
-                                                        (index + 1)
-                                                            .toString()
-                                                            .padLeft(2,
-                                                                '0'), // Add leading zero
-                                                        style:
-                                                            GoogleFonts.poppins(
-                                                          color: _getRankColor(
-                                                              index),
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                        (index + 1).toString().padLeft(2, '0'), // Add leading zero
+                                                        style: GoogleFonts.poppins(
+                                                          color: _getRankColor(index),
+                                                          fontWeight: FontWeight.bold,
                                                           fontSize: 30,
                                                         ),
                                                       ),
@@ -594,34 +523,22 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                     const SizedBox(width: 16),
                                                     Expanded(
                                                       child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
                                                           Text(
-                                                            school.name ??
-                                                                "Unknown School",
-                                                            style: GoogleFonts
-                                                                .poppins(
-                                                              color: AppColors
-                                                                  .peach,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
+                                                            school.name ?? "Unknown School",
+                                                            style: GoogleFonts.poppins(
+                                                              color: AppColors.peach,
+                                                              fontWeight: FontWeight.w700,
                                                               fontSize: 13,
                                                             ),
                                                           ),
-                                                          const SizedBox(
-                                                              height: 4),
+                                                          const SizedBox(height: 4),
                                                           Text(
                                                             "Total Point: ${school.rank.toString()}",
-                                                            style: GoogleFonts
-                                                                .poppins(
-                                                              color: AppColors
-                                                                  .peachLight,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
+                                                            style: GoogleFonts.poppins(
+                                                              color: AppColors.peachLight,
+                                                              fontWeight: FontWeight.w500,
                                                               fontSize: 12,
                                                             ),
                                                           ),
@@ -653,17 +570,14 @@ class SchoolScreenState extends State<SchoolScreen> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ViewAllSchools(),
+                                          builder: (context) => const ViewAllSchools(),
                                         ),
                                       );
                                     },
                                     child: Text(
                                       "View all >>",
                                       style: GoogleFonts.poppins(
-                                          color: AppColors.white,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 16),
+                                          color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 16),
                                     ),
                                   ),
                                   // ListView.builder(
@@ -733,25 +647,20 @@ class SchoolScreenState extends State<SchoolScreen> {
                                 ],
                               ),
                             ),
-                                                Column(
+                            Column(
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
-                                      colors: [
-                                        Colors.black12,
-                                        Colors.blueGrey,
-                                        Colors.black12
-                                      ],
+                                      colors: [Colors.black12, Colors.blueGrey, Colors.black12],
                                     ),
                                     borderRadius: BorderRadius.circular(20.0),
                                   ),
                                   padding: const EdgeInsets.all(0.0),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       const SizedBox(height: 10),
 
@@ -760,9 +669,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                         text: TextSpan(
                                           text: "Showcase ",
                                           style: GoogleFonts.poppins(
-                                              color: AppColors.msbGold,
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 17),
+                                              color: AppColors.msbGold, fontWeight: FontWeight.w700, fontSize: 17),
                                           children: [
                                             TextSpan(
                                               text: "Your talents in",
@@ -781,51 +688,29 @@ class SchoolScreenState extends State<SchoolScreen> {
                                           shrinkWrap: true,
                                           itemCount: menuItems.length,
                                           scrollDirection: Axis.horizontal,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 1),
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
+                                          padding: const EdgeInsets.symmetric(horizontal: 1),
+                                          itemBuilder: (BuildContext context, int index) {
                                             final menuItem = menuItems[index];
                                             return GestureDetector(
                                               onTap: () {
                                                 //callNextScreen(context, const QuizScreen());
                                                 if (index == 0) {
-                                                  Navigator.of(context,
-                                                          rootNavigator: false)
-                                                      .push(
+                                                  Navigator.of(context, rootNavigator: false).push(
                                                     MaterialPageRoute(
                                                         builder: (_) =>
-                                                            PostFeeds("Dance",
-                                                                contentType:
-                                                                    PostFeedType
-                                                                        .video
-                                                                        .value)),
+                                                            PostFeeds("Dance", contentType: PostFeedType.video.value)),
                                                   );
                                                 } else if (index == 1) {
-                                                  Navigator.of(context,
-                                                          rootNavigator: false)
-                                                      .push(
+                                                  Navigator.of(context, rootNavigator: false).push(
                                                     MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            PostFeeds(
-                                                                "Art & Crafts",
-                                                                contentType:
-                                                                    PostFeedType
-                                                                        .image
-                                                                        .value)),
+                                                        builder: (_) => PostFeeds("Art & Crafts",
+                                                            contentType: PostFeedType.image.value)),
                                                   );
                                                 } else if (index == 2) {
-                                                  Navigator.of(context,
-                                                          rootNavigator: false)
-                                                      .push(
+                                                  Navigator.of(context, rootNavigator: false).push(
                                                     MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            PostFeeds(
-                                                                "Story Telling",
-                                                                contentType:
-                                                                    PostFeedType
-                                                                        .image
-                                                                        .value)),
+                                                        builder: (_) => PostFeeds("Story Telling",
+                                                            contentType: PostFeedType.image.value)),
                                                   );
                                                 }
                                               },
@@ -837,43 +722,23 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                         child: Container(
                                                           height: 80,
                                                           decoration: BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .circle,
+                                                              shape: BoxShape.circle,
                                                               gradient: const RadialGradient(
-                                                                  colors: [
-                                                                    AppColors
-                                                                        .black38,
-                                                                    AppColors
-                                                                        .white30
-                                                                  ],
-                                                                  center: Alignment
-                                                                      .bottomCenter,
+                                                                  colors: [AppColors.black38, AppColors.white30],
+                                                                  center: Alignment.bottomCenter,
                                                                   radius: 1.0),
-                                                              border: Border.all(
-                                                                  color:
-                                                                      AppColors
-                                                                          .white,
-                                                                  width: 1)),
+                                                              border: Border.all(color: AppColors.white, width: 1)),
                                                           child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(21.0),
-                                                            child: Image.asset(
-                                                                menuItem[
-                                                                    'icon']),
+                                                            padding: const EdgeInsets.all(21.0),
+                                                            child: Image.asset(menuItem['icon']),
                                                           ),
                                                         ),
                                                       ),
                                                       Text(menuItem['title'],
-                                                          style: GoogleFonts
-                                                              .poppins(
-                                                                  color: AppColors
-                                                                      .peachLight,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  fontSize:
-                                                                      12)),
+                                                          style: GoogleFonts.poppins(
+                                                              color: AppColors.peachLight,
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 12)),
                                                     ],
                                                   ),
                                                   const SizedBox(width: 5)
@@ -895,28 +760,18 @@ class SchoolScreenState extends State<SchoolScreen> {
                                               Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const Padding(
-                                                      padding:
-                                                          EdgeInsets.all(20.0),
+                                                    builder: (context) => const Padding(
+                                                      padding: EdgeInsets.all(20.0),
                                                       child: PublicTab(),
                                                     ),
                                                   ));
                                             },
                                             style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all(
-                                                        AppColors.black54),
-                                                shape: MaterialStateProperty
-                                                    .all(RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    50.0)))),
+                                                backgroundColor: MaterialStateProperty.all(AppColors.black54),
+                                                shape: MaterialStateProperty.all(
+                                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)))),
                                             textStyle: GoogleFonts.poppins(
-                                                color: AppColors.white,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14)),
+                                                color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 14)),
                                       ),
                                       SizedBox(
                                         height: 15,
@@ -930,7 +785,6 @@ class SchoolScreenState extends State<SchoolScreen> {
                         );
                       },
                     ),
-
                   ],
                 ),
               ),
@@ -974,16 +828,12 @@ class SchoolScreenState extends State<SchoolScreen> {
           LayoutBuilder(
             builder: (context, constraints) {
               return Container(
-                width: constraints.maxWidth *
-                    progress, // Adjust the width based on progress
+                width: constraints.maxWidth * progress, // Adjust the width based on progress
                 height: 12, // Height of the progress bar
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10), // Rounded corners
                   gradient: const LinearGradient(
-                    colors: [
-                      Colors.greenAccent,
-                      Colors.blueAccent
-                    ], // Gradient from green to blue
+                    colors: [Colors.greenAccent, Colors.blueAccent], // Gradient from green to blue
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
