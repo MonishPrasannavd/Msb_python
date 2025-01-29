@@ -6,11 +6,14 @@ import 'package:msb_app/Screens/home/tab_3_public.dart';
 import 'package:msb_app/Screens/profile/profile_page.dart';
 import 'package:msb_app/Screens/school/school_detail.dart';
 import 'package:msb_app/Screens/school/view_all_schools.dart';
+import 'package:msb_app/models/school_rank.dart';
 import 'package:msb_app/models/school_user.dart';
+import 'package:msb_app/providers/school/school_api_provider.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/auth.dart';
 import 'package:msb_app/utils/user.dart';
+import 'package:provider/provider.dart';
 
 import '../../components/button_builder.dart';
 import '../../enums/post_feed_type.dart';
@@ -35,7 +38,7 @@ class SchoolScreenState extends State<SchoolScreen> {
   TextEditingController searchController = TextEditingController();
   final SchoolUserRepository schoolRepository = SchoolUserRepository();
   late Future<void> _fetchDataFuture;
-  List<SchoolUser> topSchools = [];
+  List<SchoolRank> topSchools = [];
   List<SchoolUser> recentlyJoinedSchools = [];
   int totalUsersCount = 0;
   int totalSchoolsCounts = 0;
@@ -46,6 +49,8 @@ class SchoolScreenState extends State<SchoolScreen> {
     searchController.dispose();
     super.dispose();
   }
+  
+  late SchoolApiProvider _schoolApiProvider;
 
   @override
   void initState() {
@@ -55,13 +60,27 @@ class SchoolScreenState extends State<SchoolScreen> {
     setState(() {
       progress = 0.0;
     });
-    _fetchDataFuture = fetchData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) { 
+      _schoolApiProvider = Provider.of<SchoolApiProvider>(context, listen: false);
+
+      _fetchDataFuture = fetchData();
+    });
   }
 
   Future<void> fetchData() async {
     await fetchSchoolsData();
     await fetchUserProfile();
     await fetchUsersData();
+    await fetchTopSchools();
+  }
+  
+  
+  Future<void> fetchTopSchools() async { 
+    Map<String, dynamic> response = await _schoolApiProvider.getTopSchools();
+    setState(() {
+      topSchools = response['topSchools'] ?? [];
+    });
   }
 
   Future<void> fetchSchoolsData() async {
@@ -76,7 +95,7 @@ class SchoolScreenState extends State<SchoolScreen> {
     var fetchTopSchoolsCount = await schoolRepository.getTotalSchoolCount();
     setState(() {
       totalSchoolsCounts = fetchTopSchoolsCount;
-      topSchools = fetchedTopSchools;
+      // topSchools = fetchedTopSchools;
       recentlyJoinedSchools = fetchedRecentlyJoinedSchools;
       progress = 0.66;
     });
@@ -544,7 +563,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                           builder: (context) =>
                                                               SchoolDetailPage(
                                                             schoolId: school
-                                                                .schoolId!,
+                                                                .id!.toString(),
                                                           ),
                                                         ))
                                                     .then((val) => val
@@ -580,7 +599,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            school.schoolName ??
+                                                            school.name ??
                                                                 "Unknown School",
                                                             style: GoogleFonts
                                                                 .poppins(
@@ -595,7 +614,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                           const SizedBox(
                                                               height: 4),
                                                           Text(
-                                                            "Total Point: ${school.averagePoints.toStringAsFixed(2)}",
+                                                            "Total Point: ${school.rank.toString()}",
                                                             style: GoogleFonts
                                                                 .poppins(
                                                               color: AppColors

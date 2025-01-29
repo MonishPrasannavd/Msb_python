@@ -42,6 +42,9 @@ class AppUrl {
   static const String REMOVE_COMMENT = "/auth/submissions/comment/remove";
   static const String GET_COMMENTS = "/submission/comments";
 
+  static const String GET_SCHOOL_DASHBOARD = "/school/dashboard ";
+  static const String GET_TOP_SCHOOLS = "/school/top";
+
   static const String DASHBOARD_USER = '/auth/student/dashboard';
   static const String POST_FEED_ALL = '/submission/by_sub_category';
 
