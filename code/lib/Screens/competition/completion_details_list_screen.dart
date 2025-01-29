@@ -53,6 +53,7 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
     //postFeedRepository = PostFeedRepository();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       postFeedsProvider = Provider.of<PostFeedsProvider>(context, listen: false);
+      postFeedsProvider.getAllPost();
     });
   }
 
