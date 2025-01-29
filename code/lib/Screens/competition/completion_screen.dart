@@ -126,7 +126,7 @@ class _CompletionScreenState extends State<CompletionScreen> {
                       builder: (_) => CompletionDetailsListScreen(categoryName: widget.categoryName,
                         postCompilation: index.toString(),
                         contentType: widget.contentType,
-                        postsFuture: getPostListForCompletionIndex([], index: index),)),
+                        postsFuture: getPostListForCompletionIndex([], index: index, ), subCategoryId: widget.subcategories?[index].id.toString() ?? "")),
                         //todo: Add list of competition
                         //postsFuture: getPostListForCompletionIndex(userSnapshot.data, index: index),)),
                   ).then((value){
