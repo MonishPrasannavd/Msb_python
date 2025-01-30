@@ -17,6 +17,7 @@ import 'package:fluttertoast/fluttertoast.dart'; // Import FlutterToast for toas
 
 import '../../components/button_builder.dart';
 import '../../constants/navigation.dart';
+import '../../services/preferences_service.dart';
 import '../../utils/colours.dart';
 import '../dashboard/dashboard_setup.dart';
 import '../sign_up/sign_up_screen.dart';
@@ -72,11 +73,16 @@ class _SignInScreenState extends State<SignInScreen> {
         DialogBuilder(context).hideOpenDialog();
         msb.MsbUser user = response['user'];
         Provider.of<UserProvider>(context, listen: false).setUser(user);
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString("userId", user.user?.id.toString() ?? "");
-        prefs.setString("nameEmail", user.user?.email.toString() ?? "");
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        ScaffoldMessenger.of(context)
+       // ✅ Use PrefsService instead of SharedPreferences instance
+      await PrefsService.setUserId(user.user?.id.toString() ?? "");
+      await PrefsService.setString("nameEmail", user.user?.email.toString() ?? "");
+       await PrefsService.setToken(user.accessToken);
+  // Debugging: Check if data is saved correctly
+      String? storedUserId = await PrefsService.getUserId();
+      String? storedEmail = await PrefsService.getUserNameEmail().whenComplete((){
+    ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(
                 duration: Duration(seconds: 1),
                 content: Text("Successfully logged in"),
@@ -87,6 +93,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   MaterialPageRoute(builder: (context) => const DashboardSetup()),
                   (route) => false,
                 ));
+      });
+
+      print("Stored User ID: $storedUserId");  // Should print actual user ID
+      print("Stored Email: $storedEmail");    // Should print email
+      
+    
       } else {
         DialogBuilder(context).hideOpenDialog();
         ScaffoldMessenger.of(context)

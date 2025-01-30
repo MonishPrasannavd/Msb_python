@@ -49,29 +49,34 @@ class HomeTabState extends State<HomeTab> {
   late Future<void> _fetchDataFuture;
   double progress = 0.0;
   bool isFirstTimeLoading = false;
-
+bool isLoading = false;
   late StudentDashboardProvider studentDashboardProvider;
   late Dash _dash;
+@override
+void initState() {
+  super.initState();
+  
+  isFirstTimeLoading = true;
+  schoolUserRepository = SchoolUserRepository();
+  userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
 
-  @override
-  void initState() {
-    super.initState();
-    isFirstTimeLoading = true;
-    schoolUserRepository = SchoolUserRepository();
-    userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
+  // Initialize studentDashboardProvider here
+  studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
+  _dash = Provider.of<Dash>(context, listen: false);
 
-    _fetchDataFuture = fetchData();
+  _fetchDataFuture = fetchData();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
-      _dash = Provider.of<Dash>(context, listen: false);
-      getDashboard();
-    });
-  }
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    getDashboard();
+  });
+}
+
 
   Future<void> getDashboard() async {
+    setState(() {
+          isLoading = true;
+    });
     var dashboardData = await studentDashboardProvider.getStudentDashboard();
-    print('user dashboard: $dashboardData');
     final Future<Map<String, dynamic>> successfulMessage = studentDashboardProvider.getStudentDashboard();
 
     successfulMessage.then((response) {
@@ -91,7 +96,14 @@ class HomeTabState extends State<HomeTab> {
             top3Students =
                 topStudents.length >= 3 ? topStudents.sublist(0, 3) : topStudents.sublist(0, topStudents.length);
             remainingTopStudents = topStudents.length > 3 ? topStudents.sublist(3) : [];
+            
+              isLoading = false ;
+        
           } else {
+             isLoading = false ;
+setState(() {
+  
+});
             top3Students = [];
             remainingTopStudents = [];
           }
@@ -108,7 +120,7 @@ class HomeTabState extends State<HomeTab> {
 
   Future<void> fetchData() async {
     await fetchSchoolsData();
-    await fetchUsersData();
+    // await fetchUsersData();
     //if (isFirstTimeLoading) {
     //fetchUsersPostsData();
     //   isFirstTimeLoading = false;
@@ -133,16 +145,16 @@ class HomeTabState extends State<HomeTab> {
     });
   }
 
-  Future<void> fetchUsersData() async {
-    var fetchedTotalCount = await userRepository.getTotalUserCount();
-    setState(() {
-      progress = 0.66;
-    });
-    var fetchedTopUsers = await userRepository.getTopUsersByPoints();
-    setState(() {
-      progress = 0.83;
-    });
-  }
+  // Future<void> fetchUsersData() async {
+  //   var fetchedTotalCount = await userRepository.getTotalUserCount();
+  //   setState(() {
+  //     progress = 0.66;
+  //   });
+  //   var fetchedTopUsers = await userRepository.getTopUsersByPoints();
+  //   setState(() {
+  //     progress = 0.83;
+  //   });
+  // }
 
   // List of moods
   final List<String> moods = ['Terrible', 'Bad', 'Neutral', 'Good', 'Excellent'];
@@ -230,10 +242,9 @@ class HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
-
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
+        child:isLoading ? const Center(child: CircularProgressIndicator(),) : Column(
           children: [
             CarouselSlider.builder(
               itemCount: slides.length,

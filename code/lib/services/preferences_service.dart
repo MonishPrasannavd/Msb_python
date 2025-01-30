@@ -47,7 +47,17 @@ class PrefsService {
     final prefs = await _instance;
     await prefs.setString('role', value);
   }
-
+ /// token
+  static Future<void> setToken(String value) async {
+    final prefs = await _instance;
+    await prefs.setString('token', value);
+  }
+  //token
+ static Future<String?> getToken() async {
+    final prefs = await _instance;
+    return prefs.getString('token');
+  }
+//role
   static Future<String?> getRole() async {
     final prefs = await _instance;
     return prefs.getString('role');

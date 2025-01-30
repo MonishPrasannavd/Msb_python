@@ -6,6 +6,7 @@ import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:msb_app/models/comment_v2.dart';
 import 'package:msb_app/models/submission.dart';
+import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/api.dart';
 
 class SubmissionApiProvider extends ChangeNotifier {
@@ -210,6 +211,8 @@ class SubmissionApiProvider extends ChangeNotifier {
 
     final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_USER_ID}/${userId.toString()}");
     try {
+    //  authToken = await PrefsService.getToken(); // Retrieve token
+  //  AppUrl.addHeader('Authorization', 'Bearer $authToken');
       var response = await get(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());

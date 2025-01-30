@@ -1,3 +1,5 @@
+import 'package:msb_app/services/preferences_service.dart';
+
 class ApiConfig {
   // static const String baseUrl = "localhost:8080";
   static const String baseUrl = "35.163.101.210:8080";
@@ -18,6 +20,7 @@ class ApiConfig {
     _headers['Cookie'] = cookie;
   }
 }
+  String? authToken = "";
 
 class AppUrl {
   static const String BASE_URL = 'https://msb.instabee.pro';
@@ -47,11 +50,14 @@ class AppUrl {
 
   static const String DASHBOARD_USER = '/auth/student/dashboard';
   static const String POST_FEED_ALL = '/submission/by_sub_category';
+  // 🔹 Update the Authorization Token in Headers
+
 
   /// Private headers map
   static final Map<String, String> _headers = {
     'accept': 'application/json',
     'Content-Type': 'application/json',
+    
   };
 
   /// Getter for headers
