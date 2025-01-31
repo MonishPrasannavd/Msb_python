@@ -50,8 +50,8 @@ class AppUrl {
 
   static const String DASHBOARD_USER = '/auth/student/dashboard';
   static const String POST_FEED_ALL = '/submission/by_sub_category';
-  // 🔹 Update the Authorization Token in Headers
 
+  static const String GET_STUDENT_BY_SCHOOL_ID = "/student/get-students-by_school";
 
   /// Private headers map
   static final Map<String, String> _headers = {
