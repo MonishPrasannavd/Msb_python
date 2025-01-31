@@ -13,7 +13,6 @@ import 'package:msb_app/repository/comment_repository.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
-import 'package:msb_app/models/user.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -23,6 +22,8 @@ import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/post.dart';
 import 'package:msb_app/utils/post_v2.dart';
 import 'package:provider/provider.dart';
+
+import '../../models/msbuser.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String id;
@@ -42,36 +43,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   late Future<MsbUser?> _userFuture;
   late Future<SchoolUser?> _schoolFuture;
   late Future<List<PostFeed>> _postsFuture;
-  late PostFeedRepository postFeedRepository;
-  final CommentRepository commentRepository =
-      CommentRepository(commentCollection: FirebaseFirestore.instance.collection(FirestoreCollections.comments));
   late SchoolUserRepository schoolUserRepository;
   bool isLoadingPosts = true; // Loading indicator for posts
   List<PostFeed> posts = [];
   late MsbUser currentUser;
-  UserRepository userRepository =
-      UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
 
   late UserAuthProvider _authProvider;
+  late UserProvider _userProvider;
   late SubmissionProvider _submissionProvider;
   late SubmissionApiProvider _submissionApiProvider;
 
   @override
   void initState() {
     super.initState();
-    postFeedRepository = PostFeedRepository();
-    schoolUserRepository = SchoolUserRepository();
-    if (widget.type == "user") {
-      _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-      _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-    } else if (widget.type == "school") {
-      _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-      _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
-    }
-    loadUser();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
+      _userProvider = Provider.of<UserProvider>(context, listen: false);
       _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
       _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
 
@@ -80,7 +67,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
-  void loadAllSubmissions() async {
+  Future<void> loadAllSubmissions() async {
     Map<String, dynamic> response = {};
     if (widget.type == "user") {
       response = await _submissionApiProvider.getSubmissionsByUserId(int.parse(widget.id));
@@ -89,12 +76,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
     _submissionProvider.clearSubmissions();
     _submissionProvider.addSubmissions(response['submissions'] as List<Submission>);
-  }
-
-  Future<void> loadUser() async {
-    setState(() async {
-      currentUser = (await userRepository.getOne(widget.id))!;
-    });
   }
 
   @override
@@ -122,8 +103,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     try {
       final fetchedPosts = await fetchFunction();
       for (var post in fetchedPosts) {
-        var comments = await commentRepository.getCommentsByPost(post.id!);
-        fetchedPosts[fetchedPosts.indexOf(post)] = post.copyWith(comments: comments);
+        // var comments = await commentRepository.getCommentsByPost(post.id!);
+        // fetchedPosts[fetchedPosts.indexOf(post)] = post.copyWith(comments: comments);
       }
       setState(() {
         posts = fetchedPosts;
@@ -142,58 +123,43 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     var query = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            height: query.height / 6,
-            width: query.width,
-            decoration: const BoxDecoration(
+      body: Consumer3<UserAuthProvider, SubmissionProvider, SubmissionApiProvider>(builder: (ctxt, authProvider, submissionProvider, submissionApiProvider, child) {
+        return Column(
+          children: [
+            Container(
+              height: query.height / 6,
+              width: query.width,
+              decoration: const BoxDecoration(
                 // color: AppColors.primary,
-                color: AppColors.purpleDark,
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
-            child: Column(
-              children: [
-                // SafeArea(
-                //   child: Text(
-                //     widget.type == "user" ? "User Profile" : "School Profile",
-                //     style: GoogleFonts.poppins(
-                //       color: Colors.white,
-                //       fontWeight: FontWeight.w600,
-                //       fontSize: 30,
-                //     ),
-                //   ),
-                // ),
-                SafeArea(child: widget.type == "user" ? _buildUserProfile() : _buildSchoolProfile()),
-              ],
+                  color: AppColors.purpleDark,
+                  borderRadius: BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+              child: Column(
+                children: [
+                  // SafeArea(
+                  //   child: Text(
+                  //     widget.type == "user" ? "User Profile" : "School Profile",
+                  //     style: GoogleFonts.poppins(
+                  //       color: Colors.white,
+                  //       fontWeight: FontWeight.w600,
+                  //       fontSize: 30,
+                  //     ),
+                  //   ),
+                  // ),
+                  SafeArea(child: widget.type == "user" ? _buildUserProfile() : _buildSchoolProfile()),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          _buildPostList(),
-        ],
-      ),
+            const SizedBox(height: 16),
+            _buildPostList(),
+          ],
+        );
+      }),
     );
   }
 
   // Builds the user profile screen
   Widget _buildUserProfile() {
-    return FutureBuilder<MsbUser?>(
-      future: _userFuture,
-      builder: (context, userSnapshot) {
-        if (userSnapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (userSnapshot.hasError || userSnapshot.data == null) {
-          return const Center(child: Text('Error loading user data'));
-        }
-
-        MsbUser user = userSnapshot.data!;
-        return Column(
-          children: [
-            const SizedBox(height: 10),
-            _buildProfileHeader(user: user),
-          ],
-        );
-      },
-    );
+    return _buildProfileHeader(user: _userProvider.user);
   }
 
   // Builds the school profile screen
@@ -226,7 +192,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileImage(user.name, user.profileImageUrl),
+            _buildProfileImage(user.user?.name, user.user?.profileUrl),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -235,7 +201,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      user.name ?? 'Unknown User',
+                      user.user?.name ?? 'Unknown User',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -254,7 +220,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                       children: [
                         TextSpan(
-                          text: user.schoolName ?? "N/A",
+                          text: user.student.school?.name ?? "N/A",
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
@@ -274,7 +240,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   // ),
                   const SizedBox(height: 4),
                   Text(
-                    user.grade!,
+                    user.student.grade?.name ?? "N/A",
                     style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -356,12 +322,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   (postId) async {
                     await CommentBottomSheet.show(context, postId: postId);
                     if (widget.type == "user") {
-                      _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'))
-                          .getOne(widget.id);
-                      _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+                      // _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'))
+                      //     .getOne(widget.id);
+                      // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
                     } else if (widget.type == "school") {
                       _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-                      _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
+                      // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
                     }
                   },
                   () => {
@@ -429,11 +395,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               )),
       );
     });
-    await postFeedRepository.addLikedByForPost(
-      post.id!,
-      userId ?? '',
-      userHasLiked,
-    );
+    // await postFeedRepository.addLikedByForPost(
+    //   post.id!,
+    //   userId ?? '',
+    //   userHasLiked,
+    // );
   }
 
   // Helper function to build post tile based on post type
