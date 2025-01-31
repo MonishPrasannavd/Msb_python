@@ -77,7 +77,10 @@ class _PublicTabState extends State<PublicTab> {
 
   Future<void> loadAllSubmissions() async {
     var response = await _submissionApiProvider.getAllSubmissions();
-    _submissionProvider.submissions = response['submissions'] as List<Submission>;
+    if (response['submissions'] != null) {
+      _submissionProvider.clearSubmissions();
+      _submissionProvider.addSubmissions(response['submissions'] as List<Submission>);
+    }
   }
 
   String? customSchoolId;

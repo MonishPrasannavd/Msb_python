@@ -7,16 +7,17 @@ import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/api.dart';
 
 class StudentDashboardProvider with ChangeNotifier {
-  List<FutureCategories>? dashboardCategoryList ;
+  List<FutureCategories>? dashboardCategoryList;
+
   DashboardResponse? dashboardResponseData;
+
   Future<Map<String, dynamic>> getStudentDashboard() async {
     Map<String, dynamic> result;
     try {
-     authToken = await PrefsService.getToken(); // Retrieve token
-   AppUrl.addHeader('Authorization', 'Bearer $authToken');
+      authToken = await PrefsService.getToken(); // Retrieve token
+      AppUrl.addHeader('Authorization', 'Bearer $authToken');
 
       final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.DASHBOARD_USER}");
-
 
       notifyListeners();
       Response response = await get(
