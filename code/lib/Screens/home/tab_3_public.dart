@@ -50,13 +50,7 @@ class _PublicTabState extends State<PublicTab> {
   List<({PostFeed post, MsbUser? user})> postUser = [];
   bool isLoading = true;
 
-  late CommentRepository commentRepository;
-  late SchoolUserRepository schoolUserRepository;
-  late UserRepository userRepository;
   List<CommentPost> commentList = [];
-
-  CollectionReference collectionReference = FirebaseFirestore.instance.collection(FirestoreCollections.comments);
-  late PostFeedRepository postFeedRepository;
   late SubmissionProvider _submissionProvider;
   late SubmissionApiProvider _submissionApiProvider;
 
@@ -76,8 +70,8 @@ class _PublicTabState extends State<PublicTab> {
       }
     });
     if (userId != null) {
-      fetchUserPosts(); // Fetch posts once userId is available
-      user = await userRepository.getOne(userId!);
+      // fetchUserPosts(); // Fetch posts once userId is available
+      // user = await userRepository.getOne(userId!);
     }
   }
 
@@ -89,46 +83,42 @@ class _PublicTabState extends State<PublicTab> {
   String? customSchoolId;
   String? customGrade;
 
-  Future<void> fetchUserPosts() async {
-    try {
-      final userPosts = await postFeedRepository.getPostsExcludingUserId(
-        userId!,
-        schoolId: switch (filter) {
-          PostFilter.mySchool => user?.schoolId,
-          PostFilter.other => customSchoolId,
-          _ => null,
-        },
-        sClass: switch (filter) {
-          PostFilter.myClass => user?.grade,
-          PostFilter.other => customGrade != '0' ? customGrade : null,
-          _ => null,
-        },
-      );
-      final result = await Future.wait(
-        userPosts.map((e) => e.userId!).map(
-              (e) => userRepository.getOne(e),
-            ),
-      );
-      postUser = [];
-      for (int i = 0; i < userPosts.length; i++) {
-        postUser.add((post: userPosts[i], user: result[i]));
-      }
-      setState(() => isLoading = false);
-    } catch (e) {
-      print("Error fetching user posts: $e");
-    }
-  }
+  // Future<void> fetchUserPosts() async {
+  //   try {
+  //     final userPosts = await postFeedRepository.getPostsExcludingUserId(
+  //       userId!,
+  //       schoolId: switch (filter) {
+  //         PostFilter.mySchool => user?.schoolId,
+  //         PostFilter.other => customSchoolId,
+  //         _ => null,
+  //       },
+  //       sClass: switch (filter) {
+  //         PostFilter.myClass => user?.grade,
+  //         PostFilter.other => customGrade != '0' ? customGrade : null,
+  //         _ => null,
+  //       },
+  //     );
+  //     final result = await Future.wait(
+  //       userPosts.map((e) => e.userId!).map(
+  //             (e) => userRepository.getOne(e),
+  //           ),
+  //     );
+  //     postUser = [];
+  //     for (int i = 0; i < userPosts.length; i++) {
+  //       postUser.add((post: userPosts[i], user: result[i]));
+  //     }
+  //     setState(() => isLoading = false);
+  //   } catch (e) {
+  //     print("Error fetching user posts: $e");
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
     loadUserId();
-    commentRepository = CommentRepository(commentCollection: collectionReference);
-    postFeedRepository = PostFeedRepository();
-    schoolUserRepository = SchoolUserRepository();
-    userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'));
 
-    fetchSchool();
+    // fetchSchool();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
@@ -271,19 +261,19 @@ class _PublicTabState extends State<PublicTab> {
       if (customGrade == null || customSchoolId == null) return;
     }
     filter = value;
-    fetchUserPosts();
+    // fetchUserPosts();
   }
 
-  fetchSchool() async {
-    final schools = await schoolUserRepository.getAll();
-
-    if (schools.isNotEmpty) {
-      setState(() {
-        schoolList = schools;
-      });
-    }
-    print(schoolList.length);
-  }
+  // fetchSchool() async {
+  //   final schools = await schoolUserRepository.getAll();
+  //
+  //   if (schools.isNotEmpty) {
+  //     setState(() {
+  //       schoolList = schools;
+  //     });
+  //   }
+  //   print(schoolList.length);
+  // }
 
   final List<Map<String, dynamic>> menuItems = [
     {
@@ -431,8 +421,8 @@ class _PublicTabState extends State<PublicTab> {
                         ],
                       ),
                     ),
-                    if (_submissionProvider.submissions.isNotEmpty) ...[
-                      Consumer<SubmissionProvider>(builder: (ctxt, provider, _) {
+                    Consumer<SubmissionProvider>(builder: (ctxt, ref, child) {
+                      if (_submissionProvider.submissions.isNotEmpty) {
                         return Expanded(
                           child: ListView.separated(
                             padding: EdgeInsets.zero,
@@ -452,13 +442,11 @@ class _PublicTabState extends State<PublicTab> {
                                 followUser: () => onFollow(
                                   index: index,
                                 ),
-                                // writerUser: postUser[index].user,
                                 currentUser: user,
                                 onSchoolTap: (schoolId) {
                                   filter = PostFilter.other;
                                   customSchoolId = schoolId;
                                   customGrade = null;
-                                  fetchUserPosts();
                                 },
                               );
                             },
@@ -467,21 +455,22 @@ class _PublicTabState extends State<PublicTab> {
                             },
                           ),
                         );
-                      })
-                    ] else ...[
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            "Loading...",
-                            style: GoogleFonts.poppins(
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 15,
+                      } else {
+                        return Expanded(
+                          // Ensure "return" is added here
+                          child: Center(
+                            child: Text(
+                              "Loading...",
+                              style: GoogleFonts.poppins(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ]
+                        );
+                      }
+                    }),
 
                     // Expanded(
                     //   child: ListView.separated(
@@ -531,7 +520,7 @@ class _PublicTabState extends State<PublicTab> {
     var userHasLiked = post.isLiked!;
 
     post.isLiked = !userHasLiked;
-    if(userHasLiked){
+    if (userHasLiked) {
       post.likesCount = post.likesCount! - 1;
     } else {
       post.likesCount = post.likesCount! + 1;
@@ -555,6 +544,6 @@ class _PublicTabState extends State<PublicTab> {
       );
     });
 
-    userRepository.updateOne(writterUser!);
+    // userRepository.updateOne(writterUser!);
   }
 }

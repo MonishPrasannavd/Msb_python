@@ -9,6 +9,7 @@ import 'package:msb_app/components/loading.dart';
 import 'package:msb_app/models/msbuser.dart' as msb;
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
+import 'package:msb_app/utils/api.dart';
 import 'package:msb_app/utils/extention_text.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,7 +64,6 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void tryLoggingIn() async {
-
     final Future<Map<String, dynamic>> successfulMessage =
         userAuth.login(emailController.text, passwordController.text);
     DialogBuilder(context).showLoadingIndicator('');
@@ -75,30 +75,31 @@ class _SignInScreenState extends State<SignInScreen> {
         Provider.of<UserProvider>(context, listen: false).setUser(user);
         // SharedPreferences prefs = await SharedPreferences.getInstance();
 
-       // ✅ Use PrefsService instead of SharedPreferences instance
-      await PrefsService.setUserId(user.user?.id.toString() ?? "");
-      await PrefsService.setString("nameEmail", user.user?.email.toString() ?? "");
-       await PrefsService.setToken(user.accessToken);
-  // Debugging: Check if data is saved correctly
-      String? storedUserId = await PrefsService.getUserId();
-      String? storedEmail = await PrefsService.getUserNameEmail().whenComplete((){
-    ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(
-                duration: Duration(seconds: 1),
-                content: Text("Successfully logged in"),
-                backgroundColor: AppColors.primary))
-            .closed
-            .then((value) => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DashboardSetup()),
-                  (route) => false,
-                ));
-      });
+        // ✅ Use PrefsService instead of SharedPreferences instance
+        await PrefsService.setUserId(user.user?.id.toString() ?? "");
+        await PrefsService.setString("nameEmail", user.user?.email.toString() ?? "");
+        await PrefsService.setToken(user.accessToken);
 
-      print("Stored User ID: $storedUserId");  // Should print actual user ID
-      print("Stored Email: $storedEmail");    // Should print email
-      
-    
+        AppUrl.addHeader("Authorization", "Bearer ${user.accessToken}");
+
+        // Debugging: Check if data is saved correctly
+        String? storedUserId = await PrefsService.getUserId();
+        String? storedEmail = await PrefsService.getUserNameEmail().whenComplete(() {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(
+                  duration: Duration(seconds: 1),
+                  content: Text("Successfully logged in"),
+                  backgroundColor: AppColors.primary))
+              .closed
+              .then((value) => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DashboardSetup()),
+                    (route) => false,
+                  ));
+        });
+
+        print("Stored User ID: $storedUserId"); // Should print actual user ID
+        print("Stored Email: $storedEmail"); // Should print email
       } else {
         DialogBuilder(context).hideOpenDialog();
         ScaffoldMessenger.of(context)
@@ -204,7 +205,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                 text: 'Sign in',
                                 onPressed: () async {
                                   FocusManager.instance.primaryFocus?.unfocus();
-                                  if(kDebugMode){
+                                  if (kDebugMode) {
                                     emailController.text = "monishvd@gmail.com";
                                     passwordController.text = "1234567890";
                                   }
