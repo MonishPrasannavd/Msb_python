@@ -1,12 +1,14 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsService {
   static SharedPreferences? _prefs;
 
-  static Future<SharedPreferences> get _instance async => _prefs ??= await SharedPreferences.getInstance();
+  static Future<SharedPreferences> get _instance async =>
+      _prefs ??= await SharedPreferences.getInstance();
 
   static Future<void> init() async {
     _prefs ??= await _instance;
@@ -25,7 +27,6 @@ class PrefsService {
     return prefs.getBool('isLoggedIn');
   }
 
-
   /// user id
   static Future<void> setUserId(String value) async {
     final prefs = await _instance;
@@ -42,6 +43,7 @@ class PrefsService {
     final prefs = await _instance;
     return prefs.getString('nameEmail');
   }
+
   /// role
   static Future<void> setRole(String value) async {
     final prefs = await _instance;
@@ -67,7 +69,7 @@ class PrefsService {
   static Future<void> saveUser(MsbUser user) async {
     final prefs = await _instance;
     String userJson = jsonEncode(user.toJson());
-    print('userJson: $userJson');
+    debugPrint('userJson: $userJson');
     await prefs.setString('user', userJson);
   }
 
@@ -78,7 +80,6 @@ class PrefsService {
     Map<String, dynamic> userMap = jsonDecode(userJson);
     return MsbUser.fromJson(userMap);
   }
-
 
   /// general methods
 
@@ -111,6 +112,4 @@ class PrefsService {
     final prefs = await _instance;
     return prefs.getBool(key);
   }
-
-
 }

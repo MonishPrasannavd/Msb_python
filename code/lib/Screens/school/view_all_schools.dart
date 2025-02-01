@@ -32,7 +32,8 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
 
     // Add a scroll listener for pagination
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         if (!isLoading && !isSearching) {
           _fetchSchools();
         }
@@ -54,7 +55,7 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
 
     try {
       List<SchoolUser> fetchedSchools =
-      await schoolUserRepository.getRecentlyJoinedSchoolsPaginated(
+          await schoolUserRepository.getRecentlyJoinedSchoolsPaginated(
         limit: limit,
         lastDocumentId: lastSchoolId,
       );
@@ -67,7 +68,7 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
         }
       });
     } catch (e) {
-      print('Error fetching schools: $e');
+      debugPrint('Error fetching schools: $e');
     } finally {
       setState(() {
         isLoading = false;
@@ -80,11 +81,13 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
       isSearching = query.isNotEmpty;
       if (isSearching) {
         schools = allSchools
-            .where((school) =>
-            (school.schoolName ?? '').toLowerCase().contains(query.toLowerCase()))
+            .where((school) => (school.schoolName ?? '')
+                .toLowerCase()
+                .contains(query.toLowerCase()))
             .toList();
       } else {
-        schools = List.from(allSchools); // Reset to the full list when search is cleared
+        schools = List.from(
+            allSchools); // Reset to the full list when search is cleared
       }
     });
   }
@@ -100,7 +103,9 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
             width: query.width,
             decoration: const BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(25.0),
+                    bottomLeft: Radius.circular(25.0))),
             child: Column(
               children: [
                 SafeArea(
@@ -168,4 +173,3 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
     );
   }
 }
-

@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
 
 part 'msb_state.g.dart';
 
@@ -34,7 +33,8 @@ class MsbState {
         name: name ?? this.name,
       );
 
-  factory MsbState.fromJson(Map<String, dynamic> json) => _$MsbStateFromJson(json);
+  factory MsbState.fromJson(Map<String, dynamic> json) =>
+      _$MsbStateFromJson(json);
 
   Map<String, dynamic> toJson() => _$MsbStateToJson(this);
 }

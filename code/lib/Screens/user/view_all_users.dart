@@ -1,10 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/models/student.dart';
-import 'package:msb_app/models/user.dart';
 import 'package:msb_app/providers/school/school_api_provider.dart';
-import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:provider/provider.dart';
 
@@ -38,14 +35,16 @@ class _ViewAllUsersInSchoolState extends State<ViewAllUsersInSchool> {
     super.initState();
     // Add a scroll listener for pagination
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         if (!isLoading && !isSearching) {
           _fetchUsers();
         }
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _schoolApiProvider = Provider.of<SchoolApiProvider>(context, listen: false);
+      _schoolApiProvider =
+          Provider.of<SchoolApiProvider>(context, listen: false);
 
       _fetchUsers();
     });
@@ -64,9 +63,11 @@ class _ViewAllUsersInSchoolState extends State<ViewAllUsersInSchool> {
     });
 
     try {
-      Map<String, dynamic> response = await _schoolApiProvider.getStudentsBySchoolId(int.parse(widget.schoolId), limit: limit, page: page);
+      Map<String, dynamic> response = await _schoolApiProvider
+          .getStudentsBySchoolId(int.parse(widget.schoolId),
+              limit: limit, page: page);
 
-      if(response['students'] != null) {
+      if (response['students'] != null) {
         var fetchedUsers = response['students'] as List<Student>;
         var fetchedPage = response['page'];
         var fetchedLimit = response['limit'];
@@ -89,9 +90,8 @@ class _ViewAllUsersInSchoolState extends State<ViewAllUsersInSchool> {
           }
         });
       }
-
     } catch (e) {
-      print('Error fetching users: $e');
+      debugPrint('Error fetching users: $e');
     } finally {
       setState(() {
         isLoading = false;
@@ -104,10 +104,13 @@ class _ViewAllUsersInSchoolState extends State<ViewAllUsersInSchool> {
       isSearching = query.isNotEmpty;
       if (isSearching) {
         users = allUsers
-            .where((user) => (user.user!.name ?? '').toLowerCase().contains(query.toLowerCase()))
+            .where((user) => (user.user!.name ?? '')
+                .toLowerCase()
+                .contains(query.toLowerCase()))
             .toList();
       } else {
-        users = List.from(allUsers); // Reset to the full list when search is cleared
+        users = List.from(
+            allUsers); // Reset to the full list when search is cleared
       }
     });
   }
@@ -116,7 +119,8 @@ class _ViewAllUsersInSchoolState extends State<ViewAllUsersInSchool> {
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
     return Scaffold(
-      body: Consumer<SchoolApiProvider>(builder: (ctx, schoolApiProvider, child) {
+      body:
+          Consumer<SchoolApiProvider>(builder: (ctx, schoolApiProvider, child) {
         return Column(
           children: [
             Container(
@@ -179,9 +183,10 @@ class _ViewAllUsersInSchoolState extends State<ViewAllUsersInSchool> {
                           : null,
                       child: user.user!.image == null
                           ? Text(
-                        user.user!.image?.substring(0, 1).toUpperCase() ?? 'U',
-                        style: GoogleFonts.poppins(color: Colors.white),
-                      )
+                              user.user!.image?.substring(0, 1).toUpperCase() ??
+                                  'U',
+                              style: GoogleFonts.poppins(color: Colors.white),
+                            )
                           : null,
                     ),
                     title: Text(user.user!.name ?? 'Unknown User'),

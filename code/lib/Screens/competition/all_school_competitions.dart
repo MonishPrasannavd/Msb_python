@@ -57,7 +57,8 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
   late UserRepository userRepository;
   List<CommentPost> commentList = [];
 
-  CollectionReference collectionReference = FirebaseFirestore.instance.collection(FirestoreCollections.comments);
+  CollectionReference collectionReference =
+      FirebaseFirestore.instance.collection(FirestoreCollections.comments);
   late PostFeedRepository postFeedRepository;
 
   bool isSwitched = false;
@@ -90,7 +91,8 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
 
   Future<void> fetchUserPosts() async {
     try {
-      final userPosts = await postFeedRepository.getPostsBySchoolId(widget.schoolId);
+      final userPosts =
+          await postFeedRepository.getPostsBySchoolId(widget.schoolId);
       final result = await Future.wait(
         userPosts.map((e) => e.userId!).map(
               (e) => userRepository.getOne(e),
@@ -106,7 +108,7 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
       // comments
       setState(() => isLoading = false);
     } catch (e) {
-      print("Error fetching user posts: $e");
+      debugPrint("Error fetching user posts: $e");
     }
   }
 
@@ -114,16 +116,20 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
   void initState() {
     super.initState();
     loadUserId();
-    commentRepository = CommentRepository(commentCollection: collectionReference);
+    commentRepository =
+        CommentRepository(commentCollection: collectionReference);
     postFeedRepository = PostFeedRepository();
     schoolUserRepository = SchoolUserRepository();
-    userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'));
+    userRepository = UserRepository(
+        usersCollection: FirebaseFirestore.instance.collection('users'));
 
     fetchSchool();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
-      _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+      _submissionProvider =
+          Provider.of<SubmissionProvider>(context, listen: false);
+      _submissionApiProvider =
+          Provider.of<SubmissionApiProvider>(context, listen: false);
     });
   }
 
@@ -153,7 +159,8 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
   PostFilter? filter;
 
   fetchSchool() async {
-    final fetchedSchool = await schoolUserRepository.findBySchoolId(widget.schoolId);
+    final fetchedSchool =
+        await schoolUserRepository.findBySchoolId(widget.schoolId);
 
     if (fetchedSchool != null) {
       setState(() {
@@ -183,7 +190,11 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
       "icon": 'assets/images/art.png',
       "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
     },
-    {"title": "Quiz", "icon": 'assets/images/quiz.png', "route": const QuizScreen()},
+    {
+      "title": "Quiz",
+      "icon": 'assets/images/quiz.png',
+      "route": const QuizScreen()
+    },
     {
       "title": "Painting",
       "icon": 'assets/images/painting.png',
@@ -201,7 +212,7 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
         isPlaying = true;
       });
     } catch (e) {
-      print("Error while playing audio: $e");
+      debugPrint("Error while playing audio: $e");
     }
   }
 
@@ -212,7 +223,7 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
         isPlaying = false;
       });
     } catch (e) {
-      print("Error while playing audio: $e");
+      debugPrint("Error while playing audio: $e");
     }
   }
 
@@ -227,7 +238,9 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
             width: query.width,
             decoration: const BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(25.0),
+                    bottomLeft: Radius.circular(25.0))),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -334,7 +347,9 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
     setState(() {
       postUser[index] = (
         user: writterUser.copyWith(
-            follower: follower.contains(user!.id!) ? (follower..remove(userId)) : (follower..add(userId!))),
+            follower: follower.contains(user!.id!)
+                ? (follower..remove(userId))
+                : (follower..add(userId!))),
         post: postUser[index].post,
       );
     });

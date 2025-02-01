@@ -7,11 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/enums/post_feed_type.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/repository/comment_repository.dart';
-import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
@@ -26,12 +24,12 @@ import '../../repository/posts_repository.dart';
 class PostDetailScreen extends StatefulWidget {
   PostFeed? post;
   MsbUser? currentUser;
-    MsbUser? writerUser;
+  MsbUser? writerUser;
   int? postIndex;
   final String? postId, title, description;
   PostDetailScreen({
     this.currentUser,
-        this.writerUser,
+    this.writerUser,
     this.postIndex,
     this.post,
     this.postId,
@@ -60,21 +58,21 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   final CommentRepository commentRepository = CommentRepository(
       commentCollection:
           FirebaseFirestore.instance.collection(FirestoreCollections.comments));
-            bool isLoadingPosts = true; // Loading indicator for posts
+  bool isLoadingPosts = true; // Loading indicator for posts
   List<PostFeed> posts = [];
 
   @override
   void initState() {
     super.initState();
-        postFeedRepository = PostFeedRepository();
-_fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
+    postFeedRepository = PostFeedRepository();
+    _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
         includeHidden: false));
-    if (widget.postId != null && widget.postId!.isNotEmpty) {  
+    if (widget.postId != null && widget.postId!.isNotEmpty) {
       fetchPostData();
     } else {
       loadData();
     }
-   // userName = widget.currentUser!.name!;
+    // userName = widget.currentUser!.name!;
   }
 
   Future<void> _fetchPosts(
@@ -143,38 +141,36 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
     return ClipRRect(
       // borderRadius: BorderRadius.circular(
       //     16), // Increased corner radius for more rounded edges
-      
+
       child: Container(
         decoration: BoxDecoration(
             border: Border.all(color: AppColors.black38, width: 1)),
-        child:
-      SizedBox(
-        width: double.infinity,
-        height: 400, // Increased height for larger content
-        child: _buildContentByType(context, 0, widget.post!)
-        // PostUiUtils.buildPostTile(
-        //       context,
-        //       widget.postIndex!,
-        //       widget.post!,
-        //       (postId) async {
-        //         await CommentBottomSheet.show(context, postId: postId);
-        //           _userFuture = UserRepository(
-        //                   usersCollection:
-        //                       FirebaseFirestore.instance.collection('users'))
-        //               .getOne(widget.user!.id!);
-        //           _fetchPosts(() => postFeedRepository
-        //               .getPostsByUserId(widget.user!.id!, includeHidden: false));
-                
-        //       },
-        //       () => onLike(widget.post!, index: widget.postIndex!),
-        //     ),
-      ),
+        child: SizedBox(
+            width: double.infinity,
+            height: 400, // Increased height for larger content
+            child: _buildContentByType(context, 0, widget.post!)
+            // PostUiUtils.buildPostTile(
+            //       context,
+            //       widget.postIndex!,
+            //       widget.post!,
+            //       (postId) async {
+            //         await CommentBottomSheet.show(context, postId: postId);
+            //           _userFuture = UserRepository(
+            //                   usersCollection:
+            //                       FirebaseFirestore.instance.collection('users'))
+            //               .getOne(widget.user!.id!);
+            //           _fetchPosts(() => postFeedRepository
+            //               .getPostsByUserId(widget.user!.id!, includeHidden: false));
+
+            //       },
+            //       () => onLike(widget.post!, index: widget.postIndex!),
+            //     ),
+            ),
       ),
     );
   }
 
-   Widget _buildContentByType(
-      BuildContext context, int index, PostFeed post) {
+  Widget _buildContentByType(BuildContext context, int index, PostFeed post) {
     switch (post.postType) {
       case 'video':
         return _buildVideoPlayer();
@@ -189,7 +185,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
     }
   }
 
-    Future<void> onLike(PostFeed post, {required int index}) async {
+  Future<void> onLike(PostFeed post, {required int index}) async {
     final userId = await PrefsService.getUserId();
     final likes = List<String>.from(post.likedBy);
     final userHasLiked = post.likedBy.contains(userId);
@@ -209,7 +205,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
       userHasLiked,
     );
     setState(() {
-            fetchPostData();
+      fetchPostData();
     });
   }
 
@@ -234,7 +230,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
           )..initialize().then((_) {
               (context as Element).markNeedsBuild();
             }).catchError((error) {
-              print("Video initialization error: $error");
+              debugPrint("Video initialization error: $error");
             }));
       _isOverlayVisible[index] = false;
     } else if (videoControllers[index] != null) {
@@ -249,7 +245,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
             )..initialize().then((_) {
                 (context as Element).markNeedsBuild();
               }).catchError((error) {
-                print("Video initialization error: $error");
+                debugPrint("Video initialization error: $error");
               }));
         _isOverlayVisible[index] = false;
       }
@@ -640,31 +636,36 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
   }
 
   fetchPostData() async {
-    PostFeed? data = await postFeedRepository.getOne(widget.postId ?? widget.post!.id!);
+    PostFeed? data =
+        await postFeedRepository.getOne(widget.postId ?? widget.post!.id!);
     setState(() {
       widget.post = data;
-      _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
-          includeHidden: false));
-                            PostUiUtils.buildPostTile(context, widget.postIndex!, widget.post!,  (postId) async {
+      _fetchPosts(() => postFeedRepository
+          .getPostsByUserId(widget.post!.userId!, includeHidden: false));
+      PostUiUtils.buildPostTile(
+        context,
+        widget.postIndex!,
+        widget.post!,
+        (postId) async {
           // await CommentBottomSheet.show(context, postId: postId);
         },
         () => onLike(widget.post!, index: 0),
       );
-                  PostUiUtils.buildPostFooterIndependent(
-                    context,
-                    widget.post!,
-                    (postId) async {
-                      // await CommentBottomSheet.show(context, postId: postId);
-                    },
-                    () => onLike(widget.post!, index: 0),
-                  );    });
+      PostUiUtils.buildPostFooterIndependent(
+        context,
+        widget.post!,
+        (postId) async {
+          // await CommentBottomSheet.show(context, postId: postId);
+        },
+        () => onLike(widget.post!, index: 0),
+      );
+    });
 
     loadData();
   }
 
   void loadData() {
-    if (widget.post != null &&
-        widget.post!.mediaUrls != null) {
+    if (widget.post != null && widget.post!.mediaUrls != null) {
       _videoPlayerController =
           VPlayer.VideoPlayerController.network(widget.post!.mediaUrls!.first);
       _chewieController = ChewieController(
@@ -702,13 +703,13 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildPostHeaderTitle(),
-                                const SizedBox(height: 10),
+                const SizedBox(height: 10),
                 _buildPostContent(),
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(5.0),
-                 // height: 45,
-                   decoration: BoxDecoration(
+                  // height: 45,
+                  decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -716,8 +717,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
                     ),
                     borderRadius: BorderRadius.circular(5.0),
                   ),
-                  child: 
-                  PostUiUtils.buildPostFooterIndependent(
+                  child: PostUiUtils.buildPostFooterIndependent(
                     context,
                     widget.post!,
                     (postId) async {
@@ -726,11 +726,11 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
                     () => onLike(widget.post!, index: 0),
                   ),
                 ),
-               
+
                 //_buildPostActions(),
-                                const SizedBox(height: 5),
+                const SizedBox(height: 5),
                 //_buildPostLikesAndComments(),
-                  const SizedBox(height: 100),
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -745,9 +745,9 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
       child: Row(
         children: [
           Image.asset(
-                  "assets/images/profile.png",
-                  height: 40,
-                ),
+            "assets/images/profile.png",
+            height: 40,
+          ),
           const SizedBox(width: 8),
           Text(
             widget.post != null ? widget.post!.nameOrEmail ?? 'Unknown' : "",
@@ -775,44 +775,41 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
           borderRadius: BorderRadius.circular(5.0),
         ),
         padding: const EdgeInsets.all(0.0),
-        child:
-       Row(
-        children: [
-          if (widget.post!.postType != null) ...[
-            PostUiUtils.getIconForPostFeedType(
-                PostFeedType.fromValue(widget.post!.postType!)),
-            const SizedBox(
-              width: 5,
-            )
-          ],
-          
-          const SizedBox(height: 5),
-          Column(
-            children: [
-              Text(
-                             
-                                                       maxLines: 2,
-   textAlign: TextAlign.left,
+        child: Row(
+          children: [
+            if (widget.post!.postType != null) ...[
+              PostUiUtils.getIconForPostFeedType(
+                  PostFeedType.fromValue(widget.post!.postType!)),
+              const SizedBox(
+                width: 5,
+              )
+            ],
+            const SizedBox(height: 5),
+            Column(
+              children: [
+                Text(
+                  maxLines: 2,
+                  textAlign: TextAlign.left,
                   widget.post!.title! ?? "Unkown Category",
                   style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w700,
                       fontSize: 12,
                       color: AppColors.background),
-
                 ),
-              Text(
-                textAlign: TextAlign.left,
-                          maxLines: 2,
-                widget.post!.schoolName ?? "Anonymous",
-                style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                    fontSize: 12, color: AppColors.background),
-              ),
-            ],
-          ),
-        ],
+                Text(
+                  textAlign: TextAlign.left,
+                  maxLines: 2,
+                  widget.post!.schoolName ?? "Anonymous",
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: AppColors.background),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
     );
   }
 

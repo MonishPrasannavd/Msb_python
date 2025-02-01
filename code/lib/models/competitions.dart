@@ -19,7 +19,7 @@ class CompetitionsCategory {
   final int isFuture;
   final int id;
   final int type;
-   List<FutureCategories>? subcategories;
+  List<FutureCategories>? subcategories;
   final CategoryType categoryType;
   final String iconUrl;
 
@@ -39,7 +39,7 @@ class CompetitionsCategory {
     if (json['subcategories'] != null) {
       subcategoryList = <FutureCategories>[];
       json['subcategories'].forEach((v) {
-        subcategoryList!.add(new FutureCategories.fromJson(v));
+        subcategoryList!.add(FutureCategories.fromJson(v));
       });
     }
 
@@ -98,27 +98,25 @@ class FutureCategories {
     if (json['subcategories'] != null) {
       subcategories = <Subcategories>[];
       json['subcategories'].forEach((v) {
-        subcategories!.add(new Subcategories.fromJson(v));
+        subcategories!.add(Subcategories.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['is_future'] = this.isFuture;
-    data['name'] = this.name;
-    data['icon'] = this.icon;
-    data['type'] = this.type;
-    data['icon_url'] = this.iconUrl;
-    if (this.subcategories != null) {
-      data['subcategories'] =
-          this.subcategories!.map((v) => v.toJson()).toList();
+    data['id'] = id;
+    data['is_future'] = isFuture;
+    data['name'] = name;
+    data['icon'] = icon;
+    data['type'] = type;
+    data['icon_url'] = iconUrl;
+    if (subcategories != null) {
+      data['subcategories'] = subcategories!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
-
 
 class CategoryType {
   final int id;

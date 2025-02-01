@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/enums/point_type.dart';
 import 'package:msb_app/models/quiz_record.dart';
 import 'package:msb_app/repository/repository.dart';
@@ -9,7 +10,8 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
   final CollectionReference quizRecordsCollection =
       FirebaseFirestore.instance.collection(FirestoreCollections.quizRecords);
 
-  final CollectionReference usersCollection = FirebaseFirestore.instance.collection(FirestoreCollections.users);
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection(FirestoreCollections.users);
 
   @override
   Future<QuizRecord?> getOne(String id) async {
@@ -20,7 +22,7 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
       }
       return null;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching quiz record");
     }
   }
@@ -29,9 +31,11 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
   Future<List<QuizRecord>> getAll() async {
     try {
       QuerySnapshot snapshot = await quizRecordsCollection.get();
-      return snapshot.docs.map((doc) => QuizRecord.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return snapshot.docs
+          .map((doc) => QuizRecord.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching quiz records");
     }
   }
@@ -39,10 +43,11 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
   @override
   Future<QuizRecord?> saveOne(QuizRecord entry) async {
     try {
-      DocumentReference docRef = await quizRecordsCollection.add(entry.toJson());
+      DocumentReference docRef =
+          await quizRecordsCollection.add(entry.toJson());
       return entry.copyWith(quizId: docRef.id);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -51,7 +56,9 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
   Future<List<QuizRecord>> saveAll(List<QuizRecord> entries) async {
     try {
       List<DocumentReference> docRefs = await Future.wait(
-        entries.map((entry) => quizRecordsCollection.add(entry.toJson())).toList(),
+        entries
+            .map((entry) => quizRecordsCollection.add(entry.toJson()))
+            .toList(),
       );
 
       List<QuizRecord> savedRecords = entries.asMap().entries.map((entry) {
@@ -62,7 +69,7 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
 
       return savedRecords;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -74,7 +81,7 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
       return true;
       return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -87,7 +94,7 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
       }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -99,7 +106,7 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
       return true;
       return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -112,7 +119,7 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
       }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -120,11 +127,14 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
   // Helper function to get quiz records by user ID
   Future<List<QuizRecord>> getQuizRecordsByUserId(String userId) async {
     try {
-      QuerySnapshot snapshot = await quizRecordsCollection.where('userId', isEqualTo: userId).get();
+      QuerySnapshot snapshot =
+          await quizRecordsCollection.where('userId', isEqualTo: userId).get();
 
-      return snapshot.docs.map((doc) => QuizRecord.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return snapshot.docs
+          .map((doc) => QuizRecord.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching quiz records for user");
     }
   }
@@ -132,11 +142,14 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
   // Helper function to get quiz records by quiz ID
   Future<List<QuizRecord>> getQuizRecordsByQuizId(String quizId) async {
     try {
-      QuerySnapshot snapshot = await quizRecordsCollection.where('quizId', isEqualTo: quizId).get();
+      QuerySnapshot snapshot =
+          await quizRecordsCollection.where('quizId', isEqualTo: quizId).get();
 
-      return snapshot.docs.map((doc) => QuizRecord.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return snapshot.docs
+          .map((doc) => QuizRecord.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching quiz records for quiz");
     }
   }

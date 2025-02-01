@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/repository/repository.dart';
 
@@ -18,7 +19,7 @@ class UserRepository implements IRepository<MsbUser> {
       }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -32,7 +33,7 @@ class UserRepository implements IRepository<MsbUser> {
       }
       return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -46,7 +47,7 @@ class UserRepository implements IRepository<MsbUser> {
       }).toList();
       return users;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching users");
     }
   }
@@ -72,7 +73,7 @@ class UserRepository implements IRepository<MsbUser> {
 
       return allUsers;
     } catch (e) {
-      print("Error fetching users except those in the list: $e");
+      debugPrint("Error fetching users except those in the list: $e");
       throw Exception("Error fetching users");
     }
   }
@@ -86,7 +87,7 @@ class UserRepository implements IRepository<MsbUser> {
       }
       return null;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching user");
     }
   }
@@ -113,7 +114,7 @@ class UserRepository implements IRepository<MsbUser> {
 
       return savedUsers;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -122,9 +123,10 @@ class UserRepository implements IRepository<MsbUser> {
   Future<MsbUser?> saveOne(MsbUser entry) async {
     try {
       DocumentReference docRef = await usersCollection.add(entry.toJson());
-      return entry.copyWith(id: docRef.id); // Return the MsbUser with the generated ID
+      return entry.copyWith(
+          id: docRef.id); // Return the MsbUser with the generated ID
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null; // Return null or handle error appropriately
     }
   }
@@ -139,7 +141,7 @@ class UserRepository implements IRepository<MsbUser> {
       }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -153,7 +155,7 @@ class UserRepository implements IRepository<MsbUser> {
       }
       return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -161,8 +163,10 @@ class UserRepository implements IRepository<MsbUser> {
   Future<List<MsbUser>> getTopUsersByPoints({int limit = 10}) async {
     try {
       QuerySnapshot snapshot = await usersCollection
-          .orderBy('totalPoints', descending: true) // Order by totalPoints in descending order
-          .limit(limit) // Limit the result to the top `limit` users (default is 10)
+          .orderBy('totalPoints',
+              descending: true) // Order by totalPoints in descending order
+          .limit(
+              limit) // Limit the result to the top `limit` users (default is 10)
           .get();
 
       List<MsbUser> topUsers = snapshot.docs.map((doc) {
@@ -171,27 +175,30 @@ class UserRepository implements IRepository<MsbUser> {
 
       return topUsers;
     } catch (e) {
-      print("Error fetching top users: $e");
+      debugPrint("Error fetching top users: $e");
       throw Exception("Error fetching top users");
     }
   }
 
   Future<int> getTotalUserCount() async {
     try {
-      AggregateQuerySnapshot querySnapshot = await usersCollection.count().get();
+      AggregateQuerySnapshot querySnapshot =
+          await usersCollection.count().get();
       return querySnapshot.count ?? 0;
     } catch (e) {
-      print("Error getting total user count: $e");
+      debugPrint("Error getting total user count: $e");
       throw Exception("Error getting total user count");
     }
   }
 
-  Future<List<MsbUser>> getTopUsersBySchoolId(String schoolId, {int limit = 3}) async {
+  Future<List<MsbUser>> getTopUsersBySchoolId(String schoolId,
+      {int limit = 3}) async {
     try {
       // Query to filter users by `schoolId` and order by `totalPoints` in descending order
       QuerySnapshot snapshot = await usersCollection
           .where('schoolId', isEqualTo: schoolId) // Filter by `schoolId`
-          .orderBy('totalPoints', descending: true) // Order by `totalPoints` descending
+          .orderBy('totalPoints',
+              descending: true) // Order by `totalPoints` descending
           .limit(limit) // Limit to the top `limit` users (default 3)
           .get();
 
@@ -202,18 +209,21 @@ class UserRepository implements IRepository<MsbUser> {
 
       return topUsers;
     } catch (e) {
-      print("Error fetching top users by schoolId: $e");
+      debugPrint("Error fetching top users by schoolId: $e");
       throw Exception("Error fetching top users by schoolId");
     }
   }
 
-  Future<List<MsbUser>> getUsersBySchoolId(String schoolId, {int limit = 10, String? lastDocumentId}) async {
+  Future<List<MsbUser>> getUsersBySchoolId(String schoolId,
+      {int limit = 10, String? lastDocumentId}) async {
     try {
-      Query query = usersCollection.where('schoolId', isEqualTo: schoolId).limit(limit);
+      Query query =
+          usersCollection.where('schoolId', isEqualTo: schoolId).limit(limit);
 
       // If a lastDocumentId is provided, start after the document with that ID for pagination
       if (lastDocumentId != null) {
-        DocumentSnapshot lastDocument = await usersCollection.doc(lastDocumentId).get();
+        DocumentSnapshot lastDocument =
+            await usersCollection.doc(lastDocumentId).get();
         query = query.startAfterDocument(lastDocument);
       }
 
@@ -223,7 +233,7 @@ class UserRepository implements IRepository<MsbUser> {
         return MsbUser.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
     } catch (e) {
-      print("Error fetching users by schoolId with pagination: $e");
+      debugPrint("Error fetching users by schoolId with pagination: $e");
       throw Exception("Error fetching users by schoolId with pagination");
     }
   }

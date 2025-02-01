@@ -21,7 +21,7 @@ import '../../utils/post.dart';
 
 class CompletionDetailsListScreen extends StatefulWidget {
   String categoryName, postCompilation, subCategoryId;
-  String? contentType ;
+  String? contentType;
 
   List<PostFeed> postsFuture = [];
 
@@ -34,16 +34,19 @@ class CompletionDetailsListScreen extends StatefulWidget {
       super.key});
 
   @override
-  State<CompletionDetailsListScreen> createState() => _CompletionDetailsListScreenState();
+  State<CompletionDetailsListScreen> createState() =>
+      _CompletionDetailsListScreenState();
 }
 
-class _CompletionDetailsListScreenState extends State<CompletionDetailsListScreen> {
+class _CompletionDetailsListScreenState
+    extends State<CompletionDetailsListScreen> {
   // late Future<MsbUser?> _userFuture;
   late Future<SchoolUser?> _schoolFuture;
   late Future<List<PostFeed>> _postsFuture;
   late PostFeedRepository postFeedRepository;
-  final CommentRepository commentRepository =
-      CommentRepository(commentCollection: FirebaseFirestore.instance.collection(FirestoreCollections.comments));
+  final CommentRepository commentRepository = CommentRepository(
+      commentCollection:
+          FirebaseFirestore.instance.collection(FirestoreCollections.comments));
   bool isLoadingPosts = false; // Loading indicator for posts
 
   late PostFeedsProvider postFeedsProvider;
@@ -52,7 +55,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
     super.initState();
     //postFeedRepository = PostFeedRepository();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      postFeedsProvider = Provider.of<PostFeedsProvider>(context, listen: false);
+      postFeedsProvider =
+          Provider.of<PostFeedsProvider>(context, listen: false);
       postFeedsProvider.getAllPost();
     });
   }
@@ -69,53 +73,56 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
       children: [
         Expanded(
           child: ChangeNotifierProvider.value(
-            value:  postFeedsProvider,
-            child: Consumer<PostFeedsProvider>(builder: (context, value, child){
-              return ListView.builder(
-                // shrinkWrap: true,
-                padding: const EdgeInsets.all(8.0),
-                itemCount: widget.postsFuture.length,
-                itemBuilder: (BuildContext context, int index) {
-                  PostFeed post = widget.postsFuture[index];
-                  return GestureDetector(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => PostDetailScreen(post: post),
-                      //   ),
-                      // );
-                    },
-                    child: PostUiUtils.buildPostTile(
-                      context,
-                      index,
-                      post,
-                          (postId) async {
-                        // await CommentBottomSheet.show(context, postId: postId);
-                        // _userFuture =
-                        //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-                        // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+              value: postFeedsProvider,
+              child:
+                  Consumer<PostFeedsProvider>(builder: (context, value, child) {
+                return ListView.builder(
+                  // shrinkWrap: true,
+                  padding: const EdgeInsets.all(8.0),
+                  itemCount: widget.postsFuture.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    PostFeed post = widget.postsFuture[index];
+                    return GestureDetector(
+                      onTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => PostDetailScreen(post: post),
+                        //   ),
+                        // );
                       },
-                          () => onLike(post, index: index),
-                    ),
-                  );
-                },
-              );
-            })
-            ),
-          ),
-
-        SizedBox(height: 100,)
+                      child: PostUiUtils.buildPostTile(
+                        context,
+                        index,
+                        post,
+                        (postId) async {
+                          // await CommentBottomSheet.show(context, postId: postId);
+                          // _userFuture =
+                          //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
+                          // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+                        },
+                        () => onLike(post, index: index),
+                      ),
+                    );
+                  },
+                );
+              })),
+        ),
+        SizedBox(
+          height: 100,
+        )
       ],
     );
   }
 
-  Future<void> _fetchPosts(Future<List<PostFeed>> Function() fetchFunction) async {
+  Future<void> _fetchPosts(
+      Future<List<PostFeed>> Function() fetchFunction) async {
     try {
       final fetchedPosts = await fetchFunction();
       for (var post in fetchedPosts) {
         var comments = await commentRepository.getCommentsByPost(post.id!);
-        fetchedPosts[fetchedPosts.indexOf(post)] = post.copyWith(comments: comments);
+        fetchedPosts[fetchedPosts.indexOf(post)] =
+            post.copyWith(comments: comments);
       }
       setState(() {
         widget.postsFuture = fetchedPosts;
@@ -139,10 +146,15 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(onTap: () => Navigator.pop(context), child: SvgPicture.asset("assets/svg/back.svg")),
+            GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: SvgPicture.asset("assets/svg/back.svg")),
             Text(
               widget.categoryName,
-              style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.bold, fontSize: 18),
+              style: GoogleFonts.poppins(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
             SvgPicture.asset("assets/svg/dash_1.svg"),
           ],
@@ -150,7 +162,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.9, // Make the FAB span 90% of the screen width
+        width: MediaQuery.of(context).size.width *
+            0.9, // Make the FAB span 90% of the screen width
         child: FloatingActionButton.extended(
           onPressed: () {
             Widget value = PostFeeds(
@@ -238,7 +251,10 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
                   const SizedBox(height: 4),
                   Text(
                     user.grade!,
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.white54,
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -440,7 +456,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
         image: DecorationImage(
           image: post.mediaUrls != null && post.mediaUrls!.isNotEmpty
               ? CachedNetworkImageProvider(post.mediaUrls!.first)
-              : const AssetImage("assets/images/image_placeholder.png") as ImageProvider,
+              : const AssetImage("assets/images/image_placeholder.png")
+                  as ImageProvider,
           fit: BoxFit.cover,
         ),
       ),
@@ -456,7 +473,9 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
       );
     }
 
-    final initials = name != null ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase() : '';
+    final initials = name != null
+        ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        : '';
 
     return CircleAvatar(
       radius: 40,

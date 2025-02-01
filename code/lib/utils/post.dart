@@ -10,12 +10,10 @@ import 'package:intl/intl.dart';
 import 'package:msb_app/Screens/profile/post_details_screen.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
 import 'package:msb_app/enums/post_feed_type.dart';
-import 'package:msb_app/models/comment.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/share_feature.dart';
-import 'package:msb_app/utils/user.dart';
 
 class CachePatch {
   late CachedVideoPlayerPlusController playerPlusController;
@@ -88,16 +86,17 @@ class PostUiUtils {
     );
   }
 
-Widget buildPostContentIndependent( context, index, post
-            ) {
-              return  post.mediaUrls != null
-                ? _buildPostContent(context, index, post)
-                : Center(
-                    child: Container(),
-                  );
-            }
+  Widget buildPostContentIndependent(context, index, post) {
+    return post.mediaUrls != null
+        ? _buildPostContent(context, index, post)
+        : Center(
+            child: Container(),
+          );
+  }
+
   // Method to build the header section of the post (e.g., title, uploader, time)
-static Widget buildPostFooterIndependent(  BuildContext context,
+  static Widget buildPostFooterIndependent(
+    BuildContext context,
     PostFeed post,
     Function(String) onCommentButtonPressed,
     Function() onLike, {
@@ -243,9 +242,10 @@ static Widget buildPostFooterIndependent(  BuildContext context,
       ],
     );
   }
+
   static Widget _buildPostHeader(
     BuildContext context,
-        int index,
+    int index,
     PostFeed post, {
     Widget? sideMenu,
     MsbUser? writerUser,
@@ -295,7 +295,9 @@ static Widget buildPostFooterIndependent(  BuildContext context,
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PostDetailScreen(post: post,),
+                      builder: (context) => PostDetailScreen(
+                        post: post,
+                      ),
                     ));
               },
               child: Text(
@@ -413,7 +415,7 @@ static Widget buildPostFooterIndependent(  BuildContext context,
           )..initialize().then((_) {
               (context as Element).markNeedsBuild();
             }).catchError((error) {
-              print("Video initialization error: $error");
+              debugPrint("Video initialization error: $error");
             }));
       _isOverlayVisible[index] = false;
     } else if (videoControllers[index] != null) {
@@ -428,7 +430,7 @@ static Widget buildPostFooterIndependent(  BuildContext context,
             )..initialize().then((_) {
                 (context as Element).markNeedsBuild();
               }).catchError((error) {
-                print("Video initialization error: $error");
+                debugPrint("Video initialization error: $error");
               }));
         _isOverlayVisible[index] = false;
       }
@@ -835,7 +837,6 @@ static Widget buildPostFooterIndependent(  BuildContext context,
     }
     videoControllers.clear();
   }
-
 
   static Icon getIconForPostFeedType(PostFeedType? type) {
     switch (type) {

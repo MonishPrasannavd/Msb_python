@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
 
 part 'submission.g.dart';
 
@@ -94,7 +93,8 @@ class Submission {
         isLiked: isLiked ?? this.isLiked,
       );
 
-  factory Submission.fromJson(Map<String, dynamic> json) => _$SubmissionFromJson(json);
+  factory Submission.fromJson(Map<String, dynamic> json) =>
+      _$SubmissionFromJson(json);
 
   Map<String, dynamic> toJson() => _$SubmissionToJson(this);
 }
@@ -145,7 +145,8 @@ class Category {
         iconUrl: iconUrl ?? this.iconUrl,
       );
 
-  factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
+  factory Category.fromJson(Map<String, dynamic> json) =>
+      _$CategoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$CategoryToJson(this);
 }
@@ -171,7 +172,8 @@ class CategoryType {
         id: id ?? this.id,
       );
 
-  factory CategoryType.fromJson(Map<String, dynamic> json) => _$CategoryTypeFromJson(json);
+  factory CategoryType.fromJson(Map<String, dynamic> json) =>
+      _$CategoryTypeFromJson(json);
 
   Map<String, dynamic> toJson() => _$CategoryTypeToJson(this);
 }
@@ -207,7 +209,8 @@ class Subcategory {
         name: name ?? this.name,
       );
 
-  factory Subcategory.fromJson(Map<String, dynamic> json) => _$SubcategoryFromJson(json);
+  factory Subcategory.fromJson(Map<String, dynamic> json) =>
+      _$SubcategoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$SubcategoryToJson(this);
 }
@@ -339,7 +342,8 @@ class Student {
         score: score ?? this.score,
       );
 
-  factory Student.fromJson(Map<String, dynamic> json) => _$StudentFromJson(json);
+  factory Student.fromJson(Map<String, dynamic> json) =>
+      _$StudentFromJson(json);
 
   Map<String, dynamic> toJson() => _$StudentToJson(this);
 }

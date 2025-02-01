@@ -1,11 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/tab_1_home.dart';
-import 'package:msb_app/Screens/home/tab_2_my_feed.dart';
-import 'package:msb_app/Screens/home/tab_3_public.dart';
 import 'package:msb_app/Screens/profile/profile_page.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/repository/user_repository.dart';

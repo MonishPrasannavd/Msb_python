@@ -89,7 +89,7 @@ class _MyFeedTabState extends State<MyFeedTab> {
         }
       });
     } catch (e) {
-      print("Error fetching user posts: $e");
+      debugPrint("Error fetching user posts: $e");
     }
   }*/
 
@@ -128,7 +128,7 @@ class _MyFeedTabState extends State<MyFeedTab> {
         isPlaying = true;
       });
     } catch (e) {
-      print("Error while playing audio: $e");
+      debugPrint("Error while playing audio: $e");
     }
   }
 
@@ -139,7 +139,7 @@ class _MyFeedTabState extends State<MyFeedTab> {
         isPlaying = false;
       });
     } catch (e) {
-      print("Error while playing audio: $e");
+      debugPrint("Error while playing audio: $e");
     }
   }
 

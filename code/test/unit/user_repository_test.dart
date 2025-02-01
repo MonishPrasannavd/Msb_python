@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -7,7 +8,13 @@ import 'package:msb_app/repository/user_repository.dart';
 
 import 'user_repository_test.mocks.dart';
 
-@GenerateMocks([CollectionReference, DocumentReference, DocumentSnapshot, QuerySnapshot, QueryDocumentSnapshot])
+@GenerateMocks([
+  CollectionReference,
+  DocumentReference,
+  DocumentSnapshot,
+  QuerySnapshot,
+  QueryDocumentSnapshot
+])
 void main() {
   late MockCollectionReference mockCollectionReference;
   late MockDocumentReference mockDocumentReference;
@@ -25,11 +32,14 @@ void main() {
   });
 
   group('UserRepository', () {
-    late MsbUser mockUser = MsbUser(name: 'John Doe', email: 'john@example.com', phone: '1234567890');
+    late MsbUser mockUser = MsbUser(
+        name: 'John Doe', email: 'john@example.com', phone: '1234567890');
     String generatedId = 'generatedId';
-    test('saveOne saves a user and returns the saved user with generated ID', () async {
+    test('saveOne saves a user and returns the saved user with generated ID',
+        () async {
       // Arrange
-      when(mockCollectionReference.add(mockUser.toJson())).thenAnswer((_) async => mockDocumentReference);
+      when(mockCollectionReference.add(mockUser.toJson()))
+          .thenAnswer((_) async => mockDocumentReference);
       when(mockDocumentReference.id).thenReturn(generatedId);
 
       // Act
@@ -39,13 +49,14 @@ void main() {
       expect(result, isNotNull);
       expect(result!.id, equals(generatedId));
       verify(mockCollectionReference.add(mockUser.toJson())).called(1);
-      print('Saved result: ${result.toJson()}');
+      debugPrint('Saved result: ${result.toJson()}');
       mockUser = result;
     });
 
     test('getAll retrieves all users', () async {
       // Arrange
-      when(mockCollectionReference.get()).thenAnswer((_) async => mockQuerySnapshot);
+      when(mockCollectionReference.get())
+          .thenAnswer((_) async => mockQuerySnapshot);
       when(mockQuerySnapshot.docs).thenReturn([mockQueryDocumentSnapshot]);
       when(mockQueryDocumentSnapshot.data()).thenReturn(mockUser.toJson());
 
@@ -61,8 +72,10 @@ void main() {
 
     test('updateOne updates a user', () async {
       // Arrange
-      when(mockCollectionReference.doc(mockUser.id)).thenReturn(mockDocumentReference);
-      when(mockDocumentReference.update(mockUser.toJson())).thenAnswer((_) async {});
+      when(mockCollectionReference.doc(mockUser.id))
+          .thenReturn(mockDocumentReference);
+      when(mockDocumentReference.update(mockUser.toJson()))
+          .thenAnswer((_) async {});
 
       // Act
       final result = await userRepository.updateOne(mockUser);
@@ -74,7 +87,8 @@ void main() {
 
     test('deleteOne deletes a user', () async {
       // Arrange
-      when(mockCollectionReference.doc(mockUser.id)).thenReturn(mockDocumentReference);
+      when(mockCollectionReference.doc(mockUser.id))
+          .thenReturn(mockDocumentReference);
       when(mockDocumentReference.delete()).thenAnswer((_) async {});
 
       // Act

@@ -22,8 +22,7 @@ class UserDataProvider with ChangeNotifier {
       'accept': 'application/json',
       'Content-Type': 'application/json',
     };
-    final uri =
-        Uri.parse(AppUrl.BASE_URL + AppUrl.DOMAIN + AppUrl.AUTHENTICATION);
+    final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.AUTHENTICATION);
     Response response = await post(
       uri,
       headers: headers,

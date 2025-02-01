@@ -2,12 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
-import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/post_feed_response.dart';
 import 'package:msb_app/utils/api.dart';
 
 class PostFeedsProvider with ChangeNotifier {
-  List<PostFeedDataList>? postDataList ;
+  List<PostFeedDataList>? postDataList;
 
   PostFeeds? postFeedData;
 
@@ -26,7 +25,11 @@ class PostFeedsProvider with ChangeNotifier {
         postDataList = postFeedData?.data;
         notifyListeners();
 
-        result = {'status': true, 'message': 'Successful', 'data': postFeedData};
+        result = {
+          'status': true,
+          'message': 'Successful',
+          'data': postFeedData
+        };
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];

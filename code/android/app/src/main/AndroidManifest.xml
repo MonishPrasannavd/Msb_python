@@ -36,7 +36,7 @@
             <!-- branch.io -->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
             <intent-filter>
-                <data android:scheme="fastAppTG" android:host="open" />
+                <data android:scheme="msbApp" android:host="open" />
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

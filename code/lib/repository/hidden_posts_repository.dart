@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/models/hidden_posts.dart';
 
 // Define the abstract repository interface
@@ -37,7 +38,7 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
       }
       return null;
     } catch (e) {
-      print('Error fetching hidden post by id: $e');
+      debugPrint('Error fetching hidden post by id: $e');
       return null;
     }
   }
@@ -47,10 +48,11 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
     try {
       QuerySnapshot snapshot = await hiddenPostsCollection.get();
       return snapshot.docs
-          .map((doc) => HiddenPosts.fromJson(doc.data() as Map<String, dynamic>))
+          .map(
+              (doc) => HiddenPosts.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print('Error fetching all hidden posts: $e');
+      debugPrint('Error fetching all hidden posts: $e');
       return [];
     }
   }
@@ -58,14 +60,15 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
   @override
   Future<HiddenPosts?> saveOne(HiddenPosts entry) async {
     try {
-      DocumentReference docRef = await hiddenPostsCollection.add(entry.toJson());
+      DocumentReference docRef =
+          await hiddenPostsCollection.add(entry.toJson());
       DocumentSnapshot snapshot = await docRef.get();
       if (snapshot.exists) {
         return HiddenPosts.fromJson(snapshot.data() as Map<String, dynamic>);
       }
       return null;
     } catch (e) {
-      print('Error saving hidden post: $e');
+      debugPrint('Error saving hidden post: $e');
       return null;
     }
   }
@@ -83,7 +86,7 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
       await batch.commit();
       savedPosts = entries;
     } catch (e) {
-      print('Error saving hidden posts: $e');
+      debugPrint('Error saving hidden posts: $e');
     }
     return savedPosts;
   }
@@ -98,12 +101,14 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
           .get();
 
       if (snapshot.docs.isNotEmpty) {
-        await hiddenPostsCollection.doc(snapshot.docs.first.id).update(entry.toJson());
+        await hiddenPostsCollection
+            .doc(snapshot.docs.first.id)
+            .update(entry.toJson());
         return true;
       }
       return false;
     } catch (e) {
-      print('Error updating hidden post: $e');
+      debugPrint('Error updating hidden post: $e');
       return false;
     }
   }
@@ -128,7 +133,7 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
       await batch.commit();
     } catch (e) {
       success = false;
-      print('Error updating hidden posts: $e');
+      debugPrint('Error updating hidden posts: $e');
     }
     return success;
   }
@@ -148,7 +153,7 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
       }
       return false;
     } catch (e) {
-      print('Error deleting hidden post: $e');
+      debugPrint('Error deleting hidden post: $e');
       return false;
     }
   }
@@ -173,7 +178,7 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
       await batch.commit();
     } catch (e) {
       success = false;
-      print('Error deleting hidden posts: $e');
+      debugPrint('Error deleting hidden posts: $e');
     }
     return success;
   }
@@ -188,11 +193,12 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
           .get();
 
       if (snapshot.docs.isNotEmpty) {
-        return HiddenPosts.fromJson(snapshot.docs.first.data() as Map<String, dynamic>);
+        return HiddenPosts.fromJson(
+            snapshot.docs.first.data() as Map<String, dynamic>);
       }
       return null;
     } catch (e) {
-      print('Error fetching hidden post: $e');
+      debugPrint('Error fetching hidden post: $e');
       return null;
     }
   }
@@ -200,15 +206,15 @@ class HiddenPostsRepository implements IRepository<HiddenPosts> {
   // Fetch all hidden posts by userId
   Future<List<HiddenPosts>> getAllHiddenPostsByUser(String userId) async {
     try {
-      QuerySnapshot snapshot = await hiddenPostsCollection
-          .where('userId', isEqualTo: userId)
-          .get();
+      QuerySnapshot snapshot =
+          await hiddenPostsCollection.where('userId', isEqualTo: userId).get();
 
       return snapshot.docs
-          .map((doc) => HiddenPosts.fromJson(doc.data() as Map<String, dynamic>))
+          .map(
+              (doc) => HiddenPosts.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print('Error fetching hidden posts: $e');
+      debugPrint('Error fetching hidden posts: $e');
       return [];
     }
   }

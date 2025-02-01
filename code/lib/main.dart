@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,12 +21,10 @@ import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import 'Screens/dashboard/dashboard_setup.dart';
 import 'Screens/profile/post_details_screen.dart';
-import 'Screens/school/school_screen.dart';
 // import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +33,6 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PrefsService.init(); // Initialize SharedPreference
-  var userId = await PrefsService.getToken();
 
   await Firebase.initializeApp();
 
@@ -89,27 +84,91 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: AppColors.white,
           useMaterial3: true,
         ),
+        builder: (context, child) {
+          return _DeepLinkListenerBuilder(
+            child: child!,
+          );
+        },
         home: IsLoginCheckPage(),
       ),
     );
   }
 }
 
+class _DeepLinkListenerBuilder extends StatefulWidget {
+  const _DeepLinkListenerBuilder({
+    required this.child,
+  });
+  final Widget child;
+
+  @override
+  State<_DeepLinkListenerBuilder> createState() =>
+      __DeepLinkListenerBuilderState();
+}
+
+class __DeepLinkListenerBuilderState extends State<_DeepLinkListenerBuilder> {
+  late StreamSubscription<Map>? streamSubscriptionDeepLink;
+
+  @override
+  void initState() {
+    super.initState();
+    listenDeepLinkData(context);
+  }
+
+  @override
+  void dispose() {
+    streamSubscriptionDeepLink?.cancel();
+    super.dispose();
+  }
+
+  void listenDeepLinkData(BuildContext context) {
+    streamSubscriptionDeepLink = FlutterBranchSdk.listSession().listen((data) {
+      debugPrint('data: $data');
+      if (data['+clicked_branch_link'] == true) {
+        String? postId, title, description;
+        if (data.containsKey("post_id")) {
+          postId = data["post_id"];
+          title = data["\$og_title"];
+          description = data["\$og_description"];
+        }
+
+        Navigator.push(
+          navigatorKey.currentContext!,
+          MaterialPageRoute(
+            builder: (context) => PostDetailScreen(
+              postId: postId,
+              title: title,
+              description: description,
+            ),
+          ),
+        );
+      }
+    }, onError: (error) {
+      PlatformException platformException = error as PlatformException;
+      debugPrint('exception: $platformException');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+}
+
 class IsLoginCheckPage extends StatefulWidget {
-  IsLoginCheckPage({super.key});
+  const IsLoginCheckPage({super.key});
 
   @override
   State<IsLoginCheckPage> createState() => _IsLoginCheckPageState();
 }
 
 class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
-  StreamSubscription<Map>? streamSubscriptionDeepLink;
   late MasterApiProvider _masterApiProvider;
   late MasterProvider _masterProvider;
 
   void fetchMaster() async {
     var result = await _masterApiProvider.getMasterData();
-    print('result when fetching master data: $result');
+    debugPrint('result when fetching master data: $result');
     _masterProvider.countries = result['countries'];
     _masterProvider.states = result['states'];
     _masterProvider.schools = result['schools'];
@@ -125,15 +184,15 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
     String? savedVersion = await PrefsService.getString('app_version');
 
     if (savedVersion == null || savedVersion != currentVersion) {
-      print("is clear version");
+      debugPrint("is clear version");
       // App version has changed or no version is stored
       await PrefsService
           .clear(); // Clear all saved preferences (logs out the user)
       await PrefsService.setString(
           'app_version', currentVersion); // Save new app version
-      print("User logged out due to app update.");
+      debugPrint("User logged out due to app update.");
     } else {
-      print("App version is up-to-date.");
+      debugPrint("App version is up-to-date.");
     }
   }
 
@@ -177,46 +236,12 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   @override
   void initState() {
     super.initState();
-    listenDeepLinkData(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _masterApiProvider =
           Provider.of<MasterApiProvider>(context, listen: false);
       _masterProvider = Provider.of<MasterProvider>(context, listen: false);
 
       fetchMaster();
-    });
-  }
-
-  @override
-  void dispose() {
-    streamSubscriptionDeepLink?.cancel();
-    super.dispose();
-  }
-
-  void listenDeepLinkData(BuildContext context) async {
-    streamSubscriptionDeepLink = FlutterBranchSdk.initSession().listen((data) {
-      debugPrint('data: $data');
-      if (data.containsKey('+clicked_branch_link')) {
-        if (data['+clicked_branch_link'] == true) {
-          String? postId, title, description;
-          if (data.containsKey("post_id")) {
-            postId = data["post_id"];
-            title = data["\$og_title"];
-            description = data["\$og_description"];
-          }
-
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PostDetailScreen(
-                    postId: postId, title: title, description: description),
-              ));
-          // Navigator.pushReplacementNamed(navigatorKey.currentContext??context, '/home',  arguments: [false, postId]);
-        }
-      }
-    }, onError: (error) {
-      PlatformException platformException = error as PlatformException;
-      debugPrint('exception: $platformException');
     });
   }
 }

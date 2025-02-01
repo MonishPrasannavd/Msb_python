@@ -1,24 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
-import 'package:msb_app/Screens/profile/post_details_screen.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
-import 'package:msb_app/repository/comment_repository.dart';
-import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
-import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/models/post_feed.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
-import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/post.dart';
 import 'package:msb_app/utils/post_v2.dart';
 import 'package:provider/provider.dart';
@@ -40,15 +33,12 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  late Future<MsbUser?> _userFuture;
   late Future<SchoolUser?> _schoolFuture;
-  late Future<List<PostFeed>> _postsFuture;
   late SchoolUserRepository schoolUserRepository;
   bool isLoadingPosts = true; // Loading indicator for posts
   List<PostFeed> posts = [];
   late MsbUser currentUser;
 
-  late UserAuthProvider _authProvider;
   late UserProvider _userProvider;
   late SubmissionProvider _submissionProvider;
   late SubmissionApiProvider _submissionApiProvider;
@@ -56,26 +46,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
-      _userProvider = Provider.of<UserProvider>(context, listen: false);
-      _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
-      _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
+    _submissionProvider =
+        Provider.of<SubmissionProvider>(context, listen: false);
+    _submissionApiProvider =
+        Provider.of<SubmissionApiProvider>(context, listen: false);
 
-      // getUser();
-      loadAllSubmissions();
-    });
+    // getUser();
+    loadAllSubmissions();
   }
 
   Future<void> loadAllSubmissions() async {
     Map<String, dynamic> response = {};
     if (widget.type == "user") {
-      response = await _submissionApiProvider.getSubmissionsByUserId(int.parse(widget.id));
+      response = await _submissionApiProvider
+          .getSubmissionsByUserId(int.parse(widget.id));
     } else if (widget.type == "school") {
-      response = await _submissionApiProvider.getSubmissionsBySchool(int.parse(widget.id));
+      response = await _submissionApiProvider
+          .getSubmissionsBySchool(int.parse(widget.id));
     }
     _submissionProvider.clearSubmissions();
-    _submissionProvider.addSubmissions(response['submissions'] as List<Submission>);
+    _submissionProvider
+        .addSubmissions(response['submissions'] as List<Submission>);
   }
 
   @override
@@ -92,30 +84,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     //   return const Center(child: Text('No posts available'));
     // }
 
-    if(_submissionProvider.submissions.isNotEmpty) {
-        return const Center(child: CircularProgressIndicator());
+    if (_submissionProvider.submissions.isNotEmpty) {
+      return const Center(child: CircularProgressIndicator());
     }
 
     return _buildPostsGrid();
-  }
-
-  Future<void> _fetchPosts(Future<List<PostFeed>> Function() fetchFunction) async {
-    try {
-      final fetchedPosts = await fetchFunction();
-      for (var post in fetchedPosts) {
-        // var comments = await commentRepository.getCommentsByPost(post.id!);
-        // fetchedPosts[fetchedPosts.indexOf(post)] = post.copyWith(comments: comments);
-      }
-      setState(() {
-        posts = fetchedPosts;
-        isLoadingPosts = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingPosts = false;
-      });
-      debugPrint('Error fetching posts: $e');
-    }
   }
 
   @override
@@ -123,16 +96,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     var query = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      body: Consumer3<UserAuthProvider, SubmissionProvider, SubmissionApiProvider>(builder: (ctxt, authProvider, submissionProvider, submissionApiProvider, child) {
+      body: Consumer3<UserAuthProvider, SubmissionProvider,
+              SubmissionApiProvider>(
+          builder: (ctxt, authProvider, submissionProvider,
+              submissionApiProvider, child) {
         return Column(
           children: [
             Container(
               height: query.height / 6,
               width: query.width,
               decoration: const BoxDecoration(
-                // color: AppColors.primary,
+                  // color: AppColors.primary,
                   color: AppColors.purpleDark,
-                  borderRadius: BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+                  borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(25.0),
+                      bottomLeft: Radius.circular(25.0))),
               child: Column(
                 children: [
                   // SafeArea(
@@ -145,7 +123,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   //     ),
                   //   ),
                   // ),
-                  SafeArea(child: widget.type == "user" ? _buildUserProfile() : _buildSchoolProfile()),
+                  SafeArea(
+                      child: widget.type == "user"
+                          ? _buildUserProfile()
+                          : _buildSchoolProfile()),
                 ],
               ),
             ),
@@ -241,7 +222,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(height: 4),
                   Text(
                     user.student.grade?.name ?? "N/A",
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.white54,
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -326,7 +310,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       //     .getOne(widget.id);
                       // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
                     } else if (widget.type == "school") {
-                      _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
+                      _schoolFuture =
+                          schoolUserRepository.findBySchoolId(widget.id);
                       // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
                     }
                   },
@@ -426,7 +411,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3), // Light black overlay
+              color: Colors.black.withValues(alpha: 0.3), // Light black overlay
               borderRadius: BorderRadius.circular(8),
             ),
           ),
@@ -472,7 +457,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3), // Light black overlay
+              color: Colors.black.withValues(alpha: 0.3), // Light black overlay
               borderRadius: BorderRadius.circular(8),
             ),
           ),
@@ -492,7 +477,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         image: DecorationImage(
           image: post.mediaUrls != null && post.mediaUrls!.isNotEmpty
               ? CachedNetworkImageProvider(post.mediaUrls!.first)
-              : const AssetImage("assets/images/image_placeholder.png") as ImageProvider,
+              : const AssetImage("assets/images/image_placeholder.png")
+                  as ImageProvider,
           fit: BoxFit.cover,
         ),
       ),
@@ -508,7 +494,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
     }
 
-    final initials = name != null ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase() : '';
+    final initials = name != null
+        ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        : '';
 
     return CircleAvatar(
       radius: 40,

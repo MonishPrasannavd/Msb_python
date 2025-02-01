@@ -34,9 +34,11 @@ class QuestionsScreen extends StatefulWidget {
 class _QuestionsScreenState extends State<QuestionsScreen> {
   String? _selectedOption;
 
-  CollectionReference questionsCollection = FirebaseFirestore.instance.collection(FirestoreCollections.questions);
+  CollectionReference questionsCollection =
+      FirebaseFirestore.instance.collection(FirestoreCollections.questions);
 
-  CollectionReference answersCollection = FirebaseFirestore.instance.collection(FirestoreCollections.answers);
+  CollectionReference answersCollection =
+      FirebaseFirestore.instance.collection(FirestoreCollections.answers);
 
   late AnswerRepository answerRepository;
   late QuestionRepository questionRepository;
@@ -54,11 +56,14 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     super.initState();
     answerRepository = AnswerRepository(answersCollection: answersCollection);
 
-    questionRepository =
-        QuestionRepository(questionsCollection: questionsCollection, answerRepository: answerRepository);
+    questionRepository = QuestionRepository(
+        questionsCollection: questionsCollection,
+        answerRepository: answerRepository);
     answerRepository = AnswerRepository(answersCollection: answersCollection);
     quizRecordRepository = QuizRecordRepository();
-    userRepository = UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
+    userRepository = UserRepository(
+        usersCollection:
+            FirebaseFirestore.instance.collection(FirestoreCollections.users));
 
     fetchQuestions();
     fetchAnswers();
@@ -71,13 +76,13 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   fetchQuestions() async {
     final questions = await questionRepository.getAll();
 
-    print(questions);
+    debugPrint(questions.toString());
     if (questions.isNotEmpty) {
       setState(() {
         questionList = questions.cast<Question>();
       });
     }
-    print(questionList.length);
+    debugPrint(questionList.length.toString());
   }
 
   Future<void> fetchAnswers() async {
@@ -92,9 +97,9 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
       List<Answer> filteredAnswers = ansList.where((Answer answer) =>
         questionList[i].answerIds.contains(answer.id)
       ).toList();
-      print("@@@@@@@@@@@@@ $filteredAnswers");
+      debugPrint("@@@@@@@@@@@@@ $filteredAnswers");
     }*/
-    print(ansList);
+    debugPrint(ansList.toString());
   }
 
   @override
@@ -124,7 +129,10 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                 child: const Icon(Icons.close)),
             Text(
               widget.title,
-              style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16),
+              style: GoogleFonts.poppins(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16),
             ),
             const Icon(Icons.info_outline, color: Colors.transparent)
           ],
@@ -140,14 +148,18 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                     elevation: 2,
                     child: Container(
                         height: 50,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: AppColors.white),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: AppColors.white),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
                               "${_currentPage + 1}/${questionList.length}",
                               style: GoogleFonts.poppins(
-                                  color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14),
+                                  color: AppColors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14),
                             ),
                             Slider(
                               value: _currentPage / questionList.length,
@@ -157,7 +169,9 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                             Text(
                               "00:10 / 00:30",
                               style: GoogleFonts.poppins(
-                                  color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14),
+                                  color: AppColors.black,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14),
                             ),
                           ],
                         )),
@@ -179,7 +193,8 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                               controller: pageController,
                               onPageChanged: (int page) {
                                 setState(() {
-                                  _currentPage = page; // Update the current page index
+                                  _currentPage =
+                                      page; // Update the current page index
                                 });
                               },
                               itemBuilder: (context, index) {
@@ -189,18 +204,27 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                                     Container(
                                       height: query.height * 0.22,
                                       decoration: BoxDecoration(
-                                          color: AppColors.white, borderRadius: BorderRadius.circular(20.0)),
+                                          color: AppColors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(20.0)),
                                       child: Stack(
                                         children: [
-                                          Image.asset("assets/images/back.png", width: query.width, fit: BoxFit.fill),
+                                          Image.asset("assets/images/back.png",
+                                              width: query.width,
+                                              fit: BoxFit.fill),
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 25),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 25),
                                             child: Center(
                                               child: Text(
                                                 textAlign: TextAlign.center,
-                                                questionList[index].questionText.toString(),
+                                                questionList[index]
+                                                    .questionText
+                                                    .toString(),
                                                 style: GoogleFonts.poppins(
-                                                    color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 20),
+                                                    color: AppColors.black,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 20),
                                               ),
                                             ),
                                           )
@@ -210,36 +234,58 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                                     const SizedBox(height: 12),
                                     Text("Select Correct Answer",
                                         style: GoogleFonts.poppins(
-                                            color: const Color(0xFF7F7676), fontWeight: FontWeight.w500, fontSize: 14)),
+                                            color: const Color(0xFF7F7676),
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14)),
                                     const SizedBox(height: 8),
                                     ...ansList
-                                        .where((Answer answer) => questionList[index].answerIds.contains(answer.id))
+                                        .where((Answer answer) =>
+                                            questionList[index]
+                                                .answerIds
+                                                .contains(answer.id))
                                         .map((ans) => Expanded(
                                               child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10.0,
+                                                        vertical: 3),
                                                 child: ListTile(
                                                   shape: RoundedRectangleBorder(
-                                                    side: const BorderSide(color: Color(0xFFE2DFDF)),
-                                                    borderRadius: BorderRadius.circular(10.0),
+                                                    side: const BorderSide(
+                                                        color:
+                                                            Color(0xFFE2DFDF)),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
                                                   ),
                                                   title: Text(ans.answerText,
-                                                      style: GoogleFonts.poppins(
-                                                          color: AppColors.black,
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.w500)),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                              color: AppColors
+                                                                  .black,
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500)),
                                                   trailing: Radio<String>(
                                                     value: ans.id,
                                                     groupValue: _selectedOption,
                                                     onChanged: (String? value) {
                                                       setState(() {
-                                                        _selectedOption = value!;
+                                                        _selectedOption =
+                                                            value!;
                                                         if (ans.isCorrect) {
-                                                          resultScore = resultScore + 1;
+                                                          resultScore =
+                                                              resultScore + 1;
                                                         } else {
-                                                          wrongAns = wrongAns + 1;
+                                                          wrongAns =
+                                                              wrongAns + 1;
                                                         }
-                                                        moveToNextPage(questionList[index].id, _selectedOption);
-                                                        print(value);
+                                                        moveToNextPage(
+                                                            questionList[index]
+                                                                .id,
+                                                            _selectedOption);
+                                                        debugPrint(value);
                                                       });
                                                     },
                                                   ),
@@ -265,12 +311,19 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                               moveToNextPage();
                             },
                             style: ButtonStyle(
-                                side: MaterialStateProperty.all(const BorderSide(color: AppColors.primary, width: 1)),
-                                backgroundColor: MaterialStateProperty.all(AppColors.primary),
+                                side: MaterialStateProperty.all(
+                                    const BorderSide(
+                                        color: AppColors.primary, width: 1)),
+                                backgroundColor: MaterialStateProperty.all(
+                                    AppColors.primary),
                                 shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0)))),
                             textStyle: GoogleFonts.poppins(
-                                color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16))),
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16))),
                   const SizedBox(height: 5),
                   if (_currentPage == questionList.length - 1)
                     SizedBox(
@@ -279,14 +332,20 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                         child: ButtonBuilder(
                             text: 'Result',
                             onPressed: () {
-                              callNextScreen(context, ResultScreen(resultScore, wrongAns));
+                              callNextScreen(
+                                  context, ResultScreen(resultScore, wrongAns));
                             },
                             style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(AppColors.primary),
+                                backgroundColor: MaterialStateProperty.all(
+                                    AppColors.primary),
                                 shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0)))),
                             textStyle: GoogleFonts.poppins(
-                                color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16))),
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16))),
                 ],
               ),
             ),
@@ -299,20 +358,25 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     // userId = prefs.getString("userId").toString();
 
     questionAnswerMap[questionId] = answerId;
-    pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
-    print(questionAnswerMap);
+    pageController.nextPage(
+        duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+    debugPrint(questionAnswerMap.toString());
     if (_currentPage + 1 == questionList.length) {
       var userId = FirebaseAuth.instance.currentUser?.uid;
 
       if (userId != null) {
         var user = await userRepository.getOne(userId);
 
-        var quizRecord =
-            QuizRecord(userId: userId, quizId: widget.quizId, questionAnswerMap: questionAnswerMap, score: resultScore);
+        var quizRecord = QuizRecord(
+            userId: userId,
+            quizId: widget.quizId,
+            questionAnswerMap: questionAnswerMap,
+            score: resultScore);
         quizRecordRepository.saveOne(quizRecord);
 
         if (user != null && user.grade != null) {
-          var selectedQuizGrade = await PrefsService.getString("selectedQuizGrade");
+          var selectedQuizGrade =
+              await PrefsService.getString("selectedQuizGrade");
           PointsSystem.updateUserPoints(
             userId: userId,
             quizGrade: selectedQuizGrade,
@@ -334,7 +398,8 @@ class ExitConfirmationDialog extends StatelessWidget {
     return Dialog(
       surfaceTintColor: AppColors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -346,7 +411,10 @@ class ExitConfirmationDialog extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               "Are You Sure You Want To Exit?",
-              style: GoogleFonts.poppins(color: const Color(0xFF403B3B), fontWeight: FontWeight.w500, fontSize: 16),
+              style: GoogleFonts.poppins(
+                  color: const Color(0xFF403B3B),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -359,11 +427,15 @@ class ExitConfirmationDialog extends StatelessWidget {
                         text: 'Continue Playing',
                         onPressed: () => Navigator.pop(context),
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(AppColors.primary),
+                            backgroundColor:
+                                MaterialStateProperty.all(AppColors.primary),
                             shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
-                        textStyle:
-                            GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 14))),
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0)))),
+                        textStyle: GoogleFonts.poppins(
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14))),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: () {
@@ -380,7 +452,9 @@ class ExitConfirmationDialog extends StatelessWidget {
                     child: Text(
                       "Quit",
                       style: GoogleFonts.poppins(
-                          color: const Color(0xFF6A6262), fontWeight: FontWeight.w500, fontSize: 14),
+                          color: const Color(0xFF6A6262),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14),
                     ),
                   ),
                 ),

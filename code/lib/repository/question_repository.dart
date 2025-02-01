@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/models/answer.dart';
 import 'package:msb_app/models/question.dart';
 import 'package:msb_app/repository/repository.dart';
@@ -19,17 +20,19 @@ class QuestionRepository implements IRepository<Question> {
     try {
       DocumentSnapshot doc = await questionsCollection.doc(id).get();
       if (doc.exists) {
-        var questionData = Question.fromJson(doc.data() as Map<String, dynamic>);
+        var questionData =
+            Question.fromJson(doc.data() as Map<String, dynamic>);
 
         // Fetch answers for this question using the answerRepository
         List<String> answerIds = questionData.answerIds;
-        List<Answer> answerObjects = await answerRepository.getAnswersByIds(answerIds);
+        List<Answer> answerObjects =
+            await answerRepository.getAnswersByIds(answerIds);
 
         return questionData.copyWith(answers: answerObjects);
       }
       return null;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching question");
     }
   }
@@ -43,7 +46,7 @@ class QuestionRepository implements IRepository<Question> {
       }).toList();
       return questions;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching questions");
     }
   }
@@ -54,7 +57,7 @@ class QuestionRepository implements IRepository<Question> {
       DocumentReference docRef = await questionsCollection.add(entry.toJson());
       return entry.copyWith(id: docRef.id);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -63,7 +66,9 @@ class QuestionRepository implements IRepository<Question> {
   Future<List<Question>> saveAll(List<Question> entries) async {
     try {
       List<DocumentReference> docRefs = await Future.wait(
-        entries.map((entry) => questionsCollection.add(entry.toJson())).toList(),
+        entries
+            .map((entry) => questionsCollection.add(entry.toJson()))
+            .toList(),
       );
 
       List<Question> savedQuestions = entries.asMap().entries.map((entry) {
@@ -74,7 +79,7 @@ class QuestionRepository implements IRepository<Question> {
 
       return savedQuestions;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -84,9 +89,9 @@ class QuestionRepository implements IRepository<Question> {
     try {
       await questionsCollection.doc(entry.id).update(entry.toJson());
       return true;
-          return false;
+      return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -96,10 +101,10 @@ class QuestionRepository implements IRepository<Question> {
     try {
       for (var entry in entries) {
         await questionsCollection.doc(entry.id).update(entry.toJson());
-            }
+      }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -109,9 +114,9 @@ class QuestionRepository implements IRepository<Question> {
     try {
       await questionsCollection.doc(entry.id).delete();
       return true;
-          return false;
+      return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -121,10 +126,10 @@ class QuestionRepository implements IRepository<Question> {
     try {
       for (var entry in entries) {
         await questionsCollection.doc(entry.id).delete();
-            }
+      }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }

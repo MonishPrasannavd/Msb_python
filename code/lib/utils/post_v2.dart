@@ -17,6 +17,7 @@ import 'package:msb_app/models/user.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/share_feature.dart';
 import 'package:msb_app/utils/user.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CachePatch {
   late CachedVideoPlayerPlusController playerPlusController;
@@ -27,44 +28,47 @@ class CachePatch {
 
 class PostUiUtilsV2 {
   static Map<int, CachePatch> videoControllers = {};
-  static final Map<int, bool> _isOverlayVisible = {}; // Tracks visibility of overlays
-  static final Map<int, Timer?> _overlayTimers = {}; // Tracks timers for auto-hiding overlays
+  static final Map<int, bool> _isOverlayVisible =
+      {}; // Tracks visibility of overlays
+  static final Map<int, Timer?> _overlayTimers =
+      {}; // Tracks timers for auto-hiding overlays
   static const double postContentHeight = 350;
 
   // Function to build a full post tile
   static Widget buildPostTile(
+    BuildContext context,
+    int index,
+    Submission post,
+    Function(int) onCommentButtonPressed,
+    Function() onLike, {
+    Widget? sideMenu,
+    MsbUser? writerUser,
+    Function()? followUser,
+    MsbUser? currentUser,
+    Function(String schoolId)? onSchoolTap,
+    VoidCallback? onNavigateBack,
+    Widget Function(
       BuildContext context,
       int index,
+      Submission post, {
+      Widget? sideMenu,
+      MsbUser? writerUser,
+      MsbUser? currentUser,
+      Function(String schoolId)? onSchoolTap,
+      VoidCallback? onNavigateBack,
+    })? customPostHeader,
+    Widget Function(BuildContext context, int index, Submission post)?
+        customPostContent,
+    Widget Function(
+      BuildContext context,
       Submission post,
       Function(int) onCommentButtonPressed,
       Function() onLike, {
-        Widget? sideMenu,
-        MsbUser? writerUser,
-        Function()? followUser,
-        MsbUser? currentUser,
-        Function(String schoolId)? onSchoolTap,
-        VoidCallback? onNavigateBack,
-        Widget Function(
-            BuildContext context,
-            int index,
-            Submission post, {
-            Widget? sideMenu,
-            MsbUser? writerUser,
-            MsbUser? currentUser,
-            Function(String schoolId)? onSchoolTap,
-            VoidCallback? onNavigateBack,
-            })? customPostHeader,
-        Widget Function(BuildContext context, int index, Submission post)? customPostContent,
-        Widget Function(
-            BuildContext context,
-            Submission post,
-            Function(int) onCommentButtonPressed,
-            Function() onLike, {
-            MsbUser? writerUser,
-            MsbUser? currentUser,
-            Function()? followUser,
-            })? customPostFooter,
-      }) {
+      MsbUser? writerUser,
+      MsbUser? currentUser,
+      Function()? followUser,
+    })? customPostFooter,
+  }) {
     final postHeader = customPostHeader ?? _buildPostHeader;
     final postContent = customPostContent ?? _buildPostContent;
     final postFooter = customPostFooter ?? _buildPostFooter;
@@ -108,7 +112,6 @@ class PostUiUtilsV2 {
     );
   }
 
-
   Widget buildPostContentIndependent(context, index, post) {
     return post.mediaUrls != null
         ? _buildPostContent(context, index, post)
@@ -116,7 +119,6 @@ class PostUiUtilsV2 {
             child: Container(),
           );
   }
-
 
   static Widget _buildPostHeader(
     BuildContext context,
@@ -222,7 +224,8 @@ class PostUiUtilsV2 {
                   },
                   child: Text(
                     writerUser.schoolName ?? "Anonymous",
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.blue),
+                    style:
+                        GoogleFonts.poppins(fontSize: 12, color: Colors.blue),
                   ),
                 ),
               ),
@@ -230,7 +233,7 @@ class PostUiUtilsV2 {
           ),
         ],
         const SizedBox(height: 5),
-        if(post.createdAt != null)...[
+        if (post.createdAt != null) ...[
           Text(
             DateFormat('d MMM y, hh:mm a').format(post.createdAt),
             style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
@@ -251,9 +254,11 @@ class PostUiUtilsV2 {
   }
 
   // Method to build post content based on post type (image, video, text, etc.)
-  static Widget _buildPostContent(BuildContext context, int index, Submission post) {
+  static Widget _buildPostContent(
+      BuildContext context, int index, Submission post) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16), // Increased corner radius for more rounded edges
+      borderRadius: BorderRadius.circular(
+          16), // Increased corner radius for more rounded edges
       child: SizedBox(
         width: double.infinity,
         height: postContentHeight, // Increased height for larger content
@@ -262,7 +267,8 @@ class PostUiUtilsV2 {
     );
   }
 
-  static Widget _buildContentByType(BuildContext context, int index, Submission post) {
+  static Widget _buildContentByType(
+      BuildContext context, int index, Submission post) {
     var postType = getPostFeedType(post);
     switch (postType?.value) {
       case 'video':
@@ -278,11 +284,15 @@ class PostUiUtilsV2 {
   }
 
   // Custom video player with tap-to-show overlay controls
-  static Widget _buildCustomVideoPlayer(BuildContext context, int index, Submission post) {
+  static Widget _buildCustomVideoPlayer(
+      BuildContext context, int index, Submission post) {
     if (post.mediaUrl == null) {
       return Center(
         child: Text("",
-            style: GoogleFonts.poppins(color: const Color(0xFF151414), fontWeight: FontWeight.w500, fontSize: 16)),
+            style: GoogleFonts.poppins(
+                color: const Color(0xFF151414),
+                fontWeight: FontWeight.w500,
+                fontSize: 16)),
       );
     }
     if (!videoControllers.containsKey(index)) {
@@ -298,7 +308,8 @@ class PostUiUtilsV2 {
             }));
       _isOverlayVisible[index] = false;
     } else if (videoControllers[index] != null) {
-      final difference = DateTime.now().difference(videoControllers[index]!.dateTime);
+      final difference =
+          DateTime.now().difference(videoControllers[index]!.dateTime);
       if (difference.inSeconds > 10) {
         videoControllers[index] = CachePatch(
             dateTime: DateTime.now(),
@@ -332,12 +343,15 @@ class PostUiUtilsV2 {
                   height: postContentHeight, // Fixed height for all videos
                   width: double.infinity,
                   child: AspectRatio(
-                    aspectRatio: controller.playerPlusController.value.aspectRatio,
-                    child: CachedVideoPlayerPlus(controller.playerPlusController),
+                    aspectRatio:
+                        controller.playerPlusController.value.aspectRatio,
+                    child:
+                        CachedVideoPlayerPlus(controller.playerPlusController),
                   ),
                 ),
                 _isOverlayVisible[index] ?? false
-                    ? _buildOverlayControls(controller.playerPlusController, context, index)
+                    ? _buildOverlayControls(
+                        controller.playerPlusController, context, index)
                     : const SizedBox.shrink(),
               ],
             ),
@@ -366,7 +380,10 @@ class PostUiUtilsV2 {
   }
 
   // Custom video controls (play/pause, sound, replay) shown in the bottom overlay
-  static Widget _buildOverlayControls(CachedVideoPlayerPlusController controller, BuildContext context, int index) {
+  static Widget _buildOverlayControls(
+      CachedVideoPlayerPlusController controller,
+      BuildContext context,
+      int index) {
     return Container(
       height: postContentHeight, // Overlay covering the entire video
       width: double.infinity,
@@ -384,7 +401,9 @@ class PostUiUtilsV2 {
                 size: 30,
               ),
               onPressed: () {
-                controller.value.isPlaying ? controller.pause() : controller.play();
+                controller.value.isPlaying
+                    ? controller.pause()
+                    : controller.play();
                 _hideOverlayOnTap(
                   context,
                   index,
@@ -394,7 +413,9 @@ class PostUiUtilsV2 {
             // Volume toggle button
             IconButton(
               icon: Icon(
-                controller.value.volume == 0 ? Icons.volume_off : Icons.volume_up,
+                controller.value.volume == 0
+                    ? Icons.volume_off
+                    : Icons.volume_up,
                 color: Colors.white,
                 size: 30,
               ),
@@ -439,8 +460,20 @@ class PostUiUtilsV2 {
       },
       child: CachedNetworkImage(
         imageUrl: post.mediaUrl != null ? post.mediaUrl! : "",
-        placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-        errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+        placeholder: (context, url) => Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+        errorWidget: (context, url, error) =>
+            const Center(child: Icon(Icons.error)),
         imageBuilder: (context, imageProvider) {
           return AspectRatio(
             aspectRatio: 16 / 9, // Maintain a consistent aspect ratio
@@ -448,10 +481,12 @@ class PostUiUtilsV2 {
               width: double.infinity,
               height: postContentHeight,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10), // Optional: Add rounded corners
+                borderRadius:
+                    BorderRadius.circular(10), // Optional: Add rounded corners
                 image: DecorationImage(
                   image: imageProvider,
-                  fit: BoxFit.cover, // Ensures the image fits without distortion
+                  fit:
+                      BoxFit.cover, // Ensures the image fits without distortion
                 ),
               ),
             ),
@@ -476,8 +511,10 @@ class PostUiUtilsV2 {
             child: InteractiveViewer(
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) =>
+                    const Center(child: Icon(Icons.error)),
                 fit: BoxFit.contain, // Ensure image is fully visible
               ),
             ),
@@ -551,7 +588,8 @@ class PostUiUtilsV2 {
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 5),
                       child: Row(
                         children: [
                           SvgPicture.asset(
@@ -563,7 +601,8 @@ class PostUiUtilsV2 {
                           const SizedBox(width: 5),
                           Text(
                             post.likesCount.toString(),
-                            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
+                            style: GoogleFonts.poppins(
+                                fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -580,16 +619,17 @@ class PostUiUtilsV2 {
                 // ],
 
                 /// comments counter and bottomsheet
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      onCommentButtonPressed(post.id!); // Properly call the function when comment is pressed
-                    },
-                    child: _buildIconText(
-                      Icons.comment_outlined,
-                      "0",
-                    ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  onTap: () {
+                    onCommentButtonPressed(post
+                        .id!); // Properly call the function when comment is pressed
+                  },
+                  child: _buildIconText(
+                    Icons.comment_outlined,
+                    "0",
                   ),
+                ),
                 // if (post.commentsEnabled) ...[
                 //   const SizedBox(width: 10),
                 //   GestureDetector(

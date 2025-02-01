@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/enums/point_type.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/user.dart';
@@ -33,7 +34,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
         return SchoolUser.fromJson(doc.data() as Map<String, dynamic>);
       }
     } catch (e) {
-      print("Error fetching school user: $e");
+      debugPrint("Error fetching school user: $e");
     }
     return null;
   }
@@ -49,7 +50,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
             snapshot.docs.first.data() as Map<String, dynamic>);
       }
     } catch (e) {
-      print("Error fetching school user: $e");
+      debugPrint("Error fetching school user: $e");
     }
     return null;
   }
@@ -62,7 +63,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
           .map((doc) => SchoolUser.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error fetching school users: $e");
+      debugPrint("Error fetching school users: $e");
     }
     return [];
   }
@@ -76,7 +77,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
       await docRef.set(entry.toJson());
       return entry;
     } catch (e) {
-      print("Error saving school user: $e");
+      debugPrint("Error saving school user: $e");
       return null;
     }
   }
@@ -96,7 +97,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
       await batch.commit();
       return savedEntries;
     } catch (e) {
-      print("Error saving multiple school users: $e");
+      debugPrint("Error saving multiple school users: $e");
       return [];
     }
   }
@@ -109,7 +110,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
         return true;
       }
     } catch (e) {
-      print("Error updating school user: $e");
+      debugPrint("Error updating school user: $e");
     }
     return false;
   }
@@ -127,7 +128,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
       await batch.commit();
       return true;
     } catch (e) {
-      print("Error updating multiple school users: $e");
+      debugPrint("Error updating multiple school users: $e");
     }
     return false;
   }
@@ -140,7 +141,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
         return true;
       }
     } catch (e) {
-      print("Error deleting school user: $e");
+      debugPrint("Error deleting school user: $e");
     }
     return false;
   }
@@ -158,7 +159,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
       await batch.commit();
       return true;
     } catch (e) {
-      print("Error deleting multiple school users: $e");
+      debugPrint("Error deleting multiple school users: $e");
     }
     return false;
   }
@@ -168,7 +169,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
       AggregateQuerySnapshot querySnapshot = await collection.count().get();
       return querySnapshot.count ?? 0;
     } catch (e) {
-      print("Error getting total school count: $e");
+      debugPrint("Error getting total school count: $e");
       throw Exception("Error getting total school count");
     }
   }
@@ -282,7 +283,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
 
       return topSchools;
     } catch (e) {
-      print("Error fetching top schools: $e");
+      debugPrint("Error fetching top schools: $e");
       throw Exception("Error fetching top schools");
     }
   }
@@ -303,7 +304,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
 
       return recentlyJoinedSchools;
     } catch (e) {
-      print("Error fetching recently joined schools: $e");
+      debugPrint("Error fetching recently joined schools: $e");
       throw Exception("Error fetching recently joined schools");
     }
   }
@@ -333,7 +334,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
         return SchoolUser.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
     } catch (e) {
-      print("Error fetching paginated recently joined schools: $e");
+      debugPrint("Error fetching paginated recently joined schools: $e");
       throw Exception("Error fetching paginated recently joined schools");
     }
   }
@@ -356,7 +357,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
         return SchoolUser.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
     } catch (e) {
-      print("Error searching schools: $e");
+      debugPrint("Error searching schools: $e");
       throw Exception("Error searching schools");
     }
   }
@@ -367,7 +368,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
       SchoolUser? schoolDoc = await findBySchoolId(schoolId);
 
       if (schoolDoc == null) {
-        print("School with ID $schoolId not found");
+        debugPrint("School with ID $schoolId not found");
         return null; // Return null if the school doesn't exist
       }
 
@@ -381,7 +382,7 @@ class SchoolUserRepository implements IRepository<SchoolUser> {
       // The rank is one more than the count of schools with higher average points
       return higherRankedSchools.docs.length + 1;
     } catch (e) {
-      print("Error calculating school rank: $e");
+      debugPrint("Error calculating school rank: $e");
       throw Exception("Error calculating school rank");
     }
   }

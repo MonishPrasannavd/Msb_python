@@ -30,7 +30,7 @@ class CountryStateDropdownState extends State<CountryStateDropdown> {
         // Country Dropdown
         DropdownSearch<MsbCountry>(
           compareFn: (item1, item2) => item1.id == item2.id,
-          itemAsString: (item) => item?.name ?? '',
+          itemAsString: (item) => item.name ?? '',
           items: (f, cs) => countries,
           onChanged: (MsbCountry? country) {
             setState(() {
@@ -49,20 +49,25 @@ class CountryStateDropdownState extends State<CountryStateDropdown> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               ),
             ),
           ),
           decoratorProps: const DropDownDecoratorProps(
-              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Select Country')),
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(), hintText: 'Select Country')),
         ),
         const SizedBox(height: 16),
         // State Dropdown
         DropdownSearch<MsbState>(
           compareFn: (item1, item2) => item1.id == item2.id,
-          itemAsString: (item) => item?.name ?? '',
-          items: (f, cs) =>
-              selectedCountry != null ? states.where((state) => state.countryId == selectedCountry!.id).toList() : [],
+          itemAsString: (item) => item.name ?? '',
+          items: (f, cs) => selectedCountry != null
+              ? states
+                  .where((state) => state.countryId == selectedCountry!.id)
+                  .toList()
+              : [],
           onChanged: (MsbState? state) {
             setState(() {
               selectedState = state;
@@ -79,7 +84,8 @@ class CountryStateDropdownState extends State<CountryStateDropdown> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               ),
             ),
           ),

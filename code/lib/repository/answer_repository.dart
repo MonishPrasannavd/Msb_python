@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/models/answer.dart';
 import 'package:msb_app/repository/repository.dart';
 
@@ -17,7 +18,7 @@ class AnswerRepository implements IRepository<Answer> {
       }
       return null;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching answer");
     }
   }
@@ -32,7 +33,7 @@ class AnswerRepository implements IRepository<Answer> {
           .map((doc) => Answer.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching answers");
     }
   }
@@ -46,7 +47,7 @@ class AnswerRepository implements IRepository<Answer> {
       }).toList();
       return answers;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       throw Exception("Error fetching answers");
     }
   }
@@ -57,7 +58,7 @@ class AnswerRepository implements IRepository<Answer> {
       DocumentReference docRef = await answersCollection.add(entry.toJson());
       return entry.copyWith(id: docRef.id);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -77,7 +78,7 @@ class AnswerRepository implements IRepository<Answer> {
 
       return savedAnswers;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return [];
     }
   }
@@ -87,9 +88,8 @@ class AnswerRepository implements IRepository<Answer> {
     try {
       await answersCollection.doc(entry.id).update(entry.toJson());
       return true;
-          return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -99,10 +99,10 @@ class AnswerRepository implements IRepository<Answer> {
     try {
       for (var entry in entries) {
         await answersCollection.doc(entry.id).update(entry.toJson());
-            }
+      }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -112,9 +112,8 @@ class AnswerRepository implements IRepository<Answer> {
     try {
       await answersCollection.doc(entry.id).delete();
       return true;
-          return false;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }
@@ -124,10 +123,10 @@ class AnswerRepository implements IRepository<Answer> {
     try {
       for (var entry in entries) {
         await answersCollection.doc(entry.id).delete();
-            }
+      }
       return true;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return false;
     }
   }

@@ -6,9 +6,9 @@ class DashboardResponse {
 
   DashboardResponse(
       {this.totalSchools,
-        this.totalStudent,
-        this.topScoreStudents,
-        this.futureCategories});
+      this.totalStudent,
+      this.topScoreStudents,
+      this.futureCategories});
 
   DashboardResponse.fromJson(Map<String, dynamic> json) {
     totalSchools = json['total_schools'];
@@ -29,15 +29,15 @@ class DashboardResponse {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['total_schools'] = this.totalSchools;
-    data['total_student'] = this.totalStudent;
-    if (this.topScoreStudents != null) {
+    data['total_schools'] = totalSchools;
+    data['total_student'] = totalStudent;
+    if (topScoreStudents != null) {
       data['top_score_students'] =
-          this.topScoreStudents!.map((v) => v.toJson()).toList();
+          topScoreStudents!.map((v) => v.toJson()).toList();
     }
-    if (this.futureCategories != null) {
+    if (futureCategories != null) {
       data['future_categories'] =
-          this.futureCategories!.map((v) => v.toJson()).toList();
+          futureCategories!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -62,20 +62,20 @@ class TopScoreStudents {
 
   TopScoreStudents(
       {this.userId,
-        this.points,
-        this.gradeId,
-        this.likes,
-        this.schoolId,
-        this.createdBy,
-        this.countryId,
-        this.createdAt,
-        this.stateId,
-        this.updatedAt,
-        this.city,
-        this.id,
-        this.dob,
-        this.score,
-        this.user});
+      this.points,
+      this.gradeId,
+      this.likes,
+      this.schoolId,
+      this.createdBy,
+      this.countryId,
+      this.createdAt,
+      this.stateId,
+      this.updatedAt,
+      this.city,
+      this.id,
+      this.dob,
+      this.score,
+      this.user});
 
   TopScoreStudents.fromJson(Map<String, dynamic> json) {
     userId = json['user_id'];
@@ -97,22 +97,22 @@ class TopScoreStudents {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['user_id'] = this.userId;
-    data['points'] = this.points;
-    data['grade_id'] = this.gradeId;
-    data['likes'] = this.likes;
-    data['school_id'] = this.schoolId;
-    data['created_by'] = this.createdBy;
-    data['country_id'] = this.countryId;
-    data['created_at'] = this.createdAt;
-    data['state_id'] = this.stateId;
-    data['updated_at'] = this.updatedAt;
-    data['city'] = this.city;
-    data['id'] = this.id;
-    data['dob'] = this.dob;
-    data['score'] = this.score;
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
+    data['user_id'] = userId;
+    data['points'] = points;
+    data['grade_id'] = gradeId;
+    data['likes'] = likes;
+    data['school_id'] = schoolId;
+    data['created_by'] = createdBy;
+    data['country_id'] = countryId;
+    data['created_at'] = createdAt;
+    data['state_id'] = stateId;
+    data['updated_at'] = updatedAt;
+    data['city'] = city;
+    data['id'] = id;
+    data['dob'] = dob;
+    data['score'] = score;
+    if (user != null) {
+      data['user'] = user!.toJson();
     }
     return data;
   }
@@ -140,12 +140,12 @@ class User {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['image'] = this.image;
-    data['role_id'] = this.roleId;
-    data['id'] = this.id;
-    data['image_url'] = this.imageUrl;
+    data['name'] = name;
+    data['email'] = email;
+    data['image'] = image;
+    data['role_id'] = roleId;
+    data['id'] = id;
+    data['image_url'] = imageUrl;
     return data;
   }
 }
@@ -161,12 +161,12 @@ class FutureCategories {
 
   FutureCategories(
       {this.id,
-        this.isFuture,
-        this.name,
-        this.icon,
-        this.type,
-        this.iconUrl,
-        this.subcategories});
+      this.isFuture,
+      this.name,
+      this.icon,
+      this.type,
+      this.iconUrl,
+      this.subcategories});
 
   FutureCategories.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -185,15 +185,14 @@ class FutureCategories {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['is_future'] = this.isFuture;
-    data['name'] = this.name;
-    data['icon'] = this.icon;
-    data['type'] = this.type;
-    data['icon_url'] = this.iconUrl;
-    if (this.subcategories != null) {
-      data['subcategories'] =
-          this.subcategories!.map((v) => v.toJson()).toList();
+    data['id'] = id;
+    data['is_future'] = isFuture;
+    data['name'] = name;
+    data['icon'] = icon;
+    data['type'] = type;
+    data['icon_url'] = iconUrl;
+    if (subcategories != null) {
+      data['subcategories'] = subcategories!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -216,10 +215,10 @@ class Subcategories {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['category_id'] = this.categoryId;
-    data['icon'] = this.icon;
-    data['name'] = this.name;
+    data['id'] = id;
+    data['category_id'] = categoryId;
+    data['icon'] = icon;
+    data['name'] = name;
     return data;
   }
 }

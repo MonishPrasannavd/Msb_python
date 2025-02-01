@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/enums/point_type.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/repository/repository.dart';
@@ -24,7 +25,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
         return PostFeed.fromJson(doc.data() as Map<String, dynamic>);
       }
     } catch (e) {
-      print("Error getting post: $e");
+      debugPrint("Error getting post: $e");
     }
     return null;
   }
@@ -41,7 +42,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error getting all posts: $e");
+      debugPrint("Error getting all posts: $e");
     }
     return [];
   }
@@ -61,7 +62,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
       }
       return entry;
     } catch (e) {
-      print("Error saving post: $e");
+      debugPrint("Error saving post: $e");
     }
     return null;
   }
@@ -78,7 +79,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
       await batch.commit();
       return entries;
     } catch (e) {
-      print("Error saving posts: $e");
+      debugPrint("Error saving posts: $e");
     }
     return [];
   }
@@ -89,7 +90,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
       await postsCollection.doc(entry.id).update(entry.toJson());
       return true;
     } catch (e) {
-      print("Error updating post: $e");
+      debugPrint("Error updating post: $e");
       return false;
     }
   }
@@ -104,7 +105,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
       await batch.commit();
       return true;
     } catch (e) {
-      print("Error updating posts: $e");
+      debugPrint("Error updating posts: $e");
       return false;
     }
   }
@@ -115,7 +116,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
       await postsCollection.doc(entry.id).delete();
       return true;
     } catch (e) {
-      print("Error deleting post: $e");
+      debugPrint("Error deleting post: $e");
       return false;
     }
   }
@@ -130,7 +131,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
       await batch.commit();
       return true;
     } catch (e) {
-      print("Error deleting posts: $e");
+      debugPrint("Error deleting posts: $e");
       return false;
     }
   }
@@ -145,7 +146,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
         return true;
       }
     } catch (e) {
-      print("Error toggling isHidden flag: $e");
+      debugPrint("Error toggling isHidden flag: $e");
     }
     return false;
   }
@@ -162,7 +163,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
         return true;
       }
     } catch (e) {
-      print("Error toggling commentsEnabled flag: $e");
+      debugPrint("Error toggling commentsEnabled flag: $e");
     }
     return false;
   }
@@ -185,7 +186,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error fetching top posts by likes in school: $e");
+      debugPrint("Error fetching top posts by likes in school: $e");
       return [];
     }
   }
@@ -208,7 +209,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error getting posts by userId: $e");
+      debugPrint("Error getting posts by userId: $e");
     }
     return [];
   }
@@ -233,7 +234,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
       }
       return true;
     } catch (e) {
-      print("Error toggling commentsEnabled flag: $e");
+      debugPrint("Error toggling commentsEnabled flag: $e");
     }
     return false;
   }
@@ -257,7 +258,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error getting posts by userId: $e");
+      debugPrint("Error getting posts by userId: $e");
     }
     return [];
   }
@@ -280,7 +281,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error getting posts by schoolId: $e");
+      debugPrint("Error getting posts by schoolId: $e");
     }
     return [];
   }
@@ -313,7 +314,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error getting posts excluding userId: $e");
+      debugPrint("Error getting posts excluding userId: $e");
     }
     return [];
   }
@@ -331,7 +332,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
 
       return totalLikes;
     } catch (e) {
-      print("Error getting total likes by schoolId: $e");
+      debugPrint("Error getting total likes by schoolId: $e");
       return 0;
     }
   }
@@ -363,7 +364,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error getting recent submissions by schoolId: $e");
+      debugPrint("Error getting recent submissions by schoolId: $e");
       return [];
     }
   }
@@ -411,7 +412,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .map((doc) => PostFeed.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      print("Error getting recent submissions for user by schoolId: $e");
+      debugPrint("Error getting recent submissions for user by schoolId: $e");
       return [];
     }
   }
@@ -427,7 +428,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
           .get();
 
       if (userSnapshot.docs.isEmpty) {
-        print("No users found in the school with ID: $schoolId");
+        debugPrint("No users found in the school with ID: $schoolId");
         return []; // Return an empty list if no users found
       }
 
@@ -449,7 +450,7 @@ class PostFeedRepository implements IRepository<PostFeed> {
 
       return topPosts;
     } catch (e) {
-      print("Error fetching top posts by the top user in school: $e");
+      debugPrint("Error fetching top posts by the top user in school: $e");
       return [];
     }
   }

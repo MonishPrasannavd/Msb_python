@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
 
 part 'school_rank.g.dart';
 
@@ -34,7 +33,8 @@ class SchoolRank {
         rank: rank ?? this.rank,
       );
 
-  factory SchoolRank.fromJson(Map<String, dynamic> json) => _$SchoolRankFromJson(json);
+  factory SchoolRank.fromJson(Map<String, dynamic> json) =>
+      _$SchoolRankFromJson(json);
 
   Map<String, dynamic> toJson() => _$SchoolRankToJson(this);
 }

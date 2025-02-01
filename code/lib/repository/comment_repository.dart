@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/models/comment.dart';
 import 'package:msb_app/repository/repository.dart';
 
@@ -16,7 +17,7 @@ class CommentRepository implements IRepository<CommentPost> {
       }
       return null;
     } catch (e) {
-      print('Error fetching comment by id: $e');
+      debugPrint('Error fetching comment by id: $e');
       return null;
     }
   }
@@ -25,9 +26,12 @@ class CommentRepository implements IRepository<CommentPost> {
   Future<List<CommentPost>> getAll() async {
     try {
       QuerySnapshot snapshot = await commentCollection.get();
-      return snapshot.docs.map((doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return snapshot.docs
+          .map(
+              (doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print('Error fetching all comments: $e');
+      debugPrint('Error fetching all comments: $e');
       return [];
     }
   }
@@ -42,7 +46,7 @@ class CommentRepository implements IRepository<CommentPost> {
       }
       return null;
     } catch (e) {
-      print('Error saving comment: $e');
+      debugPrint('Error saving comment: $e');
       return null;
     }
   }
@@ -60,7 +64,7 @@ class CommentRepository implements IRepository<CommentPost> {
       await batch.commit();
       savedComments = entries;
     } catch (e) {
-      print('Error saving comments: $e');
+      debugPrint('Error saving comments: $e');
     }
     return savedComments;
   }
@@ -75,12 +79,14 @@ class CommentRepository implements IRepository<CommentPost> {
           .get();
 
       if (snapshot.docs.isNotEmpty) {
-        await commentCollection.doc(snapshot.docs.first.id).update(entry.toJson());
+        await commentCollection
+            .doc(snapshot.docs.first.id)
+            .update(entry.toJson());
         return true;
       }
       return false;
     } catch (e) {
-      print('Error updating comment: $e');
+      debugPrint('Error updating comment: $e');
       return false;
     }
   }
@@ -105,7 +111,7 @@ class CommentRepository implements IRepository<CommentPost> {
       await batch.commit();
     } catch (e) {
       success = false;
-      print('Error updating comments: $e');
+      debugPrint('Error updating comments: $e');
     }
     return success;
   }
@@ -125,7 +131,7 @@ class CommentRepository implements IRepository<CommentPost> {
       }
       return false;
     } catch (e) {
-      print('Error deleting comment: $e');
+      debugPrint('Error deleting comment: $e');
       return false;
     }
   }
@@ -150,7 +156,7 @@ class CommentRepository implements IRepository<CommentPost> {
       await batch.commit();
     } catch (e) {
       success = false;
-      print('Error deleting comments: $e');
+      debugPrint('Error deleting comments: $e');
     }
     return success;
   }
@@ -158,11 +164,15 @@ class CommentRepository implements IRepository<CommentPost> {
   // Fetch all comments for a specific post
   Future<List<CommentPost>> getCommentsByPost(String postId) async {
     try {
-      QuerySnapshot snapshot = await commentCollection.where('postId', isEqualTo: postId).get();
+      QuerySnapshot snapshot =
+          await commentCollection.where('postId', isEqualTo: postId).get();
 
-      return snapshot.docs.map((doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return snapshot.docs
+          .map(
+              (doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print('Error fetching comments for post: $e');
+      debugPrint('Error fetching comments for post: $e');
       return [];
     }
   }
@@ -170,11 +180,15 @@ class CommentRepository implements IRepository<CommentPost> {
   // Fetch all comments made by a specific user
   Future<List<CommentPost>> getCommentsByUser(String userId) async {
     try {
-      QuerySnapshot snapshot = await commentCollection.where('userId', isEqualTo: userId).get();
+      QuerySnapshot snapshot =
+          await commentCollection.where('userId', isEqualTo: userId).get();
 
-      return snapshot.docs.map((doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return snapshot.docs
+          .map(
+              (doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print('Error fetching comments by user: $e');
+      debugPrint('Error fetching comments by user: $e');
       return [];
     }
   }
@@ -185,22 +199,29 @@ class CommentRepository implements IRepository<CommentPost> {
       if (postIds.isEmpty) {
         return [];
       }
-      QuerySnapshot snapshot = await commentCollection.where('postId', whereIn: postIds).get();
+      QuerySnapshot snapshot =
+          await commentCollection.where('postId', whereIn: postIds).get();
 
-      return snapshot.docs.map((doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      return snapshot.docs
+          .map(
+              (doc) => CommentPost.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
-      print('Error fetching comments by postIds: $e');
+      debugPrint('Error fetching comments by postIds: $e');
       return [];
     }
   }
 
   Future<int> getCommentCountsByPostIds(List<String> postIds) async {
     try {
-      AggregateQuerySnapshot snapshot = await commentCollection.where('postId', whereIn: postIds).count().get();
+      AggregateQuerySnapshot snapshot = await commentCollection
+          .where('postId', whereIn: postIds)
+          .count()
+          .get();
 
       return snapshot.count ?? 0;
     } catch (e) {
-      print('Error fetching comment count for post: $e');
+      debugPrint('Error fetching comment count for post: $e');
       return 0;
     }
   }

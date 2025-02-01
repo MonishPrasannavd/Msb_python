@@ -192,7 +192,7 @@ class _PostFeedsState extends State<PostFeeds> {
 
       Navigator.pop(context);
     } catch (e) {
-      print("Error uploading post: $e");
+      debugPrint("Error uploading post: $e");
       Fluttertoast.showToast(
         msg: "Failed to upload post.",
         toastLength: Toast.LENGTH_SHORT,

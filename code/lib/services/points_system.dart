@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:msb_app/enums/point_type.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/repository/posts_repository.dart';
@@ -101,7 +102,7 @@ class PointsSystem {
         });
       }
     } catch (e) {
-      print('Error updating points: $e');
+      debugPrint('Error updating points: $e');
     }
   }
 

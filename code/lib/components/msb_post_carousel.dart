@@ -11,7 +11,8 @@ class MsbPostsCarousel extends StatefulWidget {
   final List<PostFeed> posts;
   final bool showLikes;
 
-  const MsbPostsCarousel({super.key, required this.posts, this.showLikes = true});
+  const MsbPostsCarousel(
+      {super.key, required this.posts, this.showLikes = true});
 
   @override
   State<MsbPostsCarousel> createState() => _MsbPostsCarouselState();
@@ -39,7 +40,8 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
   }
 
   void _initializeVideoController() {
-    if (widget.posts[_currentIndex].postType == 'video' && widget.posts[_currentIndex].mediaUrls != null) {
+    if (widget.posts[_currentIndex].postType == 'video' &&
+        widget.posts[_currentIndex].mediaUrls != null) {
       _videoController = CachedVideoPlayerPlusController.networkUrl(
         Uri.parse(widget.posts[_currentIndex].mediaUrls!.first),
       )..initialize().then((_) {
@@ -81,7 +83,9 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
         children: [
           IconButton(
             icon: Icon(
-              _videoController!.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              _videoController!.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow,
               color: Colors.white,
             ),
             onPressed: () {
@@ -96,12 +100,15 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
           ),
           IconButton(
             icon: Icon(
-              _videoController!.value.volume > 0 ? Icons.volume_up : Icons.volume_off,
+              _videoController!.value.volume > 0
+                  ? Icons.volume_up
+                  : Icons.volume_off,
               color: Colors.white,
             ),
             onPressed: () {
               setState(() {
-                _videoController!.setVolume(_videoController!.value.volume > 0 ? 0 : 1);
+                _videoController!
+                    .setVolume(_videoController!.value.volume > 0 ? 0 : 1);
               });
             },
           ),
@@ -118,7 +125,9 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
   }
 
   Widget _buildMediaContent(PostFeed post) {
-    if (post.postType == 'image' && post.mediaUrls != null && post.mediaUrls!.isNotEmpty) {
+    if (post.postType == 'image' &&
+        post.mediaUrls != null &&
+        post.mediaUrls!.isNotEmpty) {
       return GestureDetector(
         onLongPress: () => _showImagePreview(post.mediaUrls!.first),
         child: Container(
@@ -136,7 +145,8 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
             borderRadius: BorderRadius.circular(16.0),
             child: CachedNetworkImage(
               imageUrl: post.mediaUrls!.first,
-              placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
               errorWidget: (context, url, error) => const Icon(Icons.error),
               fit: BoxFit.cover,
               width: double.infinity,
@@ -145,41 +155,44 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
           ),
         ),
       );
-    } else if (post.postType == 'video' && _videoController != null && _videoController!.value.isInitialized) {
+    } else if (post.postType == 'video' &&
+        _videoController != null &&
+        _videoController!.value.isInitialized) {
       return GestureDetector(
         onTap: () {
           _toggleOverlay();
         },
-        child: _videoController!.value.isInitialized ?
-        Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Container(
-              width: double.infinity, // Adjust width as needed
-              height: 250, // Set a fixed height
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8.0,
-                    offset: const Offset(0, 4),
+        child: _videoController!.value.isInitialized
+            ? Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    width: double.infinity, // Adjust width as needed
+                    height: 250, // Set a fixed height
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8.0,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: AspectRatio(
+                        aspectRatio: _videoController!.value.aspectRatio,
+                        child: CachedVideoPlayerPlus(_videoController!),
+                      ),
+                    ),
                   ),
+                  if (_isOverlayVisible) ...[
+                    _buildOverlayControls(),
+                  ]
                 ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: AspectRatio(
-                  aspectRatio: _videoController!.value.aspectRatio,
-                  child: CachedVideoPlayerPlus(_videoController!),
-                ),
-              ),
-            ),
-            if (_isOverlayVisible) ...[
-              _buildOverlayControls(),
-            ]
-          ],
-        ) : const CircularProgressIndicator(),
+              )
+            : const CircularProgressIndicator(),
       );
     } else if (post.postType == 'text') {
       return Container(
@@ -220,7 +233,8 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
             child: InteractiveViewer(
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                placeholder: (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 fit: BoxFit.contain,
               ),
@@ -265,20 +279,24 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
             height: 80,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0)),
                 shadowColor: Colors.black.withOpacity(0.5),
                 elevation: 10,
-                backgroundColor: _currentIndex > 0 ? Colors.purple : Colors.grey[300],
+                backgroundColor:
+                    _currentIndex > 0 ? Colors.purple : Colors.grey[300],
               ),
               onPressed: _currentIndex > 0
                   ? () {
                       setState(() {
-                        _currentIndex = (_currentIndex - 1) % widget.posts.length;
+                        _currentIndex =
+                            (_currentIndex - 1) % widget.posts.length;
                         _initializeVideoController();
                       });
                     }
                   : null,
-              child: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.white),
+              child: const Icon(Icons.arrow_back_ios,
+                  size: 20, color: Colors.white),
             ),
           ),
 
@@ -326,20 +344,25 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
             height: 80,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0)),
                 shadowColor: Colors.black.withOpacity(1),
                 elevation: 12,
-                backgroundColor: _currentIndex < widget.posts.length - 1 ? Colors.purple : Colors.grey[300],
+                backgroundColor: _currentIndex < widget.posts.length - 1
+                    ? Colors.purple
+                    : Colors.grey[300],
               ),
               onPressed: _currentIndex < widget.posts.length - 1
                   ? () {
                       setState(() {
-                        _currentIndex = (_currentIndex + 1) % widget.posts.length;
+                        _currentIndex =
+                            (_currentIndex + 1) % widget.posts.length;
                         _initializeVideoController();
                       });
                     }
                   : null,
-              child: const Icon(Icons.arrow_forward_ios, size: 20, color: Colors.white),
+              child: const Icon(Icons.arrow_forward_ios,
+                  size: 20, color: Colors.white),
             ),
           ),
         ],
