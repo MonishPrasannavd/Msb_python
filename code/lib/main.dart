@@ -10,8 +10,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
 import 'package:msb_app/providers/competitions_provider.dart';
-import 'package:msb_app/providers/user_data_provider.dart';
+import 'package:msb_app/providers/dash.dart';
+import 'package:msb_app/providers/master/master_api_provider.dart';
+import 'package:msb_app/providers/master/master_provider.dart';
+import 'package:msb_app/providers/post_feed_provider.dart';
+import 'package:msb_app/providers/school/school_api_provider.dart';
+import 'package:msb_app/providers/student_dashboard_provider.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
+import 'package:msb_app/providers/submission/submission_provider.dart';
+import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
+import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,13 +29,15 @@ import 'package:sizer/sizer.dart';
 import 'Screens/dashboard/dashboard_setup.dart';
 import 'Screens/profile/post_details_screen.dart';
 import 'Screens/school/school_screen.dart';
-import 'package:is_first_run/is_first_run.dart';
+// import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await PrefsService.init(); // Initialize SharedPreference
+  var userId = await PrefsService.getToken();
 
   await Firebase.initializeApp();
 
@@ -37,6 +48,7 @@ void main() async {
         AndroidProvider.debug, // Use debug for Android in development
     appleProvider: AppleProvider.debug, // Use debug for iOS in development
   );
+  FirebaseFirestore.setLoggingEnabled(false);
 
   ///init Branch.io for deeplink.
   await FlutterBranchSdk.init();
@@ -56,8 +68,19 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => UserDataProvider()),
+        ChangeNotifierProvider(create: (_) => UserAuthProvider()),
+
+        // master provider
+        ChangeNotifierProvider(create: (_) => MasterProvider()),
+        ChangeNotifierProvider(create: (_) => MasterApiProvider()),
+        ChangeNotifierProvider(create: (_) => StudentDashboardProvider()),
+        ChangeNotifierProvider(create: (_) => Dash()),
+        ChangeNotifierProvider(create: (_) => SchoolApiProvider()),
+        ChangeNotifierProvider(create: (_) => SubmissionProvider()),
+        ChangeNotifierProvider(create: (_) => SubmissionApiProvider()),
+        ChangeNotifierProvider(create: (_) => PostFeedsProvider()),
         ChangeNotifierProvider(create: (_) => CompetitionsProvider()),
+        // ChangeNotifierProvider(create: (_) => Dash()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -81,19 +104,32 @@ class IsLoginCheckPage extends StatefulWidget {
 
 class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   StreamSubscription<Map>? streamSubscriptionDeepLink;
+  late MasterApiProvider _masterApiProvider;
+  late MasterProvider _masterProvider;
+
+  void fetchMaster() async {
+    var result = await _masterApiProvider.getMasterData();
+    print('result when fetching master data: $result');
+    _masterProvider.countries = result['countries'];
+    _masterProvider.states = result['states'];
+    _masterProvider.schools = result['schools'];
+    _masterProvider.grades = result['grades'];
+  }
 
   Future<void> checkAppVersion(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String currentVersion = packageInfo.version;
 
     // Fetch saved app version from SharedPreferences
-    String? savedVersion = prefs.getString('app_version');
+    String? savedVersion = await PrefsService.getString('app_version');
 
     if (savedVersion == null || savedVersion != currentVersion) {
+      print("is clear version");
       // App version has changed or no version is stored
-      await prefs.clear(); // Clear all saved preferences (logs out the user)
-      await prefs.setString(
+      await PrefsService
+          .clear(); // Clear all saved preferences (logs out the user)
+      await PrefsService.setString(
           'app_version', currentVersion); // Save new app version
       print("User logged out due to app update.");
     } else {
@@ -102,14 +138,16 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   }
 
   Future<bool> checkUserLogin(BuildContext context) async {
-    bool firstCall = await IsFirstRun.isFirstCall();
-    bool firstRun = await IsFirstRun.isFirstRun();
+    // bool firstCall = await IsFirstRun.isFirstCall();
+    // bool firstRun = await IsFirstRun.isFirstRun();
     // Check the app version first
     await checkAppVersion(context);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var userId = prefs.getString('userId');
-    return firstCall && firstRun ? false : userId != null;
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    var userId = await PrefsService.getUserId();
+    // print("what is user id :-  ${userId}");
+    // return firstCall && firstRun ? false : userId != null; // removing this because its outdated library and creating issue
+    return userId != null ? true : false;
   }
 
   @override
@@ -129,6 +167,7 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
             );
           }
           bool isLoggedIn = snapshot.data ?? false;
+          // print("what is snapshot data ${isLoggedIn}");
           return isLoggedIn ? const DashboardSetup() : const SignInScreen();
         },
       );
@@ -139,6 +178,13 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   void initState() {
     super.initState();
     listenDeepLinkData(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _masterApiProvider =
+          Provider.of<MasterApiProvider>(context, listen: false);
+      _masterProvider = Provider.of<MasterProvider>(context, listen: false);
+
+      fetchMaster();
+    });
   }
 
   @override

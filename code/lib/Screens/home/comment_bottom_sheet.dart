@@ -3,18 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/sign_up/sign_up_screen.dart';
 import 'package:msb_app/models/comment.dart';
+import 'package:msb_app/models/comment_v2.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
+import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/repository/comment_repository.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
+import 'package:provider/provider.dart';
 
 class CommentBottomSheet extends StatefulWidget {
   const CommentBottomSheet({super.key, required this.postId});
-  final String postId;
+
+  final int postId;
 
   static Future<void> show(
     BuildContext context, {
-    required String postId,
+    required int postId,
   }) async {
     await showModalBottomSheet(
       context: context,
@@ -33,16 +38,19 @@ class CommentBottomSheet extends StatefulWidget {
 class _CommentBottomSheetState extends State<CommentBottomSheet> {
   TextEditingController commentController = TextEditingController();
 
-  List<CommentPost> commentList = [];
-  late CommentRepository commentRepository;
+  List<Comment> commentList = [];
+  late SubmissionProvider _submissionProvider;
+  late SubmissionApiProvider _submissionApiProvider;
 
   @override
   void initState() {
     super.initState();
-    commentRepository = CommentRepository(
-        commentCollection: FirebaseFirestore.instance
-            .collection(FirestoreCollections.comments));
-    loadComments();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+      _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+
+      loadComments();
+    });
   }
 
   @override
@@ -51,22 +59,12 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     super.dispose();
   }
 
-  void loadComments() async {
-    final comments = await commentRepository.getCommentsByPost(widget.postId);
-
+  Future<void> loadComments() async {
+    Map<String, dynamic> response = await _submissionApiProvider.getComments(widget.postId);
+    List<Comment> comments = response['comments'];
     if (comments.isNotEmpty) {
       setState(() {
-        commentList = comments.cast<CommentPost>();
-      });
-    }
-  }
-
-  fetchComment() async {
-    final comments = await commentRepository.getCommentsByPost(widget.postId);
-
-    if (comments.isNotEmpty) {
-      setState(() {
-        commentList = comments.cast<CommentPost>();
+        commentList = comments;
       });
     }
   }
@@ -77,12 +75,9 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
       child: Container(
           decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  topRight: Radius.circular(10.0))),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0))),
           child: Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, right: 16.0, top: 10, bottom: 0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 10, bottom: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -92,16 +87,12 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                       Container(
                         height: 4,
                         width: 50,
-                        decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(15.0)),
+                        decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(15.0)),
                       ),
                       const SizedBox(height: 5),
                       Text("Comments",
-                          style: GoogleFonts.poppins(
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14)),
+                          style:
+                              GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14)),
                     ],
                   ),
                 ),
@@ -116,11 +107,12 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     ),
                     itemBuilder: (context, index) {
                       final e = commentList[index];
+                      final user = e.user;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            e.nameOrEmail,
+                            user?.name ?? user?.email ?? "Unknown User",
                             style: GoogleFonts.poppins(
                               color: AppColors.black,
                               fontWeight: FontWeight.w600,
@@ -128,7 +120,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                             ),
                           ),
                           Text(
-                            e.comment,
+                            e.comment!.toString(),
                             style: GoogleFonts.poppins(
                               color: AppColors.black,
                               fontWeight: FontWeight.w400,
@@ -149,26 +141,25 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     labelText: "Add a comment",
                     prefixIcon: const Text(""),
                     suffixIcon: IconButton(
-                        onPressed: () async {
-                          var fetchedUserId = await PrefsService.getUserId();
-                          var fetchedUserNameEmail =
-                              await PrefsService.getUserNameEmail();
-                          var commentRecord = CommentPost(
-                            nameOrEmail: fetchedUserNameEmail.toString(),
-                            userId: fetchedUserId.toString(),
-                            postId: widget.postId,
-                            comment: commentController.text,
-                            createdAt: DateTime.now()
-                          );
-                          commentRepository.saveOne(commentRecord);
-                          setState(() {
-                            commentController.clear();
-                            FocusManager.instance.primaryFocus?.unfocus();
-                          });
-                          fetchComment();
-                        },
-                        icon: const Icon(Icons.send_rounded,
-                            color: AppColors.primary)),
+                      onPressed: () async {
+                        await _submissionApiProvider.addComment(widget.postId, commentController.text);
+                        // var fetchedUserId = await PrefsService.getUserId();
+                        // var fetchedUserNameEmail = await PrefsService.getUserNameEmail();
+                        // var commentRecord = CommentPost(
+                        //     nameOrEmail: fetchedUserNameEmail.toString(),
+                        //     userId: fetchedUserId.toString(),
+                        //     postId: widget.postId,
+                        //     comment: commentController.text,
+                        //     createdAt: DateTime.now());
+                        // commentRepository.saveOne(commentRecord);
+                        setState(() {
+                          commentController.clear();
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        });
+                        loadComments();
+                      },
+                      icon: const Icon(Icons.send_rounded, color: AppColors.primary),
+                    ),
                   ),
                 ),
               ],

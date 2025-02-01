@@ -4,10 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
 import 'package:msb_app/models/competitions.dart';
-import 'package:msb_app/models/currentstudent.dart' as cs;
-import 'package:msb_app/models/user.dart';
+import 'package:msb_app/models/msbuser.dart';
 import 'package:msb_app/providers/competitions_provider.dart';
-import 'package:msb_app/providers/user_data_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +24,7 @@ class CategoriesScreen extends StatefulWidget {
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
   late CompetitionsProvider compDataProvider;
-  late cs.CurrentStudent user;
+  late MsbUser user;
 //late List<CompetitionCategories> competions = [];
   @override
   void initState() {
@@ -175,11 +173,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   crossAxisSpacing: 8.0,
                   crossAxisCount: 3),
               itemBuilder: (BuildContext context, int index) {
-                final menuItem = competitions.compititions[index].data;
+                final FutureCategories? menuItem =competitions.compititions.elementAt(index);
 
                 return GestureDetector(
                   onTap: () {
-                    if (menuItem.name == '') {
+                    if (menuItem?.name  == '') {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -190,9 +188,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => CompletionScreen(
-                            categoryName: (menuItem.name),
-                            contentType: menuItem.categoryType.name,
-                            subcategoryList: menuItem.subcategories,
+                            categoryName: menuItem?.name ?? '',
+                            contentType: '',
+                            subcategories: menuItem?.subcategories,
                           ),
                         ),
                       );
@@ -213,8 +211,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: CircleAvatar(
-                              backgroundImage: menuItem.iconUrl != null
-                                  ? NetworkImage(menuItem.iconUrl)
+                              backgroundImage: menuItem?.iconUrl != null
+                                  ? NetworkImage(menuItem!.iconUrl!)
                                   : const AssetImage(
                                           'assets/images/profile1.png')
                                       as ImageProvider,
@@ -225,7 +223,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       const SizedBox(height: 5),
                       FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text(menuItem.name,
+                        child: Text(menuItem?.name ?? '',
                             style: GoogleFonts.poppins(
                                 color: AppColors.black,
                                 fontWeight: FontWeight.w500,

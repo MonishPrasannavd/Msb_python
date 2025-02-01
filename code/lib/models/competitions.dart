@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:flutter/foundation.dart';
-//part 'competitions.g.dart';
+import 'package:msb_app/models/dashboard.dart';
 
 @JsonSerializable(explicitToJson: true)
 class CompetitionsCategories {
@@ -10,17 +9,8 @@ class CompetitionsCategories {
 
   factory CompetitionsCategories.fromJson(Map<String, dynamic> json) {
     var data = CompetitionsCategory.fromJson(json);
-    // List<Competition> competitionList =
-    //     dataList.map((i) => Competition.fromJson(i)).toList();
-
     return CompetitionsCategories(data: data);
   }
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'data': data.map((competition) => competition.toJson()).toList(),
-  //   };
-  // }
 }
 
 class CompetitionsCategory {
@@ -29,7 +19,7 @@ class CompetitionsCategory {
   final int isFuture;
   final int id;
   final int type;
-  final List<Subcategory> subcategories;
+   List<FutureCategories>? subcategories;
   final CategoryType categoryType;
   final String iconUrl;
 
@@ -45,9 +35,13 @@ class CompetitionsCategory {
   });
 
   factory CompetitionsCategory.fromJson(Map<String, dynamic> json) {
-    var subcategoriesFromJson = json['subcategories'] as List;
-    List<Subcategory> subcategoryList =
-        subcategoriesFromJson.map((i) => Subcategory.fromJson(i)).toList();
+    List<FutureCategories>? subcategoryList;
+    if (json['subcategories'] != null) {
+      subcategoryList = <FutureCategories>[];
+      json['subcategories'].forEach((v) {
+        subcategoryList!.add(new FutureCategories.fromJson(v));
+      });
+    }
 
     return CompetitionsCategory(
       name: json['name'],
@@ -69,44 +63,62 @@ class CompetitionsCategory {
       'id': id,
       'type': type,
       'subcategories':
-          subcategories.map((subcategory) => subcategory.toJson()).toList(),
+          subcategories?.map((subcategory) => subcategory.toJson()).toList(),
       'category_type': categoryType.toJson(),
       'icon_url': iconUrl,
     };
   }
 }
 
-class Subcategory {
-  final String name;
-  final int categoryId;
-  final int id;
-  final String? icon;
+class FutureCategories {
+  int? id;
+  int? isFuture;
+  String? name;
+  String? icon;
+  int? type;
+  String? iconUrl;
+  List<Subcategories>? subcategories;
 
-  Subcategory({
-    required this.name,
-    required this.categoryId,
-    required this.id,
-    this.icon,
-  });
+  FutureCategories(
+      {this.id,
+      this.isFuture,
+      this.name,
+      this.icon,
+      this.type,
+      this.iconUrl,
+      this.subcategories});
 
-  factory Subcategory.fromJson(Map<String, dynamic> json) {
-    return Subcategory(
-      name: json['name'],
-      categoryId: json['category_id'],
-      id: json['id'],
-      icon: json['icon'],
-    );
+  FutureCategories.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    isFuture = json['is_future'];
+    name = json['name'];
+    icon = json['icon'];
+    type = json['type'];
+    iconUrl = json['icon_url'];
+    if (json['subcategories'] != null) {
+      subcategories = <Subcategories>[];
+      json['subcategories'].forEach((v) {
+        subcategories!.add(new Subcategories.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'category_id': categoryId,
-      'id': id,
-      'icon': icon,
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['is_future'] = this.isFuture;
+    data['name'] = this.name;
+    data['icon'] = this.icon;
+    data['type'] = this.type;
+    data['icon_url'] = this.iconUrl;
+    if (this.subcategories != null) {
+      data['subcategories'] =
+          this.subcategories!.map((v) => v.toJson()).toList();
+    }
+    return data;
   }
 }
+
 
 class CategoryType {
   final int id;

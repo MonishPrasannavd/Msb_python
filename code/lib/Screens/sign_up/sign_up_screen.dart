@@ -10,13 +10,22 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:msb_app/Screens/dashboard/dashboard_setup.dart';
 import 'package:msb_app/Screens/otp_sent/otp_sent_screen.dart';
+import 'package:msb_app/components/country_state_dropdown.dart';
 import 'package:msb_app/constants/navigation.dart';
+import 'package:msb_app/models/grade.dart';
+import 'package:msb_app/models/school.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/master/master_api_provider.dart';
+import 'package:msb_app/providers/master/master_provider.dart';
+import 'package:msb_app/providers/user_auth_provider.dart';
+import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/utils/constants.dart';
 import 'package:msb_app/utils/extention_text.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/button_builder.dart';
@@ -25,10 +34,8 @@ import '../../utils/colours.dart';
 InputDecoration kTextFieldDecoration = InputDecoration(
   labelText: 'Enter value',
   hintText: 'Enter value',
-  labelStyle: GoogleFonts.poppins(
-      color: AppColors.fontHint, fontWeight: FontWeight.w400),
-  hintStyle: GoogleFonts.poppins(
-      color: AppColors.fontHint, fontWeight: FontWeight.w400),
+  labelStyle: GoogleFonts.poppins(color: AppColors.fontHint, fontWeight: FontWeight.w400),
+  hintStyle: GoogleFonts.poppins(color: AppColors.fontHint, fontWeight: FontWeight.w400),
   enabledBorder: OutlineInputBorder(
     borderSide: const BorderSide(color: AppColors.fontHint, width: 1),
     borderRadius: BorderRadius.circular(8.0), // Border radius
@@ -75,10 +82,15 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final SchoolUserRepository schoolUserRepository = SchoolUserRepository();
 
+  late MasterApiProvider masterApiProvider;
+  late MasterProvider masterProvider;
+  late UserAuthProvider userAuthProvider;
+  late UserProvider userProvider;
+
   final _formKey = GlobalKey<FormState>();
   bool _validate = false;
-  SchoolUser? selectedSchool;
-  String? selectedGrade;
+  School? selectedSchool;
+  Grade? selectedGrade;
   List<SchoolUser> schools = [];
 
   bool acceptTerms = false; // Track if the terms are accepted
@@ -93,6 +105,23 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       print("Error fetching schools: $e");
     }
+  }
+
+  void fetchMaster() {
+    var masterProvider = Provider.of<MasterProvider>(context, listen: false);
+    masterApiProvider.getMasterData().then((result) {
+      if (result['status']) {
+        print("Master data fetched successfully.");
+        masterProvider.countries = result['countries'];
+        masterProvider.states = result['states'];
+        masterProvider.schools = result['schools'];
+        masterProvider.grades = result['grades'];
+      }
+
+      print(masterProvider.grades);
+    }).catchError((error) {
+      print("Error fetching master data: $error");
+    });
   }
 
   Future<void> _showTermsDialog() async {
@@ -118,42 +147,18 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  final FirebaseFirestore _firestore =
-      FirebaseFirestore.instance; // Firestore instance
-
-  Future<void> createFirestoreRecord(String uid) async {
-    try {
-      MsbUser newUser = MsbUser(
-        id: uid,
-        name: nameController.text,
-        email: emailController.text,
-        phone: null,
-        profileImageUrl: null,
-        grade: selectedGrade,
-        schoolName: selectedSchool != null
-            ? schools
-                .firstWhere(
-                    (school) => school.schoolId == selectedSchool?.schoolId)
-                .schoolName
-            : null,
-        schoolId: selectedSchool?.schoolId,
-        city: cityController.text,
-        country: countryController.text,
-        state: stateController.text,
-        dob: dobController.text,
-      );
-
-      await _firestore.collection('users').doc(uid).set(newUser.toJson());
-
-      schoolUserRepository.updateSchoolAverageOnUserAddOrUpdate(newUser, 0.0);
-    } catch (e) {
-      print('Error creating Firestore record: $e');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
+
+    // Ensure Provider is available for initialization
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      masterApiProvider = Provider.of<MasterApiProvider>(context, listen: false);
+      masterProvider = Provider.of<MasterProvider>(context, listen: false);
+      userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
+      userProvider = Provider.of<UserProvider>(context, listen: false);
+      fetchMaster();
+    });
 
     if (isTest) {
       nameController.text = "Vishwesh Shukla";
@@ -190,11 +195,6 @@ class _SignUpPageState extends State<SignUpPage> {
     return FormBuilderDropdown<T>(
       name: hint,
       initialValue: selectedValue,
-      // validator: (value) {
-      //   if (value == null) {
-      //     return 'Grade is required';
-      //   }
-      // },
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
         border: OutlineInputBorder(
@@ -223,8 +223,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     if (pickedDate != null) {
       setState(() {
-        dobController.text =
-            "${pickedDate.toLocal()}".split(' ')[0]; // Format as needed
+        dobController.text = "${pickedDate.toLocal()}".split(' ')[0]; // Format as needed
       });
     }
   }
@@ -232,6 +231,8 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
+    masterApiProvider = Provider.of<MasterApiProvider>(context);
+
     return Scaffold(
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
@@ -249,8 +250,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 25.0, vertical: 35),
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 35),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -263,18 +263,12 @@ class _SignUpPageState extends State<SignUpPage> {
                       const SizedBox(height: 20),
                       Text(
                         "sign up",
-                        style: GoogleFonts.poppins(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 36),
+                        style: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 36),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Let’s get your on onboarded.",
-                        style: GoogleFonts.poppins(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16),
+                        style: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w400, fontSize: 16),
                       )
                     ],
                   ),
@@ -283,13 +277,10 @@ class _SignUpPageState extends State<SignUpPage> {
               Container(
                 color: AppColors.white,
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 25.0, right: 25.0, bottom: 10),
+                  padding: const EdgeInsets.only(left: 25.0, right: 25.0, bottom: 10),
                   child: Form(
                     key: _formKey,
-                    autovalidateMode: _validate
-                        ? AutovalidateMode.always
-                        : AutovalidateMode.disabled,
+                    autovalidateMode: _validate ? AutovalidateMode.always : AutovalidateMode.disabled,
                     child: Column(
                       children: [
                         const SizedBox(height: 30),
@@ -350,8 +341,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "ⓘ Enter your confirm password";
-                            } else if (passwordController.text !=
-                                confirmPasswordController.text) {
+                            } else if (passwordController.text != confirmPasswordController.text) {
                               return "ⓘ Password & confirm password do not match";
                             }
                             return null;
@@ -359,34 +349,19 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         const SizedBox(height: 15),
 
-                        CSCPicker(
-                          layout: Layout.vertical,
-                          dropdownDecoration: BoxDecoration(
-                            border: Border.all(
-                                color: AppColors.fontHint,
-                                width: 1), // Border color and width
-                            borderRadius:
-                                BorderRadius.circular(8.0), // Border radius
+                        const CountryStateDropdown(),
+                        const SizedBox(height: 15),
+                        TextFormField(
+                          controller: cityController,
+                          decoration: kTextFieldDecoration.copyWith(
+                            labelText: "City",
+                            hintText: "Enter city",
                           ),
-                          disabledDropdownDecoration: BoxDecoration(
-                            border:
-                                Border.all(color: AppColors.fontHint, width: 1),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          onCountryChanged: (val) {
-                            setState(() {
-                              countryController.text = val;
-                            });
-                          },
-                          onCityChanged: (val) {
-                            setState(() {
-                              cityController.text = val ?? '';
-                            });
-                          },
-                          onStateChanged: (val) {
-                            setState(() {
-                              stateController.text = val ?? '';
-                            });
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'City is required';
+                            }
+                            return null;
                           },
                         ),
                         const SizedBox(height: 15),
@@ -403,28 +378,20 @@ class _SignUpPageState extends State<SignUpPage> {
                             if (value == null || value.isEmpty) {
                               return 'Date of Birth is required';
                             }
-                            // final DateTime selectedDate = DateTime.parse(value);
-                            // final DateTime today = DateTime.now();
-                            // final int age = today.year -
-                            //     selectedDate.year -
-                            //     (today.isBefore(DateTime(today.year, selectedDate.month, selectedDate.day)) ? 1 : 0);
-                            // if (age < 18) {
-                            //   return 'You must be at least 18 years old';
-                            // }
                             return null;
                           },
-                          onTap: () =>
-                              _selectDate(context), // Trigger the picker
+                          onTap: () => _selectDate(context), // Trigger the picker
                         ),
                         const SizedBox(height: 15),
 
+
                         // School selection dropdown
-                        DropdownSearch<SchoolUser>(
+                        DropdownSearch<School>(
                           compareFn: (item1, item2) {
-                            return item1.schoolId == item2.schoolId;
+                            return item1.id == item2.id;
                           },
-                          itemAsString: (item) => item.schoolName!,
-                          items: (f, cs) => schools,
+                          itemAsString: (item) => item.name!,
+                          items: (f, cs) => masterProvider.schools,
                           onChanged: (school) => setState(() {
                             selectedSchool = school;
                           }),
@@ -436,9 +403,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           // Populate with school names
                           selectedItem: selectedSchool,
                           decoratorProps: const DropDownDecoratorProps(
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Select school')),
+                              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Select school')),
                           popupProps: PopupProps.menu(
                             showSearchBox: true,
                             searchFieldProps: TextFieldProps(
@@ -447,40 +412,20 @@ class _SignUpPageState extends State<SignUpPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 12),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                               ),
                             ),
                             emptyBuilder: (context, searchEntry) {
                               return ListTile(
-                                leading:
-                                    const Icon(Icons.add, color: Colors.blue),
-                                title:
-                                    Text("Add '$searchEntry' as a new school"),
+                                leading: const Icon(Icons.add, color: Colors.blue),
+                                title: Text("Add '$searchEntry' as a new school"),
                                 onTap: () async {
-                                  var newSchool = SchoolUser(
-                                      schoolId:
-                                          searchEntry.replaceAll(" ", "_"),
-                                      schoolName: searchEntry,
-                                      studentCount: 0,
-                                      totalSubmissions: 0,
-                                      averagePoints: 0,
-                                      createdAt: Timestamp.now());
-                                  var createdSchool = newSchool.schoolName != ''
-                                      ? schoolUserRepository.saveOne(newSchool)
-                                      : null;
+                                  var newSchool = School(name: searchEntry);
                                   setState(() {
-                                    if (createdSchool != null) {
-                                      selectedSchool =
-                                          createdSchool as SchoolUser?;
-                                      schools.add(newSchool);
-                                    } else {
-                                      Fluttertoast.showToast(
-                                          msg: 'Failed to create school');
-                                    }
+                                    masterProvider.addToSchools(newSchool);
+                                    selectedSchool = newSchool;
                                   });
-                                  Navigator.of(context)
-                                      .pop(); // Close the dropdown popup
+                                  Navigator.of(context).pop(); // Close the dropdown popup
                                   // showAddSchoolDialog(searchEntry); // Show the add school dialog
                                 },
                               );
@@ -488,12 +433,12 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                         const SizedBox(height: 15),
-                        DropdownSearch<String>(
+                        DropdownSearch<Grade>(
                           compareFn: (item1, item2) {
                             return item1 == item2;
                           },
-                          itemAsString: (item) => item!,
-                          items: (f, cs) => grades,
+                          itemAsString: (item) => item.name!,
+                          items: (f, cs) => masterProvider.grades,
                           onChanged: (grade) => setState(() {
                             selectedGrade = grade;
                           }),
@@ -505,9 +450,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           // Populate with school names
                           selectedItem: selectedGrade,
                           decoratorProps: const DropDownDecoratorProps(
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Select Grade')),
+                              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Select Grade')),
                           popupProps: PopupProps.menu(
                             showSearchBox: true,
                             searchFieldProps: TextFieldProps(
@@ -516,8 +459,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 12),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                               ),
                             ),
                           ),
@@ -576,8 +518,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               });
                               if (!acceptTerms) {
                                 Fluttertoast.showToast(
-                                  msg:
-                                      "You must accept the Terms and Conditions to proceed.",
+                                  msg: "You must accept the Terms and Conditions to proceed.",
                                   toastLength: Toast.LENGTH_LONG,
                                   gravity: ToastGravity.BOTTOM,
                                   backgroundColor: Colors.red,
@@ -592,23 +533,45 @@ class _SignUpPageState extends State<SignUpPage> {
                                   showSpinner = true;
                                 });
                                 try {
-                                  final newUserCredentail = await _auth
-                                      .createUserWithEmailAndPassword(
-                                    email: emailController.text,
-                                    password: passwordController.text,
+                                  Map<String, dynamic> message = await userAuthProvider.register(
+                                    nameController.text,
+                                    emailController.text,
+                                    passwordController.text,
+                                    selectedGrade!.id.toString(),
+                                    userProvider.selectedCountry!.id.toString(),
+                                    userProvider.selectedState!.id.toString(),
+                                    cityController.text,
+                                    selectedSchool?.id.toString(),
+                                    selectedSchool?.name.toString(),
+                                    dobController.text,
                                   );
-                                  SharedPreferences prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.setString(
-                                      "userId", newUserCredentail.user!.uid);
-                                  prefs.setString("nameEmail",
-                                      newUserCredentail.user!.email.toString());
-                                  var newUser = newUserCredentail.user!;
-                                  await createFirestoreRecord(newUser.uid);
-                                  await newUser.sendEmailVerification();
+                                  var user = message['user'];
+                                  var responseMessage = message['message'];
+                                  var responseStatus = message['status'];
+                                  if (responseStatus == true) {
+                                    Fluttertoast.showToast(msg: responseMessage);
+                                    userProvider.setUser(user);
+                                    callNextScreen(
+                                        context, const DashboardSetup());
+                                  } else {
+                                    Fluttertoast.showToast(msg: responseMessage);
+                                  }
+                                  // final newUserCredentail = await _auth
+                                  //     .createUserWithEmailAndPassword(
+                                  //   email: emailController.text,
+                                  //   password: passwordController.text,
+                                  // );
+                                  // SharedPreferences prefs =
+                                  //     await SharedPreferences.getInstance();
+                                  // prefs.setString(
+                                  //     "userId", newUserCredentail.user!.uid);
+                                  // prefs.setString("nameEmail",
+                                  //     newUserCredentail.user!.email.toString());
+                                  // var newUser = newUserCredentail.user!;
+                                  // // await createFirestoreRecord(newUser.uid);
+                                  // await newUser.sendEmailVerification();
+                                  //
 
-                                  callNextScreen(
-                                      context, const OtpSentScreen());
                                 } catch (e) {
                                   Fluttertoast.showToast(msg: e.toString());
                                   print(e);
@@ -619,11 +582,9 @@ class _SignUpPageState extends State<SignUpPage> {
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(AppColors.primary),
+                              backgroundColor: MaterialStateProperty.all(AppColors.primary),
                               shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0)),
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                               ),
                             ),
                             textStyle: GoogleFonts.poppins(

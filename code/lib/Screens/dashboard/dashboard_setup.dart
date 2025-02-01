@@ -36,6 +36,15 @@ class _DashboardSetupState extends State<DashboardSetup> {
   ];
 
   final List<Widget> _screens = [];
+void checkShNow() async {
+
+ // Debugging: Check if data is saved correctly
+      String? storedUserId = await PrefsService.getUserId();
+      String? storedEmail = await PrefsService.getUserNameEmail();
+
+      print("Stored User ID: $storedUserId");  // Should print actual user ID
+      print("Stored Email: $storedEmail");    // Should print email
+}
 
   void _onItemTapped(int index) {
     if (_currentIndex == index) {
@@ -58,7 +67,7 @@ class _DashboardSetupState extends State<DashboardSetup> {
         schoolScreenKey.currentState?.fetchData();
         schoolScreenKey.currentState?.refetchData();
       } else if (index == 4) {
-        profileScreenKey.currentState?.loadUserId();
+        profileScreenKey.currentState?.loadUser();
       }
     }
   }
@@ -79,6 +88,8 @@ class _DashboardSetupState extends State<DashboardSetup> {
   @override
   void initState() {
     super.initState();
+
+    checkShNow();
     _pageController = PageController(initialPage: 0);
     _screens.addAll([
       HomeScreen(
@@ -130,7 +141,7 @@ class _DashboardSetupState extends State<DashboardSetup> {
           currentIndex: _currentIndex,
           onTap: (index) {
             _onItemTapped(index);
-            _pageController.jumpToPage(index);
+            // _pageController.jumpToPage(index);
           },
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppColors.primary,

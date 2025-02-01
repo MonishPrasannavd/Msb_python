@@ -5,6 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/competition/post%20story/post_feed_screen.dart';
 import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
+import 'package:msb_app/providers/post_feed_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/post_feed.dart';
 import '../../models/school_user.dart';
@@ -18,8 +20,8 @@ import '../../utils/firestore_collections.dart';
 import '../../utils/post.dart';
 
 class CompletionDetailsListScreen extends StatefulWidget {
-  String categoryName, postCompilation;
-  String? contentType;
+  String categoryName, postCompilation, subCategoryId;
+  String? contentType ;
 
   List<PostFeed> postsFuture = [];
 
@@ -28,6 +30,7 @@ class CompletionDetailsListScreen extends StatefulWidget {
       required this.contentType,
       required this.postCompilation,
       required this.postsFuture,
+      required this.subCategoryId,
       super.key});
 
   @override
@@ -43,13 +46,15 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
       CommentRepository(commentCollection: FirebaseFirestore.instance.collection(FirestoreCollections.comments));
   bool isLoadingPosts = false; // Loading indicator for posts
 
+  late PostFeedsProvider postFeedsProvider;
   @override
   void initState() {
     super.initState();
-    postFeedRepository = PostFeedRepository();
-
-    // _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-    // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+    //postFeedRepository = PostFeedRepository();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      postFeedsProvider = Provider.of<PostFeedsProvider>(context, listen: false);
+      postFeedsProvider.getAllPost();
+    });
   }
 
   // Helper to build post list for user or school
@@ -63,37 +68,43 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
     return Column(
       children: [
         Expanded(
-          child: ListView.builder(
-            // shrinkWrap: true,
-            padding: const EdgeInsets.all(8.0),
-            itemCount: widget.postsFuture.length,
-            itemBuilder: (BuildContext context, int index) {
-              PostFeed post = widget.postsFuture[index];
-              return GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => PostDetailScreen(post: post),
-                  //   ),
-                  // );
+          child: ChangeNotifierProvider.value(
+            value:  postFeedsProvider,
+            child: Consumer<PostFeedsProvider>(builder: (context, value, child){
+              return ListView.builder(
+                // shrinkWrap: true,
+                padding: const EdgeInsets.all(8.0),
+                itemCount: widget.postsFuture.length,
+                itemBuilder: (BuildContext context, int index) {
+                  PostFeed post = widget.postsFuture[index];
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => PostDetailScreen(post: post),
+                      //   ),
+                      // );
+                    },
+                    child: PostUiUtils.buildPostTile(
+                      context,
+                      index,
+                      post,
+                          (postId) async {
+                        // await CommentBottomSheet.show(context, postId: postId);
+                        // _userFuture =
+                        //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
+                        // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+                      },
+                          () => onLike(post, index: index),
+                    ),
+                  );
                 },
-                child: PostUiUtils.buildPostTile(
-                  context,
-                  index,
-                  post,
-                  (postId) async {
-                    // await CommentBottomSheet.show(context, postId: postId);
-                    // _userFuture =
-                    //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-                    // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-                  },
-                  () => onLike(post, index: index),
-                ),
               );
-            },
+            })
+            ),
           ),
-        ),
+
         SizedBox(height: 100,)
       ],
     );

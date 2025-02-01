@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/models/msbuser.dart';
 import 'package:msb_app/utils/api.dart';
 
@@ -90,7 +93,7 @@ class UserAuthProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> getUserMe() async {
+  Future<Map<String, dynamic>> getUserMe(MsbUser existingUser) async {
     Map<String, dynamic> result;
 
     try {
@@ -101,7 +104,7 @@ class UserAuthProvider with ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
-        MsbUser user = MsbUser.fromJson(encodedString);
+        MsbUser user = MsbUser.fromJson(encodedString, existingUser: existingUser);
         notifyListeners();
         result = {'status': true, 'message': 'Successful', 'user': user};
       } else {
@@ -172,20 +175,43 @@ class UserAuthProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> updateProfile(String name, int gradeId) async {
+  Future<Map<String, dynamic>> updateProfile(String name, int gradeId, {File? profileImage}) async {
     Map<String, dynamic> result;
 
     try {
-      var body = {"name": name, "grade_id": gradeId, "profile_image": null};
-      final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.UPDATE_USER}");
-      Response response = await put(
-        uri,
-        headers: AppUrl.headers,
-        body: jsonEncode(body),
-      );
+      // Prepare the multipart request
+      var uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.UPDATE_USER}");
+      var request = MultipartRequest("PUT", uri);
+
+      // Add headers
+      request.headers.addAll(AppUrl.headers);
+
+      // Add fields
+      request.fields['name'] = name;
+      request.fields['grade_id'] = gradeId.toString();
+
+      // Add file if it exists
+      if (profileImage != null && await profileImage.exists()) {
+        request.files.add(
+          await MultipartFile.fromPath(
+            'profile_image', // Field name for the image
+            profileImage.path,
+            contentType: MediaType('image', 'jpeg'), // Adjust the content type if needed
+          ),
+        );
+      } else {
+        // request.fields['profile_image'] = null; // Explicitly set null
+      }
+
+      // Send the request
+      var streamedResponse = await request.send();
+      var response = await Response.fromStream(streamedResponse);
+
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
+        // var user = MsbUser.fromJson(encodedString);
         notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
         result = {'status': true, 'message': 'Successful'};
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
@@ -198,6 +224,38 @@ class UserAuthProvider with ChangeNotifier {
       result = {'status': false, 'message': e.toString()};
     }
 
+    return result;
+  }
+
+      Future<Map<String, dynamic>> getCompetitonsCategories(accessToken) async {
+    Map<String, Object> result;
+    notifyListeners();
+    final headers = {
+      'accept': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    };
+    final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.GET_CATEGORIES);
+    Response response = await get(
+      uri,
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> encodedString =
+          jsonDecode(response.body.toString());
+      List<FutureCategories> categories = List.castFrom(encodedString['data'])
+          .map((e) => FutureCategories.fromJson(e))
+          .toList();
+      notifyListeners();
+      result = {
+        'status': true,
+        'message': 'Success',
+        'competitions': categories
+      };
+    } else {
+      notifyListeners();
+      result = {'status': true, 'message': 'Failed', 'competitions': 'null'};
+    }
     return result;
   }
 }

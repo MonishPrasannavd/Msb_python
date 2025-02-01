@@ -646,7 +646,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
       _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
           includeHidden: false));
                             PostUiUtils.buildPostTile(context, widget.postIndex!, widget.post!,  (postId) async {
-          await CommentBottomSheet.show(context, postId: postId);
+          // await CommentBottomSheet.show(context, postId: postId);
         },
         () => onLike(widget.post!, index: 0),
       );
@@ -654,7 +654,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
                     context,
                     widget.post!,
                     (postId) async {
-                      await CommentBottomSheet.show(context, postId: postId);
+                      // await CommentBottomSheet.show(context, postId: postId);
                     },
                     () => onLike(widget.post!, index: 0),
                   );    });
@@ -721,7 +721,7 @@ _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.post!.userId!,
                     context,
                     widget.post!,
                     (postId) async {
-                      await CommentBottomSheet.show(context, postId: postId);
+                      // await CommentBottomSheet.show(context, postId: postId);
                     },
                     () => onLike(widget.post!, index: 0),
                   ),
