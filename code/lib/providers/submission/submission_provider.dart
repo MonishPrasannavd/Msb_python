@@ -3,7 +3,7 @@ import 'package:msb_app/models/submission.dart';
 
 class SubmissionProvider extends ChangeNotifier {
   List<Submission> _submissions = [];
-
+  bool _isLoadingSubmissions = false;
   List<Submission> get submissions => _submissions;
 
   set submissions(List<Submission> submissions) {
@@ -13,6 +13,13 @@ class SubmissionProvider extends ChangeNotifier {
 
   void clearSubmissions() {
     _submissions = [];
+    notifyListeners();
+  }
+
+  bool get isLoadingSubmissions => _isLoadingSubmissions;
+
+  set isLoadingSubmissions(bool isLoadingSubmissions) {
+    _isLoadingSubmissions = isLoadingSubmissions;
     notifyListeners();
   }
 

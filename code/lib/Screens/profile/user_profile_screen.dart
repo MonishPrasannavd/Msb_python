@@ -47,27 +47,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     _userProvider = Provider.of<UserProvider>(context, listen: false);
-    _submissionProvider =
-        Provider.of<SubmissionProvider>(context, listen: false);
-    _submissionApiProvider =
-        Provider.of<SubmissionApiProvider>(context, listen: false);
+    _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+    _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
 
     // getUser();
     loadAllSubmissions();
   }
 
   Future<void> loadAllSubmissions() async {
+    _submissionProvider.isLoadingSubmissions = true;
     Map<String, dynamic> response = {};
     if (widget.type == "user") {
-      response = await _submissionApiProvider
-          .getSubmissionsByUserId(int.parse(widget.id));
+      response = await _submissionApiProvider.getSubmissionsByUserId(int.parse(widget.id));
     } else if (widget.type == "school") {
-      response = await _submissionApiProvider
-          .getSubmissionsBySchool(int.parse(widget.id));
+      response = await _submissionApiProvider.getSubmissionsBySchool(int.parse(widget.id));
     }
     _submissionProvider.clearSubmissions();
-    _submissionProvider
-        .addSubmissions(response['submissions'] as List<Submission>);
+    _submissionProvider.addSubmissions(response['submissions'] as List<Submission>);
+    _submissionProvider.isLoadingSubmissions = false;
   }
 
   @override
@@ -84,11 +81,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     //   return const Center(child: Text('No posts available'));
     // }
 
-    if (_submissionProvider.submissions.isNotEmpty) {
+    if (_submissionProvider.isLoadingSubmissions) {
       return const Center(child: CircularProgressIndicator());
-    }
+    } else {
+      if (_submissionProvider.submissions.isEmpty) {
+        return const Center(child: Text('No posts available'));
+      }
 
-    return _buildPostsGrid();
+      return _buildPostsGrid();
+    }
   }
 
   @override
@@ -96,10 +97,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     var query = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      body: Consumer3<UserAuthProvider, SubmissionProvider,
-              SubmissionApiProvider>(
-          builder: (ctxt, authProvider, submissionProvider,
-              submissionApiProvider, child) {
+      body: Consumer3<UserAuthProvider, SubmissionProvider, SubmissionApiProvider>(
+          builder: (ctxt, authProvider, submissionProvider, submissionApiProvider, child) {
         return Column(
           children: [
             Container(
@@ -108,25 +107,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               decoration: const BoxDecoration(
                   // color: AppColors.primary,
                   color: AppColors.purpleDark,
-                  borderRadius: BorderRadius.only(
-                      bottomRight: Radius.circular(25.0),
-                      bottomLeft: Radius.circular(25.0))),
+                  borderRadius:
+                      BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
               child: Column(
                 children: [
-                  // SafeArea(
-                  //   child: Text(
-                  //     widget.type == "user" ? "User Profile" : "School Profile",
-                  //     style: GoogleFonts.poppins(
-                  //       color: Colors.white,
-                  //       fontWeight: FontWeight.w600,
-                  //       fontSize: 30,
-                  //     ),
-                  //   ),
-                  // ),
-                  SafeArea(
-                      child: widget.type == "user"
-                          ? _buildUserProfile()
-                          : _buildSchoolProfile()),
+                  SafeArea(child: widget.type == "user" ? _buildUserProfile() : _buildSchoolProfile()),
                 ],
               ),
             ),
@@ -222,10 +207,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(height: 4),
                   Text(
                     user.student.grade?.name ?? "N/A",
-                    style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.white54,
-                        fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -310,8 +292,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       //     .getOne(widget.id);
                       // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
                     } else if (widget.type == "school") {
-                      _schoolFuture =
-                          schoolUserRepository.findBySchoolId(widget.id);
+                      _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
                       // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
                     }
                   },
@@ -477,8 +458,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         image: DecorationImage(
           image: post.mediaUrls != null && post.mediaUrls!.isNotEmpty
               ? CachedNetworkImageProvider(post.mediaUrls!.first)
-              : const AssetImage("assets/images/image_placeholder.png")
-                  as ImageProvider,
+              : const AssetImage("assets/images/image_placeholder.png") as ImageProvider,
           fit: BoxFit.cover,
         ),
       ),
@@ -494,9 +474,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
     }
 
-    final initials = name != null
-        ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
-        : '';
+    final initials = name != null ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase() : '';
 
     return CircleAvatar(
       radius: 40,
