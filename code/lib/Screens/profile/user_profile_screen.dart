@@ -40,6 +40,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   late MsbUser currentUser;
   late bool isLoadingPostUser = false;
   late dynamic postUser;
+  late Future<Map<String, dynamic>> _profileFuture;
 
   late UserProvider _userProvider;
   late SubmissionProvider _submissionProvider;
