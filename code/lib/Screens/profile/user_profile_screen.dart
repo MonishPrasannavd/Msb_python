@@ -38,6 +38,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   bool isLoadingPosts = true; // Loading indicator for posts
   List<PostFeed> posts = [];
   late MsbUser currentUser;
+  late bool isLoadingPostUser = false;
   late dynamic postUser;
 
   late UserProvider _userProvider;
@@ -68,6 +69,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _submissionProvider.clearSubmissions();
     _submissionProvider.addSubmissions(response['submissions'] as List<Submission>);
     _submissionProvider.isLoadingSubmissions = false;
+    loadPostUser();
+  }
+
+  Future<void> loadPostUser() async {
+    setState(() {
+      isLoadingPostUser = true;
+    });
+      var postUserResponse = await _userAuthProvider.getUser(widget.id);
+
+      setState(() {
+        isLoadingPostUser = false;
+        postUser = postUserResponse['user'];
+      });
   }
 
   @override
@@ -155,13 +169,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Helper to build profile header for both user and school
   Widget _buildProfileHeader({MsbUser? user, SchoolUser? school}) {
-    if (user != null) {
+    if (postUser != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildProfileImage(user.user?.name, user.user?.profileUrl),
+            _buildProfileImage(postUser['name'], postUser['image_url']),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -170,7 +184,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      user.user?.name ?? 'Unknown User',
+                      postUser['name'] ?? 'Unknown User',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -189,7 +203,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                       children: [
                         TextSpan(
-                          text: user.student.school?.name ?? "N/A",
+                          text: postUser['school_name'] ?? "N/A",
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
@@ -209,7 +223,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   // ),
                   const SizedBox(height: 4),
                   Text(
-                    user.student.grade?.name ?? "N/A",
+                    postUser['grade'] ?? "N/A",
                     style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
                   ),
                 ],

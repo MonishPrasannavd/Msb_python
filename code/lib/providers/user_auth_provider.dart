@@ -160,7 +160,7 @@ class UserAuthProvider with ChangeNotifier {
         var encodedString = jsonDecode(response.body.toString());
         notifyListeners();
         // TODO : implement parsing json
-        result = {'status': true, 'message': 'Successful'};
+        result = {'status': true, 'message': 'Successful', 'user': encodedString};
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];
