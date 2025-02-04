@@ -67,8 +67,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           _userProvider.user.student.grade?.name?.isNotEmpty != null) {
         gradeResolve = _userProvider.user.student.grade!;
       } else {
-        gradeResolve = _masterProvider.grades.firstWhere(
-            (grade) => grade.id == _userProvider.user.student.gradeId);
+        gradeResolve = _masterProvider.grades.firstWhere((grade) => grade.id == _userProvider.user.student.gradeId);
       }
 
       setState(() {
@@ -120,8 +119,7 @@ class ProfileScreenState extends State<ProfileScreen> {
       if (response['status'] == true) {
         var updatedUserRes = await _authProvider.getUserMe(_userProvider.user);
         var updatedUser = updatedUserRes['user'] as MsbUser;
-        _userProvider.updateUserAndSchool(
-            updatedStudent: updatedUser.student, updatedUser: updatedUser.user);
+        _userProvider.updateUserAndSchool(updatedStudent: updatedUser.student, updatedUser: updatedUser.user);
       }
       // var updatedUser = response['user'] as MsbUser;
       // _userProvider.updateUserAndSchool(updatedStudent: updatedUser.student, updatedUser: updatedUser.user);
@@ -182,27 +180,14 @@ class ProfileScreenState extends State<ProfileScreen> {
             : null, // If there's no history, do not show the back button
         title: Text(
           "Profile",
-          style: GoogleFonts.poppins(
-              color: AppColors.black,
-              fontWeight: FontWeight.w500,
-              fontSize: 16),
+          style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16),
         ),
       ),
-      // body: FutureBuilder<void>(
-      //     // future: _initProfile, // Reference the _initProfile Future
-      //     future: Future.delayed(const Duration(seconds: 1)), // Reference the _initProfile Future
-      //     builder: (context, snapshot) {
-      //       if (snapshot.connectionState == ConnectionState.waiting) {
-      //         // Show progress indicator while the Future is running
-      //         return const Center(child: CircularProgressIndicator());
-      //       } else if (snapshot.hasError) {
-      //         // Handle errors
-      //         return Center(child: Text('Error: ${snapshot.error}'));
-      //       }
-      //
-      //       return mainUi();
-      //     }),
-      body: mainUi(),
+      body: Consumer3<UserProvider, UserAuthProvider, MasterProvider>(
+        builder: (ctxt, userProvider, userAuthProvider, masterProvider, child) {
+          return mainUi();
+        },
+      ),
     );
   }
 
@@ -216,15 +201,12 @@ class ProfileScreenState extends State<ProfileScreen> {
             children: [
               SizedBox(height: query.height * 0.15),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
                 child: Container(
                   // height: isEditing ? query.height * 1 : query.height * 1,
                   // width: query.width,
                   padding: const EdgeInsets.symmetric(vertical: 15),
-                  decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20.0)),
+                  decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(20.0)),
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
@@ -235,14 +217,10 @@ class ProfileScreenState extends State<ProfileScreen> {
                             : CircleAvatar(
                                 radius: 60,
                                 backgroundImage: _profileImage != null
-                                    ? FileImage(
-                                        _profileImage!) // Use the newly picked image if available
-                                    : user?.user?.profileUrl !=
-                                            null // Check if a profile image URL exists
-                                        ? CachedNetworkImageProvider(user!
-                                            .user!.profileUrl!) // Load from URL
-                                        : const AssetImage(
-                                                "assets/images/profile1.png") // Fallback to local asset
+                                    ? FileImage(_profileImage!) // Use the newly picked image if available
+                                    : user?.user?.profileUrl != null // Check if a profile image URL exists
+                                        ? CachedNetworkImageProvider(user!.user!.profileUrl!) // Load from URL
+                                        : const AssetImage("assets/images/profile1.png") // Fallback to local asset
                                             as ImageProvider, // Explicitly cast to ImageProvider
                               ),
                       ),
@@ -255,25 +233,17 @@ class ProfileScreenState extends State<ProfileScreen> {
                           : Text(
                               "Tap to change",
                               style: GoogleFonts.poppins(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 14),
+                                  color: AppColors.white, fontWeight: FontWeight.w300, fontSize: 14),
                             ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           isEditing
-                              ? Flexible(
-                                  child: _buildEditableField(
-                                      "Name", nameController))
+                              ? Flexible(child: _buildEditableField("Name", nameController))
                               : Text(
-                                  fetchFirstName(
-                                          _userProvider.user.user?.name) ??
-                                      "*** Add name",
+                                  fetchFirstName(_userProvider.user.user?.name) ?? "*** Add name",
                                   style: GoogleFonts.poppins(
-                                      color: AppColors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 32),
+                                      color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 32),
                                 ),
                           // _buildEditToggle(),
                         ],
@@ -285,9 +255,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                           : Text(
                               grade,
                               style: GoogleFonts.poppins(
-                                  color: AppColors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16),
+                                  color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16),
                             ),
 
                       /// school name
@@ -295,8 +263,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           child: Text(
                             schoolName,
                             style: GoogleFonts.poppins(
@@ -315,8 +282,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                           children: [
                             _buildStatCard(likesCount, "Likes", "unLike.svg"),
                             // _buildStatCard(user?.follower.length.toString() ?? "0", "Followers", "users.svg"),
-                            _buildStatCard(
-                                commentsCount, "Comments", "comment.svg"),
+                            _buildStatCard(commentsCount, "Comments", "comment.svg"),
                           ],
                         ),
                       ),
@@ -331,23 +297,19 @@ class ProfileScreenState extends State<ProfileScreen> {
                         child: LayoutBuilder(
                           builder: (ctxt, constraints) {
                             // Calculate button width
-                            final buttonWidth = constraints.maxWidth / 2 -
-                                5; // Adjust for padding
+                            final buttonWidth = constraints.maxWidth / 2 - 5; // Adjust for padding
 
                             return Column(
                               children: [
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     /// edit details button
                                     SizedBox(
                                       width: buttonWidth,
                                       height: 50,
                                       child: ButtonBuilder(
-                                        text: isEditing
-                                            ? 'Save Details'
-                                            : 'Edit Details',
+                                        text: isEditing ? 'Save Details' : 'Edit Details',
                                         onPressed: () {
                                           if (isEditing) {
                                             _saveProfileDetails();
@@ -363,18 +325,14 @@ class ProfileScreenState extends State<ProfileScreen> {
                                         },
                                         style: ButtonStyle(
                                           side: WidgetStateProperty.all(
-                                            const BorderSide(
-                                                color: Color(0xFFE1C7FA),
-                                                width: 1),
+                                            const BorderSide(color: Color(0xFFE1C7FA), width: 1),
                                           ),
-                                          backgroundColor:
-                                              WidgetStateProperty.all(
+                                          backgroundColor: WidgetStateProperty.all(
                                             const Color(0xFF6911BB),
                                           ),
                                           shape: WidgetStateProperty.all(
                                             RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
+                                              borderRadius: BorderRadius.circular(8.0),
                                             ),
                                           ),
                                         ),
@@ -394,18 +352,14 @@ class ProfileScreenState extends State<ProfileScreen> {
                                         onPressed: widget.onLogout,
                                         style: ButtonStyle(
                                           side: WidgetStateProperty.all(
-                                            const BorderSide(
-                                                color: Color(0xFFE1C7FA),
-                                                width: 1),
+                                            const BorderSide(color: Color(0xFFE1C7FA), width: 1),
                                           ),
-                                          backgroundColor:
-                                              WidgetStateProperty.all(
+                                          backgroundColor: WidgetStateProperty.all(
                                             const Color(0xFF6911BB),
                                           ),
                                           shape: WidgetStateProperty.all(
                                             RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
+                                              borderRadius: BorderRadius.circular(8.0),
                                             ),
                                           ),
                                         ),
@@ -420,31 +374,26 @@ class ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 const SizedBox(height: 10),
                                 SizedBox(
-                                  width: constraints
-                                      .maxWidth, // Full width of the Row
+                                  width: constraints.maxWidth, // Full width of the Row
                                   height: 50,
                                   child: ButtonBuilder(
                                     text: 'My entries',
-                                    onPressed: () => Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => UserProfileScreen(
-                                          id: _userProvider.user.user!.id
-                                              .toString()),
+                                    onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          UserProfileScreen(id: _userProvider.user.user!.id.toString()),
                                     ))
                                     // .then((val) async => await loadUserProfile()),
                                     ,
                                     style: ButtonStyle(
                                       side: WidgetStateProperty.all(
-                                        const BorderSide(
-                                            color: Color(0xFFE1C7FA), width: 1),
+                                        const BorderSide(color: Color(0xFFE1C7FA), width: 1),
                                       ),
                                       backgroundColor: WidgetStateProperty.all(
                                         const Color(0xFF6911BB),
                                       ),
                                       shape: WidgetStateProperty.all(
                                         RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
+                                          borderRadius: BorderRadius.circular(8.0),
                                         ),
                                       ),
                                     ),
@@ -500,8 +449,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             ),
           ),
         ),
@@ -530,13 +478,9 @@ class ProfileScreenState extends State<ProfileScreen> {
           focusedBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
           ),
-          labelStyle: GoogleFonts.poppins(
-              color: AppColors.white,
-              fontWeight: FontWeight.w500,
-              fontSize: 16),
+          labelStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16),
         ),
-        style: GoogleFonts.poppins(
-            color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16),
+        style: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16),
       ),
     );
   }
@@ -558,23 +502,16 @@ class ProfileScreenState extends State<ProfileScreen> {
             children: [
               const TextBuilder(
                 text: 'Your Stars',
-                style: TextStyle(
-                    fontSize: 20.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20.0, color: AppColors.black, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8.0),
               TextBuilder(
                 text: totalPoints,
-                style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.msbNeutral400),
+                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: AppColors.msbNeutral400),
               ),
               const SizedBox(height: 16.0),
               Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Image.asset('assets/images/star.png')),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0), child: Image.asset('assets/images/star.png')),
             ],
           ),
         ),

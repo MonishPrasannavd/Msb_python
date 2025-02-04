@@ -11,10 +11,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/user.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
+import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/utils/auth.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
+import 'package:provider/provider.dart';
 
 import '../../../components/button_builder.dart';
 import '../../../utils/colours.dart';
@@ -45,9 +48,16 @@ class _PostFeedsState extends State<PostFeeds> {
   bool _clicked = false;
   MsbUser? currentUser;
 
+  late SubmissionApiProvider _submissionApiProvider;
+  late SubmissionProvider _submissionProvider;
+
   @override
   void initState() {
     super.initState();
+
+    _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+    _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+
     loadUserId();
   }
 
@@ -178,6 +188,14 @@ class _PostFeedsState extends State<PostFeeds> {
           postCategory: widget.type);
 
       await postFeedRepository.saveOne(postFeed);
+
+      await _submissionApiProvider.createSubmission(
+        widget.categoryId,
+        widget.subcategoryId,
+        storyTitleController.text,
+        descriptionController.text,
+        mediaFile: _videoFile,
+      );
 
       Fluttertoast.showToast(
         msg: "Post uploaded successfully!",
