@@ -169,38 +169,38 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
     }
   }
 
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "title": "Dance",
-      "icon": 'assets/images/trending.png',
-      "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
-    },
-    {
-      "title": "Music",
-      "icon": 'assets/images/music.png',
-      "route": PostFeeds("Music", contentType: PostFeedType.audio.value)
-    },
-    {
-      "title": "Photography",
-      "icon": 'assets/images/photography.png',
-      "route": PostFeeds("Photography", contentType: PostFeedType.image.value)
-    },
-    {
-      "title": "Art & Crafts",
-      "icon": 'assets/images/art.png',
-      "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
-    },
-    {
-      "title": "Quiz",
-      "icon": 'assets/images/quiz.png',
-      "route": const QuizScreen()
-    },
-    {
-      "title": "Painting",
-      "icon": 'assets/images/painting.png',
-      "route": PostFeeds("Painting", contentType: PostFeedType.image.value)
-    },
-  ];
+  // final List<Map<String, dynamic>> menuItems = [
+  //   {
+  //     "title": "Dance",
+  //     "icon": 'assets/images/trending.png',
+  //     "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
+  //   },
+  //   {
+  //     "title": "Music",
+  //     "icon": 'assets/images/music.png',
+  //     "route": PostFeeds("Music", contentType: PostFeedType.audio.value)
+  //   },
+  //   {
+  //     "title": "Photography",
+  //     "icon": 'assets/images/photography.png',
+  //     "route": PostFeeds("Photography", contentType: PostFeedType.image.value)
+  //   },
+  //   {
+  //     "title": "Art & Crafts",
+  //     "icon": 'assets/images/art.png',
+  //     "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
+  //   },
+  //   {
+  //     "title": "Quiz",
+  //     "icon": 'assets/images/quiz.png',
+  //     "route": const QuizScreen()
+  //   },
+  //   {
+  //     "title": "Painting",
+  //     "icon": 'assets/images/painting.png',
+  //     "route": PostFeeds("Painting", contentType: PostFeedType.image.value)
+  //   },
+  // ];
 
   late AudioPlayer _audioPlayer;
   bool isPlaying = false;

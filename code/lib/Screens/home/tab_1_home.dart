@@ -829,6 +829,7 @@ class HomeTabState extends State<HomeTab> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => CompletionScreen(
+                                        categoryId: menuItem?.id ?? 1,
                                         subcategories: menuItem?.subcategories,
                                         categoryName: menuItem?.name ?? "",
                                         contentType: 'menuItem["route"]',

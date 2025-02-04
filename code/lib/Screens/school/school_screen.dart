@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:msb_app/Screens/competition/completion_screen.dart';
 import 'package:msb_app/Screens/home/tab_3_public.dart';
 import 'package:msb_app/Screens/profile/profile_page.dart';
 import 'package:msb_app/Screens/school/school_detail.dart';
@@ -40,6 +42,8 @@ class SchoolScreenState extends State<SchoolScreen> {
   int totalSchoolsCounts = 0;
   double progress = 0.0;
   DashboardResponse? studentDashboardResponse;
+  late StudentDashboardProvider studentDashboardProvider;
+
   @override
   void dispose() {
     searchController.dispose();
@@ -59,7 +63,8 @@ class SchoolScreenState extends State<SchoolScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _schoolApiProvider =
           Provider.of<SchoolApiProvider>(context, listen: false);
-
+      studentDashboardProvider =
+          Provider.of<StudentDashboardProvider>(context, listen: false);
       _fetchDataFuture = fetchData();
     });
   }
@@ -131,28 +136,28 @@ class SchoolScreenState extends State<SchoolScreen> {
     const Color(0xFF1C8727),
   ];
 
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "title": "Dance",
-      "icon": 'assets/images/trending.png',
-      "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
-    },
-    {
-      "title": "Art & Crafts",
-      "icon": 'assets/images/art.png',
-      "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
-    },
-    {
-      "title": "Quiz",
-      "icon": 'assets/images/quiz.png',
-      "route": const QuizScreen()
-    },
-    {
-      "title": "Story Telling",
-      "icon": 'assets/images/story.png',
-      "route": PostFeeds("Story Telling", contentType: PostFeedType.image.value)
-    },
-  ];
+  // final List<Map<String, dynamic>> menuItems = [
+  //   {
+  //     "title": "Dance",
+  //     "icon": 'assets/images/trending.png',
+  //     "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
+  //   },
+  //   {
+  //     "title": "Art & Crafts",
+  //     "icon": 'assets/images/art.png',
+  //     "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
+  //   },
+  //   {
+  //     "title": "Quiz",
+  //     "icon": 'assets/images/quiz.png',
+  //     "route": const QuizScreen()
+  //   },
+  //   {
+  //     "title": "Story Telling",
+  //     "icon": 'assets/images/story.png',
+  //     "route": PostFeeds("Story Telling", contentType: PostFeedType.image.value)
+  //   },
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -684,112 +689,174 @@ class SchoolScreenState extends State<SchoolScreen> {
                                         const SizedBox(height: 10),
                                         SizedBox(
                                           height: query.height / 8,
-                                          child: ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: menuItems.length,
-                                            scrollDirection: Axis.horizontal,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 1),
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              final menuItem = menuItems[index];
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  //callNextScreen(context, const QuizScreen());
-                                                  if (index == 0) {
-                                                    Navigator.of(context,
-                                                            rootNavigator:
-                                                                false)
-                                                        .push(
-                                                      MaterialPageRoute(
-                                                          builder: (_) => PostFeeds(
-                                                              "Dance",
-                                                              contentType:
-                                                                  PostFeedType
-                                                                      .video
-                                                                      .value)),
-                                                    );
-                                                  } else if (index == 1) {
-                                                    Navigator.of(context,
-                                                            rootNavigator:
-                                                                false)
-                                                        .push(
-                                                      MaterialPageRoute(
-                                                          builder: (_) => PostFeeds(
-                                                              "Art & Crafts",
-                                                              contentType:
-                                                                  PostFeedType
-                                                                      .image
-                                                                      .value)),
-                                                    );
-                                                  } else if (index == 2) {
-                                                    Navigator.of(context,
-                                                            rootNavigator:
-                                                                false)
-                                                        .push(
-                                                      MaterialPageRoute(
-                                                          builder: (_) => PostFeeds(
-                                                              "Story Telling",
-                                                              contentType:
-                                                                  PostFeedType
-                                                                      .image
-                                                                      .value)),
-                                                    );
-                                                  }
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    Column(
-                                                      children: [
-                                                        Expanded(
-                                                          child: Container(
-                                                            height: 80,
-                                                            decoration: BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                gradient: const RadialGradient(
-                                                                    colors: [
-                                                                      AppColors
-                                                                          .black38,
-                                                                      AppColors
-                                                                          .white30
-                                                                    ],
-                                                                    center: Alignment
-                                                                        .bottomCenter,
-                                                                    radius:
-                                                                        1.0),
-                                                                border: Border.all(
-                                                                    color: AppColors
-                                                                        .white,
-                                                                    width: 1)),
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(
-                                                                      21.0),
-                                                              child: Image.asset(
-                                                                  menuItem[
-                                                                      'icon']),
-                                                            ),
+                                          child: ChangeNotifierProvider.value(
+                                            value: studentDashboardProvider,
+                                            child: Consumer<StudentDashboardProvider>(
+                                                builder: (context, value, child) {
+                                                  return ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount: (value.dashboardCategoryList?.length ?? 0),
+                                                    scrollDirection: Axis.horizontal,
+                                                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                                                    itemBuilder: (BuildContext context, int index) {
+                                                      final FutureCategories? menuItem =
+                                                      value.dashboardCategoryList?[index];
+                                                      return GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) => CompletionScreen(
+                                                                  categoryId: menuItem?.id ?? 1,
+                                                                  subcategories: menuItem?.subcategories,
+                                                                  categoryName: menuItem?.name ?? "",
+                                                                  contentType: 'menuItem["route"]',
+                                                                ),
+                                                              ));
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                          const EdgeInsets.symmetric(horizontal: 8.0),
+                                                          child: Column(
+                                                            children: [
+                                                              Expanded(
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.all(0.0),
+                                                                  child: CachedNetworkImage(
+                                                                    imageUrl: menuItem?.iconUrl ?? "",
+                                                                    placeholder: (context, url) =>
+                                                                    const Center(
+                                                                        child:
+                                                                        CircularProgressIndicator()),
+                                                                    errorWidget: (context, url, error) =>
+                                                                    const Center(
+                                                                        child: Icon(Icons.error)),
+                                                                    fit: BoxFit.contain,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Text(menuItem?.name ?? "",
+                                                                  style: GoogleFonts.poppins(
+                                                                      color: AppColors.black,
+                                                                      fontWeight: FontWeight.w500,
+                                                                      fontSize: 14)),
+                                                            ],
                                                           ),
                                                         ),
-                                                        Text(menuItem['title'],
-                                                            style: GoogleFonts.poppins(
-                                                                color: AppColors
-                                                                    .peachLight,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                fontSize: 12)),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(width: 5)
-                                                  ],
-                                                ),
-                                              );
-                                            },
+                                                      );
+                                                    },
+                                                  );
+                                                }),
                                           ),
                                         ),
+                                        // SizedBox(
+                                        //   height: query.height / 8,
+                                        //   child: ListView.builder(
+                                        //     shrinkWrap: true,
+                                        //     itemCount: menuItems.length,
+                                        //     scrollDirection: Axis.horizontal,
+                                        //     padding: const EdgeInsets.symmetric(
+                                        //         horizontal: 1),
+                                        //     itemBuilder: (BuildContext context,
+                                        //         int index) {
+                                        //       final menuItem = menuItems[index];
+                                        //       return GestureDetector(
+                                        //         onTap: () {
+                                        //           //callNextScreen(context, const QuizScreen());
+                                        //           if (index == 0) {
+                                        //             Navigator.of(context,
+                                        //                     rootNavigator:
+                                        //                         false)
+                                        //                 .push(
+                                        //               MaterialPageRoute(
+                                        //                   builder: (_) => PostFeeds(
+                                        //                       "Dance",
+                                        //                       contentType:
+                                        //                           PostFeedType
+                                        //                               .video
+                                        //                               .value)),
+                                        //             );
+                                        //           } else if (index == 1) {
+                                        //             Navigator.of(context,
+                                        //                     rootNavigator:
+                                        //                         false)
+                                        //                 .push(
+                                        //               MaterialPageRoute(
+                                        //                   builder: (_) => PostFeeds(
+                                        //                       "Art & Crafts",
+                                        //                       contentType:
+                                        //                           PostFeedType
+                                        //                               .image
+                                        //                               .value)),
+                                        //             );
+                                        //           } else if (index == 2) {
+                                        //             Navigator.of(context,
+                                        //                     rootNavigator:
+                                        //                         false)
+                                        //                 .push(
+                                        //               MaterialPageRoute(
+                                        //                   builder: (_) => PostFeeds(
+                                        //                       "Story Telling",
+                                        //                       contentType:
+                                        //                           PostFeedType
+                                        //                               .image
+                                        //                               .value)),
+                                        //             );
+                                        //           }
+                                        //         },
+                                        //         child: Row(
+                                        //           children: [
+                                        //             Column(
+                                        //               children: [
+                                        //                 Expanded(
+                                        //                   child: Container(
+                                        //                     height: 80,
+                                        //                     decoration: BoxDecoration(
+                                        //                         shape: BoxShape
+                                        //                             .circle,
+                                        //                         gradient: const RadialGradient(
+                                        //                             colors: [
+                                        //                               AppColors
+                                        //                                   .black38,
+                                        //                               AppColors
+                                        //                                   .white30
+                                        //                             ],
+                                        //                             center: Alignment
+                                        //                                 .bottomCenter,
+                                        //                             radius:
+                                        //                                 1.0),
+                                        //                         border: Border.all(
+                                        //                             color: AppColors
+                                        //                                 .white,
+                                        //                             width: 1)),
+                                        //                     child: Padding(
+                                        //                       padding:
+                                        //                           const EdgeInsets
+                                        //                               .all(
+                                        //                               21.0),
+                                        //                       child: Image.asset(
+                                        //                           menuItem[
+                                        //                               'icon']),
+                                        //                     ),
+                                        //                   ),
+                                        //                 ),
+                                        //                 Text(menuItem['title'],
+                                        //                     style: GoogleFonts.poppins(
+                                        //                         color: AppColors
+                                        //                             .peachLight,
+                                        //                         fontWeight:
+                                        //                             FontWeight
+                                        //                                 .w500,
+                                        //                         fontSize: 12)),
+                                        //               ],
+                                        //             ),
+                                        //             const SizedBox(width: 5)
+                                        //           ],
+                                        //         ),
+                                        //       );
+                                        //     },
+                                        //   ),
+                                        // ),
                                         const SizedBox(
                                           height: 15,
                                         ),

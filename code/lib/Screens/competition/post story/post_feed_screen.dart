@@ -20,11 +20,12 @@ import '../../../components/button_builder.dart';
 import '../../../utils/colours.dart';
 
 class PostFeeds extends StatefulWidget {
+  final int categoryId, subcategoryId;
   final String type;
   final String? contentType, postCompilation;
 
   const PostFeeds(this.type,
-      {super.key, this.postCompilation, this.contentType});
+      {required this.categoryId, required this.subcategoryId, super.key, this.postCompilation, this.contentType});
 
   @override
   State<PostFeeds> createState() => _PostFeedsState();
@@ -34,9 +35,8 @@ class _PostFeedsState extends State<PostFeeds> {
   TextEditingController storyTitleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   PostFeedRepository postFeedRepository = PostFeedRepository();
-  UserRepository userRepository = UserRepository(
-      usersCollection:
-          FirebaseFirestore.instance.collection(FirestoreCollections.users));
+  UserRepository userRepository =
+      UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
   final _formKey = GlobalKey<FormState>();
   late String userId;
   bool _validate = false;
@@ -78,9 +78,7 @@ class _PostFeedsState extends State<PostFeeds> {
       );
     }
     pickedFile = XFile(result!.files.first.path!,
-        name: result.files.first.name,
-        bytes: result.files.first.bytes,
-        length: result.files.first.size);
+        name: result.files.first.name, bytes: result.files.first.bytes, length: result.files.first.size);
     setState(() {
       _videoFile = pickedFile;
     });
@@ -153,9 +151,7 @@ class _PostFeedsState extends State<PostFeeds> {
       List<String> mediaUrls = [];
       if (_videoFile != null) {
         FirebaseStorage storage = FirebaseStorage.instance;
-        Reference ref = storage
-            .ref()
-            .child("$userId/media/${DateTime.now().millisecondsSinceEpoch}");
+        Reference ref = storage.ref().child("$userId/media/${DateTime.now().millisecondsSinceEpoch}");
         File file = File(_videoFile!.path);
 
         UploadTask uploadTask = ref.putFile(file);
@@ -172,9 +168,10 @@ class _PostFeedsState extends State<PostFeeds> {
           postCompilation: widget.postCompilation,
           mediaUrls: mediaUrls.isNotEmpty ? mediaUrls : null,
           postType: widget.contentType,
-          schoolId: currentUser?.schoolId ?? '', // Add appropriate schoolId
-          schoolName:
-              currentUser?.schoolName ?? '', // Add appropriate schoolName
+          schoolId: currentUser?.schoolId ?? '',
+          // Add appropriate schoolId
+          schoolName: currentUser?.schoolName ?? '',
+          // Add appropriate schoolName
           grade: currentUser?.grade,
           createdAt: DateTime.now(),
           nameOrEmail: currentUser?.name ?? currentUser?.email ?? '',
@@ -217,15 +214,10 @@ class _PostFeedsState extends State<PostFeeds> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: SvgPicture.asset("assets/svg/back.svg")),
+            GestureDetector(onTap: () => Navigator.pop(context), child: SvgPicture.asset("assets/svg/back.svg")),
             Text(
               widget.type,
-              style: GoogleFonts.poppins(
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16),
+              style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16),
             ),
             const SizedBox(width: 24), // Spacer for symmetry
           ],
@@ -236,8 +228,7 @@ class _PostFeedsState extends State<PostFeeds> {
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
-            autovalidateMode:
-                _validate ? AutovalidateMode.always : AutovalidateMode.disabled,
+            autovalidateMode: _validate ? AutovalidateMode.always : AutovalidateMode.disabled,
             child: Column(
               children: [
                 const SizedBox(height: 15),
@@ -256,9 +247,7 @@ class _PostFeedsState extends State<PostFeeds> {
                   },
                 ),
                 const SizedBox(height: 15),
-                if (widget.contentType == "video" ||
-                    widget.contentType == "audio" ||
-                    widget.contentType == "image")
+                if (widget.contentType == "video" || widget.contentType == "audio" || widget.contentType == "image")
                   GestureDetector(
                     onTap: pickMedia,
                     child: Container(
@@ -287,8 +276,7 @@ class _PostFeedsState extends State<PostFeeds> {
                   decoration: const InputDecoration(
                     hintText: "Description",
                     labelText: "Description",
-                    prefixIcon:
-                        Icon(Icons.description, color: AppColors.fontHint),
+                    prefixIcon: Icon(Icons.description, color: AppColors.fontHint),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -311,25 +299,18 @@ class _PostFeedsState extends State<PostFeeds> {
                             setState(() {
                               _validate = true;
                             });
-                            if (_formKey.currentState!.validate() &&
-                                _videoFile != null) {
+                            if (_formKey.currentState!.validate() && _videoFile != null) {
                               uploadPostFeed();
                             }
                           },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          _videoFile != null
-                              ? AppColors.primary
-                              : AppColors.black12),
+                      backgroundColor:
+                          MaterialStateProperty.all(_videoFile != null ? AppColors.primary : AppColors.black12),
                       shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
+                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                       ),
                     ),
-                    textStyle: GoogleFonts.poppins(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16),
+                    textStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16),
                   ),
                 ),
               ],

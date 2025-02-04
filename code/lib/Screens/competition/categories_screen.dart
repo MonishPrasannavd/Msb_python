@@ -190,6 +190,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => CompletionScreen(
+                            categoryId: menuItem?.id ?? 1,
                             categoryName: menuItem?.name ?? '',
                             contentType: '',
                             subcategories: menuItem?.subcategories,

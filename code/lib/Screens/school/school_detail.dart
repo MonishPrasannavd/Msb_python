@@ -1,14 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:msb_app/Screens/competition/completion_screen.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
 import 'package:msb_app/Screens/school/top_users.dart';
 import 'package:msb_app/Screens/user/view_all_users.dart';
 import 'package:msb_app/components/msb_carousel.dart';
 import 'package:msb_app/components/msb_post_carousel.dart';
 import 'package:msb_app/components/msb_post_carousel_v2.dart';
+import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/school_dashboard.dart';
 import 'package:msb_app/models/school_rank.dart';
@@ -17,6 +20,7 @@ import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/ui/carousel_slides.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/providers/school/school_api_provider.dart';
+import 'package:msb_app/providers/student_dashboard_provider.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
@@ -64,6 +68,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
   late SchoolApiProvider _schoolApiProvider;
   late SubmissionApiProvider _submissionApiProvider;
   late SubmissionProvider _submissionProvider;
+  late StudentDashboardProvider studentDashboardProvider;
 
   @override
   void initState() {
@@ -73,7 +78,8 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _schoolApiProvider = Provider.of<SchoolApiProvider>(context, listen: false);
-
+      studentDashboardProvider =
+          Provider.of<StudentDashboardProvider>(context, listen: false);
       fetchDataFuture = fetchScreenData();
       fetchScreenData();
     });
@@ -206,24 +212,24 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
     }
   }
 
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "title": "Dance",
-      "icon": 'assets/images/trending.png',
-      "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
-    },
-    {
-      "title": "Art & Crafts",
-      "icon": 'assets/images/art.png',
-      "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
-    },
-    {"title": "Quiz", "icon": 'assets/images/quiz.png', "route": const QuizScreen()},
-    {
-      "title": "Story Telling",
-      "icon": 'assets/images/story.png',
-      "route": PostFeeds("Story Telling", contentType: PostFeedType.image.value)
-    },
-  ];
+  // final List<Map<String, dynamic>> menuItems = [
+  //   {
+  //     "title": "Dance",
+  //     "icon": 'assets/images/trending.png',
+  //     "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
+  //   },
+  //   {
+  //     "title": "Art & Crafts",
+  //     "icon": 'assets/images/art.png',
+  //     "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
+  //   },
+  //   {"title": "Quiz", "icon": 'assets/images/quiz.png', "route": const QuizScreen()},
+  //   {
+  //     "title": "Story Telling",
+  //     "icon": 'assets/images/story.png',
+  //     "route": PostFeeds("Story Telling", contentType: PostFeedType.image.value)
+  //   },
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -661,51 +667,113 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
             ),
             const SizedBox(height: 15),
             SizedBox(
-              height: query.height / 7,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: menuItems.length,
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                itemBuilder: (BuildContext context, int index) {
-                  final menuItem = menuItems[index];
-                  return GestureDetector(
-                    onTap: () {
-                      //callNextScreen(context, const QuizScreen());
-                      Navigator.of(context, rootNavigator: false).push(
-                        MaterialPageRoute(builder: (_) => menuItem["route"]),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                              height: 85,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: const RadialGradient(
-                                      colors: [Color(0xFFE1C7FA), AppColors.white30],
-                                      center: Alignment.bottomCenter,
-                                      radius: 1.0),
-                                  border: Border.all(color: const Color(0xFFE1C7FA), width: 5)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Image.asset(menuItem['icon']),
+              height: query.height / 8,
+              child: ChangeNotifierProvider.value(
+                value: studentDashboardProvider,
+                child: Consumer<StudentDashboardProvider>(
+                    builder: (context, value, child) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: (value.dashboardCategoryList?.length ?? 0),
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        itemBuilder: (BuildContext context, int index) {
+                          final FutureCategories? menuItem =
+                          value.dashboardCategoryList?[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CompletionScreen(
+                                      categoryId: menuItem?.id ?? 1,
+                                      subcategories: menuItem?.subcategories,
+                                      categoryName: menuItem?.name ?? "",
+                                      contentType: 'menuItem["route"]',
+                                    ),
+                                  ));
+                            },
+                            child: Padding(
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(0.0),
+                                      child: CachedNetworkImage(
+                                        imageUrl: menuItem?.iconUrl ?? "",
+                                        placeholder: (context, url) =>
+                                        const Center(
+                                            child:
+                                            CircularProgressIndicator()),
+                                        errorWidget: (context, url, error) =>
+                                        const Center(
+                                            child: Icon(Icons.error)),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(menuItem?.name ?? "",
+                                      style: GoogleFonts.poppins(
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14)),
+                                ],
                               ),
                             ),
-                            Text(menuItem['title'],
-                                style: GoogleFonts.poppins(
-                                    color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14)),
-                          ],
-                        ),
-                        const SizedBox(width: 5)
-                      ],
-                    ),
-                  );
-                },
+                          );
+                        },
+                      );
+                    }),
               ),
             ),
+            // SizedBox(
+            //   height: query.height / 7,
+            //   child: ListView.builder(
+            //     shrinkWrap: true,
+            //     itemCount: menuItems.length,
+            //     scrollDirection: Axis.horizontal,
+            //     padding: const EdgeInsets.symmetric(horizontal: 2),
+            //     itemBuilder: (BuildContext context, int index) {
+            //       final menuItem = menuItems[index];
+            //       return GestureDetector(
+            //         onTap: () {
+            //           //callNextScreen(context, const QuizScreen());
+            //           Navigator.of(context, rootNavigator: false).push(
+            //             MaterialPageRoute(builder: (_) => menuItem["route"]),
+            //           );
+            //         },
+            //         child: Row(
+            //           children: [
+            //             Column(
+            //               children: [
+            //                 Container(
+            //                   height: 85,
+            //                   decoration: BoxDecoration(
+            //                       shape: BoxShape.circle,
+            //                       gradient: const RadialGradient(
+            //                           colors: [Color(0xFFE1C7FA), AppColors.white30],
+            //                           center: Alignment.bottomCenter,
+            //                           radius: 1.0),
+            //                       border: Border.all(color: const Color(0xFFE1C7FA), width: 5)),
+            //                   child: Padding(
+            //                     padding: const EdgeInsets.all(20.0),
+            //                     child: Image.asset(menuItem['icon']),
+            //                   ),
+            //                 ),
+            //                 Text(menuItem['title'],
+            //                     style: GoogleFonts.poppins(
+            //                         color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14)),
+            //               ],
+            //             ),
+            //             const SizedBox(width: 5)
+            //           ],
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
             const SizedBox(height: 5),
             ButtonBuilder(
                 text: 'View All Competitions',
