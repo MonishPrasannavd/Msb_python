@@ -227,31 +227,21 @@ class UserAuthProvider with ChangeNotifier {
     return result;
   }
 
-      Future<Map<String, dynamic>> getCompetitonsCategories(accessToken) async {
+  Future<Map<String, dynamic>> getCompetitonsCategories(accessToken) async {
     Map<String, Object> result;
     notifyListeners();
-    final headers = {
-      'accept': 'application/json',
-      'Authorization': 'Bearer $accessToken',
-    };
     final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.GET_CATEGORIES);
     Response response = await get(
       uri,
-      headers: headers,
+      headers: AppUrl.headers,
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> encodedString =
-          jsonDecode(response.body.toString());
-      List<FutureCategories> categories = List.castFrom(encodedString['data'])
-          .map((e) => FutureCategories.fromJson(e))
-          .toList();
+      final Map<String, dynamic> encodedString = jsonDecode(response.body.toString());
+      List<FutureCategories> categories =
+          List.castFrom(encodedString['data']).map((e) => FutureCategories.fromJson(e)).toList();
       notifyListeners();
-      result = {
-        'status': true,
-        'message': 'Success',
-        'competitions': categories
-      };
+      result = {'status': true, 'message': 'Success', 'competitions': categories};
     } else {
       notifyListeners();
       result = {'status': true, 'message': 'Failed', 'competitions': 'null'};

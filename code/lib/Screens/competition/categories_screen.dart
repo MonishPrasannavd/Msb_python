@@ -39,6 +39,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   void getCompetitions() async {
     var compDataProvider =
         Provider.of<CompetitionsProvider>(context, listen: false);
+
+    await compDataProvider.getCompetitionsData();
     compDataProvider.getCompetitionsData().then((result) {
       if (result['status']) {
         print("Master data fetched successfully.");

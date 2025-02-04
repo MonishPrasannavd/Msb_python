@@ -38,10 +38,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   bool isLoadingPosts = true; // Loading indicator for posts
   List<PostFeed> posts = [];
   late MsbUser currentUser;
+  late dynamic postUser;
 
   late UserProvider _userProvider;
   late SubmissionProvider _submissionProvider;
   late SubmissionApiProvider _submissionApiProvider;
+  late UserAuthProvider _userAuthProvider;
 
   @override
   void initState() {
@@ -49,6 +51,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
     _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+    _userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
 
     // getUser();
     loadAllSubmissions();
@@ -97,8 +100,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     var query = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      body: Consumer3<UserAuthProvider, SubmissionProvider, SubmissionApiProvider>(
-          builder: (ctxt, authProvider, submissionProvider, submissionApiProvider, child) {
+      body: Consumer4<UserAuthProvider, SubmissionProvider, SubmissionApiProvider, UserAuthProvider>(
+          builder: (ctxt, authProvider, submissionProvider, submissionApiProvider, userAuthProvider, child) {
         return Column(
           children: [
             Container(
