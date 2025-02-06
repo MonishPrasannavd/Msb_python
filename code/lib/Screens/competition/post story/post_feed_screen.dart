@@ -39,9 +39,6 @@ class PostFeeds extends StatefulWidget {
 class _PostFeedsState extends State<PostFeeds> {
   TextEditingController storyTitleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  // PostFeedRepository postFeedRepository = PostFeedRepository();
-  // UserRepository userRepository =
-  //     UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
   final _formKey = GlobalKey<FormState>();
   late int? userId;
   bool _validate = false;
@@ -67,9 +64,6 @@ class _PostFeedsState extends State<PostFeeds> {
 
   Future<void> loadUserId() async {
     userId = _userProvider.user.user?.id;
-    // setState(() async {
-    //   currentUser = await userRepository.getOne(userId);
-    // });
   }
 
   void pickMedia() async {
@@ -134,8 +128,6 @@ class _PostFeedsState extends State<PostFeeds> {
   }
 
   Future<void> uploadPostFeed() async {
-    // final user = FirebaseAuth.instance.currentUser;
-    //
     if (userId == null) {
       Fluttertoast.showToast(
         msg: "User not signed in.",
@@ -147,16 +139,6 @@ class _PostFeedsState extends State<PostFeeds> {
       AuthUtils.handleLogout(context);
       return;
     }
-    //
-    // // Reload the user to get the latest email verification status
-    // await user.reload();
-    // final refreshedUser = FirebaseAuth.instance.currentUser;
-    //
-    // if (refreshedUser != null && !refreshedUser.emailVerified) {
-    //   showAlertForVerification();
-    //   return;
-    // }
-
     setState(() {
       _isUploading = true;
     });
@@ -174,24 +156,6 @@ class _PostFeedsState extends State<PostFeeds> {
           mediaUrls.add(fileUrl);
         });
       }
-
-      // final postFeed = PostFeed(
-      //     userId: user.uid,
-      //     title: storyTitleController.text,
-      //     description: descriptionController.text,
-      //     postCompilation: widget.postCompilation,
-      //     mediaUrls: mediaUrls.isNotEmpty ? mediaUrls : null,
-      //     postType: widget.contentType,
-      //     schoolId: currentUser?.schoolId ?? '',
-      //     // Add appropriate schoolId
-      //     schoolName: currentUser?.schoolName ?? '',
-      //     // Add appropriate schoolName
-      //     grade: currentUser?.grade,
-      //     createdAt: DateTime.now(),
-      //     nameOrEmail: currentUser?.name ?? currentUser?.email ?? '',
-      //     postCategory: widget.type);
-
-      // await postFeedRepository.saveOne(postFeed);
 
       await _submissionApiProvider.createSubmission(
         widget.categoryId,
@@ -321,13 +285,13 @@ class _PostFeedsState extends State<PostFeeds> {
                             setState(() {
                               _validate = true;
                             });
-                            if (_formKey.currentState!.validate() && _videoFile != null) {
+                            if (_formKey.currentState!.validate()) {
                               uploadPostFeed();
                             }
                           },
                     style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all(_videoFile != null ? AppColors.primary : AppColors.black12),
+                          MaterialStateProperty.all(AppColors.primary),
                       shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                       ),

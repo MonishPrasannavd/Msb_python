@@ -87,11 +87,15 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
             return FutureBuilder(
               future: _submissionsFuture,
               builder: (context, snapshot) {
-                if(snapshot.connectionState == ConnectionState.waiting){
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                var submissions = (snapshot.data?['submissions'] ?? []) as List<Submission>;
+                if(snapshot.data?['submissions'] == null) {
+                  return const Center(child: Text('No posts available'));
+                }
+
+                var submissions = snapshot.data?['submissions'] != null ? snapshot.data!['submissions'] as List<Submission> : [];
 
                 return ListView.builder(
                   // shrinkWrap: true,
@@ -135,6 +139,24 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refreshSubmissions();
+  }
+  Future<void> _refreshSubmissions() async {
+    setState(() {
+      isLoadingPosts = true;
+    });
+
+    final newSubmissions = await submissionApiProvider.getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
+
+    setState(() {
+      _submissionsFuture = Future.value(newSubmissions);
+      isLoadingPosts = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     var query = MediaQuery.sizeOf(context);
 
@@ -173,6 +195,10 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
               MaterialPageRoute(builder: (_) => value),
             )
                 .then((value) {
+              setState(() async {
+                await _refreshSubmissions();
+              });
+              // await postFeedsProvider.getAllPost();
               // fetchData();
             });
           },

@@ -98,7 +98,7 @@ class HomeTabState extends State<HomeTab> {
     }
   }
 
-  void refetchData() {
+  Future<void> refetchData() async {
     setState(() {
       _fetchDataFuture = fetchData();
     });
@@ -675,7 +675,9 @@ class HomeTabState extends State<HomeTab> {
                                         categoryName: menuItem?.name ?? "",
                                         contentType: menuItem?.categoryType?.name,
                                       ),
-                                    ));
+                                    )).then((value) async {
+                                      await refetchData();
+                                });
                               },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
