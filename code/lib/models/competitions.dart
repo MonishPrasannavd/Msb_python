@@ -1,6 +1,9 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:msb_app/models/dashboard.dart';
 
+
+part 'competitions.g.dart';
+
 @JsonSerializable(explicitToJson: true)
 class CompetitionsCategories {
   final CompetitionsCategory data;

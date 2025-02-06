@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:msb_app/models/comment_v2.dart';
 
 part 'submission.g.dart';
 
@@ -36,6 +37,10 @@ class Submission {
   int? likesCount;
   @JsonKey(name: "is_liked")
   bool? isLiked;
+  @JsonKey(name: "comments_count")
+  int? commentsCount;
+  @JsonKey(name: "comments")
+  List<Comment> comments;
 
   Submission({
     this.id,
@@ -54,6 +59,8 @@ class Submission {
     this.mediaUrl,
     this.likesCount,
     this.isLiked,
+    this.commentsCount,
+    this.comments = const []
   });
 
   Submission copyWith({

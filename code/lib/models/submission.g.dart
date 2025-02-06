@@ -29,6 +29,11 @@ Submission _$SubmissionFromJson(Map<String, dynamic> json) => Submission(
       mediaUrl: json['media_url'] as String?,
       likesCount: (json['likes_count'] as num?)?.toInt(),
       isLiked: json['is_liked'] as bool?,
+      commentsCount: (json['comments_count'] as num?)?.toInt(),
+      comments: (json['comments'] as List<dynamic>?)
+              ?.map((e) => Comment.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$SubmissionToJson(Submission instance) =>
@@ -49,6 +54,8 @@ Map<String, dynamic> _$SubmissionToJson(Submission instance) =>
       'media_url': instance.mediaUrl,
       'likes_count': instance.likesCount,
       'is_liked': instance.isLiked,
+      'comments_count': instance.commentsCount,
+      'comments': instance.comments,
     };
 
 Category _$CategoryFromJson(Map<String, dynamic> json) => Category(

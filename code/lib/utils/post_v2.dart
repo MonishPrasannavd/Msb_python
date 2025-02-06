@@ -627,7 +627,7 @@ class PostUiUtilsV2 {
                   },
                   child: _buildIconText(
                     Icons.comment_outlined,
-                    "0",
+                    post.commentsCount?.toString() ?? "0",
                   ),
                 ),
                 // if (post.commentsEnabled) ...[

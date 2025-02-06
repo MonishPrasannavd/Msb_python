@@ -218,10 +218,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                 text: 'Sign in',
                                 onPressed: () async {
                                   FocusManager.instance.primaryFocus?.unfocus();
-                                  if (kDebugMode) {
-                                    emailController.text = "monishvd@gmail.com";
-                                    passwordController.text = "1234567890";
-                                  }
+                                  // if (kDebugMode) {
+                                  //   emailController.text = "monishvd@gmail.com";
+                                  //   passwordController.text = "1234567890";
+                                  // }
                                   setState(() {
                                     _validate = true;
                                     showSpinner =
