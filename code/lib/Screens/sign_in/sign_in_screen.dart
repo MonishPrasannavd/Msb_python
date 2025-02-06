@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -84,6 +86,7 @@ class _SignInScreenState extends State<SignInScreen> {
         // SharedPreferences prefs = await SharedPreferences.getInstance();
 
         // ✅ Use PrefsService instead of SharedPreferences instance
+        await PrefsService.saveUser(user);
         await PrefsService.setUserId(user.user?.id.toString() ?? "");
         await PrefsService.setString(
             "nameEmail", user.user?.email.toString() ?? "");

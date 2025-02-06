@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
 import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
+import 'package:msb_app/models/msbuser.dart';
 import 'package:msb_app/providers/competitions_provider.dart';
 import 'package:msb_app/providers/dash.dart';
 import 'package:msb_app/providers/master/master_api_provider.dart';
@@ -26,6 +27,7 @@ import 'package:sizer/sizer.dart';
 
 import 'Screens/dashboard/dashboard_setup.dart';
 import 'Screens/profile/post_details_screen.dart';
+
 // import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 
@@ -40,16 +42,14 @@ void main() async {
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
   await FirebaseAppCheck.instance.activate(
-    androidProvider:
-        AndroidProvider.debug, // Use debug for Android in development
+    androidProvider: AndroidProvider.debug, // Use debug for Android in development
     appleProvider: AppleProvider.debug, // Use debug for iOS in development
   );
   FirebaseFirestore.setLoggingEnabled(false);
 
   ///init Branch.io for deeplink.
   await FlutterBranchSdk.init();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
     runApp(MyApp(firestore: fireStore));
   });
 }
@@ -100,11 +100,11 @@ class _DeepLinkListenerBuilder extends StatefulWidget {
   const _DeepLinkListenerBuilder({
     required this.child,
   });
+
   final Widget child;
 
   @override
-  State<_DeepLinkListenerBuilder> createState() =>
-      __DeepLinkListenerBuilderState();
+  State<_DeepLinkListenerBuilder> createState() => __DeepLinkListenerBuilderState();
 }
 
 class __DeepLinkListenerBuilderState extends State<_DeepLinkListenerBuilder> {
@@ -166,6 +166,8 @@ class IsLoginCheckPage extends StatefulWidget {
 class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   late MasterApiProvider _masterApiProvider;
   late MasterProvider _masterProvider;
+  late UserAuthProvider _userAuthProvider;
+  late UserProvider _userProvider;
 
   void fetchMaster() async {
     var result = await _masterApiProvider.getMasterData();
@@ -187,10 +189,8 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
     if (savedVersion == null || savedVersion != currentVersion) {
       debugPrint("is clear version");
       // App version has changed or no version is stored
-      await PrefsService
-          .clear(); // Clear all saved preferences (logs out the user)
-      await PrefsService.setString(
-          'app_version', currentVersion); // Save new app version
+      await PrefsService.clear(); // Clear all saved preferences (logs out the user)
+      await PrefsService.setString('app_version', currentVersion); // Save new app version
       debugPrint("User logged out due to app update.");
     } else {
       debugPrint("App version is up-to-date.");
@@ -206,8 +206,14 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     var userId = await PrefsService.getUserId();
     var token = await PrefsService.getToken();
-    if(userId != null ) {
+    var prefsUser = await PrefsService.getUser();
+    if (userId != null && token != null && prefsUser != null) {
       AppUrl.addHeader("Authorization", "Bearer $token");
+
+      // from persisted token, get user details and load in provider
+      var response = await _userAuthProvider.getUserMe(prefsUser);
+      var user = response['user'] as MsbUser;
+      _userProvider.setUser(user);
     }
     // print("what is user id :-  ${userId}");
     // return firstCall && firstRun ? false : userId != null; // removing this because its outdated library and creating issue
@@ -241,9 +247,10 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   @override
   void initState() {
     super.initState();
+    _userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _masterApiProvider =
-          Provider.of<MasterApiProvider>(context, listen: false);
+      _masterApiProvider = Provider.of<MasterApiProvider>(context, listen: false);
       _masterProvider = Provider.of<MasterProvider>(context, listen: false);
 
       fetchMaster();

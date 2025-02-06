@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:msb_app/models/user.dart';
+import 'package:msb_app/models/msbuser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefsService {
