@@ -39,6 +39,7 @@ class AppUrl {
   static const String GET_ALL_SUBMISSIONS = "/submission/all";
   static const String GET_SUBMISSIONS_BY_USER_ID = "/submission/by_user";
   static const String GET_SUBMISSIONS_BY_SCHOOL_ID = "/submission/by_school";
+  static const String GET_SUBMISSIONS_BY_SUBCATEGORY = "/submission/by_sub_category";
   static const String TOGGLE_LIKE = "/auth/submissions/like";
   static const String ADD_COMMENT = "/auth/submissions/comment";
   static const String REMOVE_COMMENT = "/auth/submissions/comment/remove";

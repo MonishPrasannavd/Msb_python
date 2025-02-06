@@ -5,7 +5,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/competition/post%20story/post_feed_screen.dart';
 import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
+import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
+import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/providers/post_feed_provider.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
+import 'package:msb_app/providers/submission/submission_provider.dart';
+import 'package:msb_app/utils/post_v2.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/post_feed.dart';
@@ -49,11 +54,18 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
   bool isLoadingPosts = false; // Loading indicator for posts
 
   late PostFeedsProvider postFeedsProvider;
+  late SubmissionApiProvider submissionApiProvider;
+  late SubmissionProvider submissionProvider;
+  late Future<Map<String, dynamic>> _submissionsFuture;
 
   @override
   void initState() {
     super.initState();
     //postFeedRepository = PostFeedRepository();
+    submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+    submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+    _submissionsFuture = submissionApiProvider.getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       postFeedsProvider = Provider.of<PostFeedsProvider>(context, listen: false);
       postFeedsProvider.getAllPost();
@@ -62,24 +74,31 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
 
   // Helper to build post list for user or school
   Widget _buildPostList() {
-    if (isLoadingPosts) {
-      return const Center(child: CircularProgressIndicator());
-    } else if (widget.postsFuture.isEmpty) {
-      return const Center(child: Text('No posts available'));
-    }
-
     return Column(
       children: [
         Expanded(
-          child: ChangeNotifierProvider.value(
-              value: postFeedsProvider,
-              child: Consumer<PostFeedsProvider>(builder: (context, value, child) {
+          child: Consumer3<PostFeedsProvider, SubmissionProvider, SubmissionApiProvider>(builder: (
+            context,
+            postFeedsProvider,
+            submissionProvider,
+            submissionApiProvider,
+            child,
+          ) {
+            return FutureBuilder(
+              future: _submissionsFuture,
+              builder: (context, snapshot) {
+                if(snapshot.connectionState == ConnectionState.waiting){
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                var submissions = (snapshot.data?['submissions'] ?? []) as List<Submission>;
+
                 return ListView.builder(
                   // shrinkWrap: true,
                   padding: const EdgeInsets.all(8.0),
-                  itemCount: widget.postsFuture.length,
+                  itemCount: submissions.length,
                   itemBuilder: (BuildContext context, int index) {
-                    PostFeed post = widget.postsFuture[index];
+                    Submission post = submissions[index];
                     return GestureDetector(
                       onTap: () {
                         // Navigator.push(
@@ -89,12 +108,12 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
                         //   ),
                         // );
                       },
-                      child: PostUiUtils.buildPostTile(
+                      child: PostUiUtilsV2.buildPostTile(
                         context,
                         index,
                         post,
                         (postId) async {
-                          // await CommentBottomSheet.show(context, postId: postId);
+                          await CommentBottomSheet.show(context, postId: postId);
                           // _userFuture =
                           //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
                           // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
@@ -104,32 +123,15 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
                     );
                   },
                 );
-              })),
+              },
+            );
+          }),
         ),
         SizedBox(
           height: 100,
         )
       ],
     );
-  }
-
-  Future<void> _fetchPosts(Future<List<PostFeed>> Function() fetchFunction) async {
-    try {
-      final fetchedPosts = await fetchFunction();
-      for (var post in fetchedPosts) {
-        var comments = await commentRepository.getCommentsByPost(post.id!);
-        fetchedPosts[fetchedPosts.indexOf(post)] = post.copyWith(comments: comments);
-      }
-      setState(() {
-        widget.postsFuture = fetchedPosts;
-        isLoadingPosts = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingPosts = false;
-      });
-      debugPrint('Error fetching posts: $e');
-    }
   }
 
   @override
@@ -278,81 +280,18 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
     return const SizedBox.shrink();
   }
 
-  // Helper to build post list for user or school
-  // Widget _buildPostList() {
-  //   return FutureBuilder<List<PostFeed>>(
-  //     future: _postsFuture,
-  //     builder: (context, postsSnapshot) {
-  //       if (postsSnapshot.connectionState == ConnectionState.waiting) {
-  //         return const Center(child: CircularProgressIndicator());
-  //       } else if (postsSnapshot.hasError ||
-  //           postsSnapshot.data == null ||
-  //           postsSnapshot.data!.isEmpty) {
-  //         return const Center(child: Text('No posts available'));
-  //       }
-  //
-  //       List<PostFeed> posts = postsSnapshot.data!;
-  //       return Expanded(child: _buildPostsGrid(posts));
-  //     },
-  //   );
-  // }
+  Future<void> onLike(Submission post, {required int index}) async {
+    var userHasLiked = post.isLiked!;
 
-  // Helper to build the posts grid
-  Widget _buildPostsGrid(List<PostFeed> posts) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.8, // Example height
-      child: ListView.builder(
-        // shrinkWrap: true,
-        padding: const EdgeInsets.all(8.0),
-        itemCount: posts.length,
-        itemBuilder: (BuildContext context, int index) {
-          PostFeed post = posts[index];
-          return GestureDetector(
-            // onTap: () {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => PostDetailScreen(post: post),
-            //     ),
-            //   );
-            // },
-            child: PostUiUtils.buildPostTile(
-              context,
-              index,
-              post,
-              (postId) async {
-                // await CommentBottomSheet.show(context, postId: postId);
-                // _userFuture =
-                //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-                // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-              },
-              () => onLike(post, index: index),
-            ),
-          );
-        },
-      ),
-    );
-  }
+    post.isLiked = !userHasLiked;
+    if (userHasLiked) {
+      post.likesCount = post.likesCount! - 1;
+    } else {
+      post.likesCount = post.likesCount! + 1;
+    }
+    submissionProvider.updateSubmission(post);
 
-  Future<void> onLike(PostFeed post, {required int index}) async {
-    final userId = await PrefsService.getUserId();
-    final likes = List<String>.from(post.likedBy);
-    final userHasLiked = post.likedBy.contains(userId);
-    setState(() {
-      widget.postsFuture[index] = post.copyWith(
-        likedBy: userHasLiked
-            ? (likes..remove(userId))
-            : (likes
-              ..add(
-                userId!,
-              )),
-      );
-    });
-    await postFeedRepository.addLikedByForPost(
-      post.id!,
-      userId ?? '',
-      userHasLiked,
-    );
+    submissionApiProvider.toggleLike(post.id!);
   }
 
   // Helper function to build post tile based on post type
