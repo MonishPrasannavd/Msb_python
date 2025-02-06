@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -34,13 +35,15 @@ class SubmissionApiProvider extends ChangeNotifier {
       if (mediaFile != null) {
         File file = File(mediaFile.path); // Convert XFile to File
         String fileName = path.basename(mediaFile.path);
-
+        String? mimeType = lookupMimeType(file.path);
+        mimeType ??= "application/octet-stream";
         request.files.add(
           await MultipartFile.fromPath(
-            'media', // Field name for media file
+            'media_file', // Field name for media file
             file.path,
             filename: fileName,
-            contentType: MediaType('video', 'mp4'), // Adjust based on file type
+            contentType: MediaType.parse(mimeType), // Get mime type from file
+            // contentType: MediaType('video', 'mp4'), // Adjust based on file type
           ),
         );
       }

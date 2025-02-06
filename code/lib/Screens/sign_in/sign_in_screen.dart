@@ -39,6 +39,15 @@ class _SignInScreenState extends State<SignInScreen> {
   late UserAuthProvider userAuth;
 
   @override
+  void initState() {
+    super.initState();
+    if (kDebugMode) {
+      emailController.text = "vishweshone@gmail.com";
+      passwordController.text = "vishweshone";
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
     emailController.dispose();

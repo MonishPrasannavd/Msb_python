@@ -56,80 +56,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     });
   }
 
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "title": "Dance",
-      "icon": 'assets/images/trending.png',
-      "route": PostFeedType.video.value
-    },
-    {
-      "title": "Music",
-      "icon": 'assets/images/music.png',
-      "route": PostFeedType.audio.value
-    },
-    {
-      "title": "Photography",
-      "icon": 'assets/images/photography.png',
-      "route": PostFeedType.image.value
-    },
-    {
-      "title": "Art & Crafts",
-      "icon": 'assets/images/art.png',
-      "route": PostFeedType.image.value
-    },
-    {"title": "Quiz", "icon": 'assets/images/quiz.png', "route": null},
-    {
-      "title": "Painting",
-      "icon": 'assets/images/painting.png',
-      "route": PostFeedType.image.value
-    },
-    {
-      "title": "Story Telling",
-      "icon": 'assets/images/story.png',
-      "route": PostFeedType.image.value
-    },
-    {
-      "title": "Writing",
-      "icon": 'assets/images/writing.png',
-      "route": PostFeedType.text.value
-    },
-    {
-      "title": "Poetry",
-      "icon": 'assets/images/poetry.png',
-      "route": PostFeedType.text.value
-    },
-    {
-      "title": "Comedy",
-      "icon": 'assets/images/comedy.png',
-      "route": PostFeedType.image.value
-    },
-    {
-      "title": "Action / Drama",
-      "icon": 'assets/images/action.png',
-      "route": PostFeedType.image.value
-    },
-    {
-      "title": "Speaking",
-      "icon": 'assets/images/speaking.png',
-      "route": PostFeedType.audio.value
-    },
-    {
-      "title": "Coding",
-      "icon": 'assets/images/coding.png',
-      "route": PostFeedType.image.value
-    },
-    {
-      "title": "Science",
-      "icon": 'assets/images/science1.png',
-      "route": PostFeedType.image.value
-    },
-    {
-      "title": "Debate",
-      "icon": 'assets/images/debate.png',
-      "route": PostFeedType.image.value
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     var competitions =
@@ -192,7 +118,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           builder: (context) => CompletionScreen(
                             categoryId: menuItem?.id ?? 1,
                             categoryName: menuItem?.name ?? '',
-                            contentType: '',
+                            contentType: menuItem?.categoryType?.name,
                             subcategories: menuItem?.subcategories,
                           ),
                         ),

@@ -1,3 +1,5 @@
+import 'package:msb_app/models/category_type_v2.dart';
+
 class DashboardResponse {
   int? totalSchools;
   int? totalStudent;
@@ -157,6 +159,7 @@ class FutureCategories {
   String? icon;
   int? type;
   String? iconUrl;
+  CategoryTypeV2? categoryType;
   List<Subcategories>? subcategories;
 
   FutureCategories(

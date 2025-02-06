@@ -35,7 +35,7 @@ class AppUrl {
   static const String GET_USER = '/users/get-user';
   static const String LOGOUT = '/auth/logout';
   static const String UPDATE_USER = '/auth/me/update-profile';
-  static const String CREATE_SUBMISSION = "/submission/submissions";
+  static const String CREATE_SUBMISSION = "/submission/create";
   static const String GET_ALL_SUBMISSIONS = "/submission/all";
   static const String GET_SUBMISSIONS_BY_USER_ID = "/submission/by_user";
   static const String GET_SUBMISSIONS_BY_SCHOOL_ID = "/submission/by_school";

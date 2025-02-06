@@ -13,6 +13,8 @@ import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
+import 'package:msb_app/providers/user_auth_provider.dart';
+import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/utils/auth.dart';
@@ -37,11 +39,11 @@ class PostFeeds extends StatefulWidget {
 class _PostFeedsState extends State<PostFeeds> {
   TextEditingController storyTitleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  PostFeedRepository postFeedRepository = PostFeedRepository();
-  UserRepository userRepository =
-      UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
+  // PostFeedRepository postFeedRepository = PostFeedRepository();
+  // UserRepository userRepository =
+  //     UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
   final _formKey = GlobalKey<FormState>();
-  late String userId;
+  late int? userId;
   bool _validate = false;
   XFile? _videoFile;
   bool _isUploading = false;
@@ -50,6 +52,7 @@ class _PostFeedsState extends State<PostFeeds> {
 
   late SubmissionApiProvider _submissionApiProvider;
   late SubmissionProvider _submissionProvider;
+  late UserProvider _userProvider;
 
   @override
   void initState() {
@@ -57,15 +60,16 @@ class _PostFeedsState extends State<PostFeeds> {
 
     _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
     _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
 
     loadUserId();
   }
 
   Future<void> loadUserId() async {
-    userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    setState(() async {
-      currentUser = await userRepository.getOne(userId);
-    });
+    userId = _userProvider.user.user?.id;
+    // setState(() async {
+    //   currentUser = await userRepository.getOne(userId);
+    // });
   }
 
   void pickMedia() async {
@@ -130,9 +134,9 @@ class _PostFeedsState extends State<PostFeeds> {
   }
 
   Future<void> uploadPostFeed() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
+    // final user = FirebaseAuth.instance.currentUser;
+    //
+    if (userId == null) {
       Fluttertoast.showToast(
         msg: "User not signed in.",
         toastLength: Toast.LENGTH_SHORT,
@@ -143,15 +147,15 @@ class _PostFeedsState extends State<PostFeeds> {
       AuthUtils.handleLogout(context);
       return;
     }
-
-    // Reload the user to get the latest email verification status
-    await user.reload();
-    final refreshedUser = FirebaseAuth.instance.currentUser;
-
-    if (refreshedUser != null && !refreshedUser.emailVerified) {
-      showAlertForVerification();
-      return;
-    }
+    //
+    // // Reload the user to get the latest email verification status
+    // await user.reload();
+    // final refreshedUser = FirebaseAuth.instance.currentUser;
+    //
+    // if (refreshedUser != null && !refreshedUser.emailVerified) {
+    //   showAlertForVerification();
+    //   return;
+    // }
 
     setState(() {
       _isUploading = true;
@@ -171,23 +175,23 @@ class _PostFeedsState extends State<PostFeeds> {
         });
       }
 
-      final postFeed = PostFeed(
-          userId: user.uid,
-          title: storyTitleController.text,
-          description: descriptionController.text,
-          postCompilation: widget.postCompilation,
-          mediaUrls: mediaUrls.isNotEmpty ? mediaUrls : null,
-          postType: widget.contentType,
-          schoolId: currentUser?.schoolId ?? '',
-          // Add appropriate schoolId
-          schoolName: currentUser?.schoolName ?? '',
-          // Add appropriate schoolName
-          grade: currentUser?.grade,
-          createdAt: DateTime.now(),
-          nameOrEmail: currentUser?.name ?? currentUser?.email ?? '',
-          postCategory: widget.type);
+      // final postFeed = PostFeed(
+      //     userId: user.uid,
+      //     title: storyTitleController.text,
+      //     description: descriptionController.text,
+      //     postCompilation: widget.postCompilation,
+      //     mediaUrls: mediaUrls.isNotEmpty ? mediaUrls : null,
+      //     postType: widget.contentType,
+      //     schoolId: currentUser?.schoolId ?? '',
+      //     // Add appropriate schoolId
+      //     schoolName: currentUser?.schoolName ?? '',
+      //     // Add appropriate schoolName
+      //     grade: currentUser?.grade,
+      //     createdAt: DateTime.now(),
+      //     nameOrEmail: currentUser?.name ?? currentUser?.email ?? '',
+      //     postCategory: widget.type);
 
-      await postFeedRepository.saveOne(postFeed);
+      // await postFeedRepository.saveOne(postFeed);
 
       await _submissionApiProvider.createSubmission(
         widget.categoryId,

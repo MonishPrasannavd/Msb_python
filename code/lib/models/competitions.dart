@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:msb_app/models/category_type_v2.dart';
 import 'package:msb_app/models/dashboard.dart';
 
 
@@ -80,6 +81,7 @@ class FutureCategories {
   String? icon;
   int? type;
   String? iconUrl;
+  CategoryTypeV2? categoryType;
   List<Subcategories>? subcategories;
 
   FutureCategories(
@@ -103,6 +105,9 @@ class FutureCategories {
       json['subcategories'].forEach((v) {
         subcategories!.add(Subcategories.fromJson(v));
       });
+    }
+    if(json['category_type'] != null){
+      categoryType = CategoryTypeV2.fromJson(json['category_type']);
     }
   }
 
