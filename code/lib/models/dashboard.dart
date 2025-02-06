@@ -184,6 +184,10 @@ class FutureCategories {
         subcategories!.add(new Subcategories.fromJson(v));
       });
     }
+    if(json['category_type'] != null){
+      categoryType = CategoryTypeV2.fromJson(json['category_type']);
+    }
+
   }
 
   Map<String, dynamic> toJson() {

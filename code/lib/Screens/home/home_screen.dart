@@ -37,8 +37,8 @@ class HomeScreenState extends State<HomeScreen>
     tabController.addListener(() {
       setState(() {
         if (tabController.index == 0) {
-          homeTabKey.currentState?.fetchSchoolsData();
           // homeTabKey.currentState?.fetchUsersData();
+          homeTabKey.currentState?.getDashboard();
         }
       });
     });

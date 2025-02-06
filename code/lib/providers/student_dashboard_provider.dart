@@ -14,9 +14,6 @@ class StudentDashboardProvider with ChangeNotifier {
   Future<Map<String, dynamic>> getStudentDashboard() async {
     Map<String, dynamic> result;
     try {
-      authToken = await PrefsService.getToken(); // Retrieve token
-      AppUrl.addHeader('Authorization', 'Bearer $authToken');
-
       final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.DASHBOARD_USER}");
 
       notifyListeners();
