@@ -19,6 +19,7 @@ import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/services/preferences_service.dart';
+import 'package:msb_app/utils/api.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sizer/sizer.dart';
@@ -204,6 +205,10 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
 
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     var userId = await PrefsService.getUserId();
+    var token = await PrefsService.getToken();
+    if(userId != null ) {
+      AppUrl.addHeader("Authorization", "Bearer $token");
+    }
     // print("what is user id :-  ${userId}");
     // return firstCall && firstRun ? false : userId != null; // removing this because its outdated library and creating issue
     return userId != null ? true : false;
