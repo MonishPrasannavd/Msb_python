@@ -415,7 +415,7 @@ class HomeTabState extends State<HomeTab> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => UserProfileScreen(id: student.id.toString()),
+                                          builder: (context) => UserProfileScreen(id: student.userId.toString()),
                                         ),
                                       ).then((val) => refetchData());
                                     },

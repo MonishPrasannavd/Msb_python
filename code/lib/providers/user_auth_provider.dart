@@ -7,6 +7,7 @@ import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/models/msbuser.dart';
+import 'package:msb_app/models/user_single.dart';
 import 'package:msb_app/utils/api.dart';
 
 class UserAuthProvider with ChangeNotifier {
@@ -160,7 +161,8 @@ class UserAuthProvider with ChangeNotifier {
         var encodedString = jsonDecode(response.body.toString());
         notifyListeners();
         // TODO : implement parsing json
-        result = {'status': true, 'message': 'Successful', 'user': encodedString};
+        var user = UserSingle.fromJson(encodedString);
+        result = {'status': true, 'message': 'Successful', 'user': user};
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];

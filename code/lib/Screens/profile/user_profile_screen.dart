@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/submission.dart';
+import 'package:msb_app/models/user_single.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
@@ -34,12 +35,11 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   late Future<SchoolUser?> _schoolFuture;
-  late SchoolUserRepository schoolUserRepository;
   bool isLoadingPosts = true; // Loading indicator for posts
   List<PostFeed> posts = [];
   late MsbUser currentUser;
   late bool isLoadingPostUser = false;
-  late dynamic postUser;
+  late UserSingle postUser;
   late Future<Map<String, dynamic>> _profileFuture;
 
   late UserProvider _userProvider;
@@ -60,6 +60,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> loadAllSubmissions() async {
+    setState(() {
+      isLoadingPostUser = true;
+    });
+    var postUserResponse = await _userAuthProvider.getUser(widget.id);
+
+    setState(() {
+      isLoadingPostUser = false;
+      postUser = postUserResponse['user'];
+    });
     _submissionProvider.isLoadingSubmissions = true;
     Map<String, dynamic> response = {};
     if (widget.type == "user") {
@@ -68,21 +77,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       response = await _submissionApiProvider.getSubmissionsBySchool(int.parse(widget.id));
     }
     _submissionProvider.clearSubmissions();
-    _submissionProvider.addSubmissions(response['submissions'] as List<Submission>);
+    var fetchedSubmissions = response['submissions'];
+    if(fetchedSubmissions != null) {
+      _submissionProvider.addSubmissions(fetchedSubmissions);
+    } else {
+      _submissionProvider.addSubmissions([]);
+    }
     _submissionProvider.isLoadingSubmissions = false;
-    loadPostUser();
-  }
-
-  Future<void> loadPostUser() async {
-    setState(() {
-      isLoadingPostUser = true;
-    });
-      var postUserResponse = await _userAuthProvider.getUser(widget.id);
-
-      setState(() {
-        isLoadingPostUser = false;
-        postUser = postUserResponse['user'];
-      });
   }
 
   @override
@@ -133,7 +134,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
             _buildPostList(),
           ],
         );
@@ -170,70 +170,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Helper to build profile header for both user and school
   Widget _buildProfileHeader({MsbUser? user, SchoolUser? school}) {
-    if (postUser != null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildProfileImage(postUser['name'], postUser['image_url']),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      postUser['name'] ?? 'Unknown User',
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  RichText(
-                    text: TextSpan(
-                      text: 'Studying in: ',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white54,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: postUser['school_name'] ?? "N/A",
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.white54,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // const SizedBox(height: 4),
-                  // Text(
-                  //   'Profile type: User',
-                  //   style: GoogleFonts.poppins(
-                  //     fontSize: 12,
-                  //     color: Colors.white54,
-                  //   ),
-                  // ),
-                  const SizedBox(height: 4),
-                  Text(
-                    postUser['grade'] ?? "N/A",
-                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    if (widget.type == "user" && isLoadingPostUser) {
+      return Center(
+        child: CircularProgressIndicator(),
       );
-    } else if (school != null) {
+    }
+
+    if (school != null) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
@@ -257,70 +200,105 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ),
       );
     }
-    return const SizedBox.shrink();
-  }
 
-  // Helper to build post list for user or school
-  // Widget _buildPostList() {
-  //   return FutureBuilder<List<PostFeed>>(
-  //     future: _postsFuture,
-  //     builder: (context, postsSnapshot) {
-  //       if (postsSnapshot.connectionState == ConnectionState.waiting) {
-  //         return const Center(child: CircularProgressIndicator());
-  //       } else if (postsSnapshot.hasError ||
-  //           postsSnapshot.data == null ||
-  //           postsSnapshot.data!.isEmpty) {
-  //         return const Center(child: Text('No posts available'));
-  //       }
-  //
-  //       List<PostFeed> posts = postsSnapshot.data!;
-  //       return Expanded(child: _buildPostsGrid(posts));
-  //     },
-  //   );
-  // }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildProfileImage(postUser.name, postUser.imageUrl),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    postUser.name ?? 'Unknown User',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                RichText(
+                  text: TextSpan(
+                    text: 'Studying in: ',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white54,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: postUser.students?.first.schoolId.toString() ?? "N/A",
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  postUser.students?.first.userId.toString() ?? "N/A",
+                  style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   // Helper to build the posts grid
   Widget _buildPostsGrid() {
     return Consumer<SubmissionProvider>(builder: (context, ref, child) {
-      return SizedBox(
-          height: MediaQuery.of(context).size.height * 0.7, // Example height
-          child: ListView.builder(
-            // shrinkWrap: true,
-            padding: const EdgeInsets.all(8.0),
-            itemCount: _submissionProvider.submissions.length,
-            itemBuilder: (BuildContext context, int index) {
-              Submission post = _submissionProvider.submissions[index];
-              return GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => PostDetailScreen(post: post),
-                  //   ),
-                  // );
+      return Expanded(
+        child: ListView.builder(
+          // shrinkWrap: true,
+          padding: const EdgeInsets.all(8.0),
+          itemCount: _submissionProvider.submissions.length,
+          itemBuilder: (BuildContext context, int index) {
+            Submission post = _submissionProvider.submissions[index];
+            return GestureDetector(
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => PostDetailScreen(post: post),
+                //   ),
+                // );
+              },
+              child: PostUiUtilsV2.buildPostTile(
+                context,
+                index,
+                post,
+                (postId) async {
+                  await CommentBottomSheet.show(context, postId: postId);
+                  if (widget.type == "user") {
+                    // _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'))
+                    //     .getOne(widget.id);
+                    // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+                  } else if (widget.type == "school") {
+                    // _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
+                    // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
+                  }
                 },
-                child: PostUiUtilsV2.buildPostTile(
-                  context,
-                  index,
-                  post,
-                  (postId) async {
-                    await CommentBottomSheet.show(context, postId: postId);
-                    if (widget.type == "user") {
-                      // _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'))
-                      //     .getOne(widget.id);
-                      // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-                    } else if (widget.type == "school") {
-                      _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-                      // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
-                    }
-                  },
-                  () => {
-                    // onLike(post, index: index)
-                  },
-                ),
-              );
-            },
-          ));
+                () => {
+                  // onLike(post, index: index)
+                },
+              ),
+            );
+          },
+        ),
+      );
     });
   }
 

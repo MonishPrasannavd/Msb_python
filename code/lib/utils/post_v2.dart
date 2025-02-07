@@ -28,10 +28,8 @@ class CachePatch {
 
 class PostUiUtilsV2 {
   static Map<int, CachePatch> videoControllers = {};
-  static final Map<int, bool> _isOverlayVisible =
-      {}; // Tracks visibility of overlays
-  static final Map<int, Timer?> _overlayTimers =
-      {}; // Tracks timers for auto-hiding overlays
+  static final Map<int, bool> _isOverlayVisible = {}; // Tracks visibility of overlays
+  static final Map<int, Timer?> _overlayTimers = {}; // Tracks timers for auto-hiding overlays
   static const double postContentHeight = 350;
 
   // Function to build a full post tile
@@ -57,8 +55,7 @@ class PostUiUtilsV2 {
       Function(String schoolId)? onSchoolTap,
       VoidCallback? onNavigateBack,
     })? customPostHeader,
-    Widget Function(BuildContext context, int index, Submission post)?
-        customPostContent,
+    Widget Function(BuildContext context, int index, Submission post)? customPostContent,
     Widget Function(
       BuildContext context,
       Submission post,
@@ -155,8 +152,6 @@ class PostUiUtilsV2 {
                   ),
                 ),
               ),
-              // const Spacer(),
-              // if (sideMenu != null) sideMenu,
             ],
           ),
         ),
@@ -177,11 +172,58 @@ class PostUiUtilsV2 {
                 //     ));
               },
               child: Text(
-                post.title ?? "Unkown Category",
+                post.title ?? "Default title",
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            const Spacer(),
+            if (sideMenu != null) sideMenu,
+          ],
+        ),
+        const SizedBox(height: 5),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => PostDetailScreen(post: post,),
+                //     ));
+              },
+              child: Text(
+                post.description ?? "No description found",
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                 ),
+              ),
+            ),
+            const Spacer(),
+            if (sideMenu != null) sideMenu,
+          ],
+        ),
+        const SizedBox(height: 5),
+        Row(
+          children: [
+            Text(
+              "Uploaded to:",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              post.subcategory?.name ?? "Unkown competition",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
               ),
             ),
             const Spacer(),
@@ -224,8 +266,7 @@ class PostUiUtilsV2 {
                   },
                   child: Text(
                     writerUser.schoolName ?? "Anonymous",
-                    style:
-                        GoogleFonts.poppins(fontSize: 12, color: Colors.blue),
+                    style: GoogleFonts.poppins(fontSize: 12, color: Colors.blue),
                   ),
                 ),
               ),
@@ -254,11 +295,9 @@ class PostUiUtilsV2 {
   }
 
   // Method to build post content based on post type (image, video, text, etc.)
-  static Widget _buildPostContent(
-      BuildContext context, int index, Submission post) {
+  static Widget _buildPostContent(BuildContext context, int index, Submission post) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(
-          16), // Increased corner radius for more rounded edges
+      borderRadius: BorderRadius.circular(16), // Increased corner radius for more rounded edges
       child: SizedBox(
         width: double.infinity,
         height: postContentHeight, // Increased height for larger content
@@ -267,8 +306,7 @@ class PostUiUtilsV2 {
     );
   }
 
-  static Widget _buildContentByType(
-      BuildContext context, int index, Submission post) {
+  static Widget _buildContentByType(BuildContext context, int index, Submission post) {
     var postType = getPostFeedType(post);
     switch (postType?.value) {
       case 'video':
@@ -284,15 +322,11 @@ class PostUiUtilsV2 {
   }
 
   // Custom video player with tap-to-show overlay controls
-  static Widget _buildCustomVideoPlayer(
-      BuildContext context, int index, Submission post) {
+  static Widget _buildCustomVideoPlayer(BuildContext context, int index, Submission post) {
     if (post.mediaUrl == null) {
       return Center(
         child: Text("",
-            style: GoogleFonts.poppins(
-                color: const Color(0xFF151414),
-                fontWeight: FontWeight.w500,
-                fontSize: 16)),
+            style: GoogleFonts.poppins(color: const Color(0xFF151414), fontWeight: FontWeight.w500, fontSize: 16)),
       );
     }
     if (!videoControllers.containsKey(index)) {
@@ -308,8 +342,7 @@ class PostUiUtilsV2 {
             }));
       _isOverlayVisible[index] = false;
     } else if (videoControllers[index] != null) {
-      final difference =
-          DateTime.now().difference(videoControllers[index]!.dateTime);
+      final difference = DateTime.now().difference(videoControllers[index]!.dateTime);
       if (difference.inSeconds > 10) {
         videoControllers[index] = CachePatch(
             dateTime: DateTime.now(),
@@ -343,15 +376,12 @@ class PostUiUtilsV2 {
                   height: postContentHeight, // Fixed height for all videos
                   width: double.infinity,
                   child: AspectRatio(
-                    aspectRatio:
-                        controller.playerPlusController.value.aspectRatio,
-                    child:
-                        CachedVideoPlayerPlus(controller.playerPlusController),
+                    aspectRatio: controller.playerPlusController.value.aspectRatio,
+                    child: CachedVideoPlayerPlus(controller.playerPlusController),
                   ),
                 ),
                 _isOverlayVisible[index] ?? false
-                    ? _buildOverlayControls(
-                        controller.playerPlusController, context, index)
+                    ? _buildOverlayControls(controller.playerPlusController, context, index)
                     : const SizedBox.shrink(),
               ],
             ),
@@ -380,10 +410,7 @@ class PostUiUtilsV2 {
   }
 
   // Custom video controls (play/pause, sound, replay) shown in the bottom overlay
-  static Widget _buildOverlayControls(
-      CachedVideoPlayerPlusController controller,
-      BuildContext context,
-      int index) {
+  static Widget _buildOverlayControls(CachedVideoPlayerPlusController controller, BuildContext context, int index) {
     return Container(
       height: postContentHeight, // Overlay covering the entire video
       width: double.infinity,
@@ -401,9 +428,7 @@ class PostUiUtilsV2 {
                 size: 30,
               ),
               onPressed: () {
-                controller.value.isPlaying
-                    ? controller.pause()
-                    : controller.play();
+                controller.value.isPlaying ? controller.pause() : controller.play();
                 _hideOverlayOnTap(
                   context,
                   index,
@@ -413,9 +438,7 @@ class PostUiUtilsV2 {
             // Volume toggle button
             IconButton(
               icon: Icon(
-                controller.value.volume == 0
-                    ? Icons.volume_off
-                    : Icons.volume_up,
+                controller.value.volume == 0 ? Icons.volume_off : Icons.volume_up,
                 color: Colors.white,
                 size: 30,
               ),
@@ -472,8 +495,7 @@ class PostUiUtilsV2 {
             ),
           ),
         ),
-        errorWidget: (context, url, error) =>
-            const Center(child: Icon(Icons.error)),
+        errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
         imageBuilder: (context, imageProvider) {
           return AspectRatio(
             aspectRatio: 16 / 9, // Maintain a consistent aspect ratio
@@ -481,12 +503,10 @@ class PostUiUtilsV2 {
               width: double.infinity,
               height: postContentHeight,
               decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(10), // Optional: Add rounded corners
+                borderRadius: BorderRadius.circular(10), // Optional: Add rounded corners
                 image: DecorationImage(
                   image: imageProvider,
-                  fit:
-                      BoxFit.cover, // Ensures the image fits without distortion
+                  fit: BoxFit.cover, // Ensures the image fits without distortion
                 ),
               ),
             ),
@@ -511,10 +531,8 @@ class PostUiUtilsV2 {
             child: InteractiveViewer(
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
-                placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) =>
-                    const Center(child: Icon(Icons.error)),
+                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
                 fit: BoxFit.contain, // Ensure image is fully visible
               ),
             ),
@@ -579,30 +597,24 @@ class PostUiUtilsV2 {
                   onTap: onLike,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: (post.isLiked != null && post.isLiked!)
-                          ? AppColors.primary.withOpacity(0.2)
-                          : null,
+                      color: (post.isLiked != null && post.isLiked!) ? AppColors.primary.withOpacity(0.2) : null,
                       borderRadius: BorderRadius.circular(50.0),
                       border: Border.all(
                         color: const Color(0xFFCECACA),
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10.0, vertical: 5),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                       child: Row(
                         children: [
                           SvgPicture.asset(
-                            (post.isLiked != null && post.isLiked!)
-                                ? "assets/svg/like.svg"
-                                : "assets/svg/unLike.svg",
+                            (post.isLiked != null && post.isLiked!) ? "assets/svg/like.svg" : "assets/svg/unLike.svg",
                             height: 15,
                           ),
                           const SizedBox(width: 5),
                           Text(
                             post.likesCount.toString(),
-                            style: GoogleFonts.poppins(
-                                fontSize: 12, color: Colors.grey),
+                            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -622,8 +634,7 @@ class PostUiUtilsV2 {
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
-                    onCommentButtonPressed(post
-                        .id!); // Properly call the function when comment is pressed
+                    onCommentButtonPressed(post.id!); // Properly call the function when comment is pressed
                   },
                   child: _buildIconText(
                     Icons.comment_outlined,

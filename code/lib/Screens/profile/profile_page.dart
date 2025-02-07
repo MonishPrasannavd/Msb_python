@@ -404,6 +404,7 @@ class ProfileScreenState extends State<ProfileScreen> {
         onChanged: (Grade? newGrade) {
           setState(() {
             if (newGrade != null) {
+              selectedGrade = newGrade;
               grade = newGrade.name!;
             }
           });
