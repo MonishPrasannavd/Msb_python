@@ -50,82 +50,26 @@ class _PublicTabState extends State<PublicTab> {
   bool isSwitched = false;
   MsbUser? user;
 
-  void loadUserId() async {
-    var fetchedUserId = await PrefsService.getUserId();
-    var fetchedUserNameEmail = await PrefsService.getUserNameEmail();
+  late ScrollController _scrollController;
+  int _currentPage = 1;
+  bool _isFetchingMore = false;
+  bool _hasMoreData = true; // Track if there’s more data to fetch
 
-    setState(() {
-      if (fetchedUserId != null) {
-        userId = fetchedUserId;
-        userEmail = fetchedUserNameEmail ?? "";
-      } else {
-        // back to login screen
-      }
-    });
-    if (userId != null) {
-      // fetchUserPosts(); // Fetch posts once userId is available
-      // user = await userRepository.getOne(userId!);
-    }
-  }
-
-  Future<void> loadAllSubmissions() async {
-    var response = await _submissionApiProvider.getAllSubmissions();
-    if (response['submissions'] != null) {
-      _submissionProvider.clearSubmissions();
-      _submissionProvider
-          .addSubmissions(response['submissions'] as List<Submission>);
-    }
-  }
+  List<Submission> _submissions = [];
 
   String? customSchoolId;
   String? customGrade;
 
-  // Future<void> fetchUserPosts() async {
-  //   try {
-  //     final userPosts = await postFeedRepository.getPostsExcludingUserId(
-  //       userId!,
-  //       schoolId: switch (filter) {
-  //         PostFilter.mySchool => user?.schoolId,
-  //         PostFilter.other => customSchoolId,
-  //         _ => null,
-  //       },
-  //       sClass: switch (filter) {
-  //         PostFilter.myClass => user?.grade,
-  //         PostFilter.other => customGrade != '0' ? customGrade : null,
-  //         _ => null,
-  //       },
-  //     );
-  //     final result = await Future.wait(
-  //       userPosts.map((e) => e.userId!).map(
-  //             (e) => userRepository.getOne(e),
-  //           ),
-  //     );
-  //     postUser = [];
-  //     for (int i = 0; i < userPosts.length; i++) {
-  //       postUser.add((post: userPosts[i], user: result[i]));
-  //     }
-  //     setState(() => isLoading = false);
-  //   } catch (e) {
-  //     print("Error fetching user posts: $e");
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
-    loadUserId();
+    _scrollController = ScrollController()..addListener(_scrollListener);
+    _submissionProvider =
+        Provider.of<SubmissionProvider>(context, listen: false);
+    _submissionApiProvider =
+        Provider.of<SubmissionApiProvider>(context, listen: false);
 
-    // fetchSchool();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _submissionProvider =
-          Provider.of<SubmissionProvider>(context, listen: false);
-      _submissionApiProvider =
-          Provider.of<SubmissionApiProvider>(context, listen: false);
-
-      // getUser();
-      loadAllSubmissions();
-    });
+    _fetchInitialSubmissions();
   }
 
   List<SchoolUser> schoolList = [];
@@ -133,7 +77,55 @@ class _PublicTabState extends State<PublicTab> {
   @override
   void dispose() {
     PostUiUtils.disposeVideoControllers();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _scrollListener() async {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (!_isFetchingMore && _hasMoreData) {
+        await _fetchMoreSubmissions();
+      }
+    }
+  }
+
+  Future<void> _fetchInitialSubmissions() async {
+    setState(() => _isFetchingMore = true);
+
+    final response = await _submissionApiProvider.getAllSubmissions(page: _currentPage);
+
+    if (response['submissions'] != null && response['submissions'].isNotEmpty) {
+      setState(() {
+        _submissions = response['submissions'];
+        _hasMoreData = response['submissions'].length >= 10; // If less than 10, assume no more data
+      });
+    } else {
+      _hasMoreData = false;
+    }
+
+    setState(() => _isFetchingMore = false);
+  }
+
+  Future<void> _fetchMoreSubmissions() async {
+    if (_isFetchingMore || !_hasMoreData) return;
+
+    setState(() {
+      _isFetchingMore = true;
+      _currentPage++;
+    });
+
+    final response = await _submissionApiProvider.getAllSubmissions(page: _currentPage);
+
+    if (response['submissions'] != null && response['submissions'].isNotEmpty) {
+      setState(() {
+        _submissions.addAll(response['submissions']);
+        _hasMoreData = response['submissions'].length >= 10;
+      });
+    } else {
+      _hasMoreData = false; // No more data to load
+    }
+
+    setState(() => _isFetchingMore = false);
   }
 
   Future<void> _modalSchoolSelectionMenu() async {
@@ -269,76 +261,6 @@ class _PublicTabState extends State<PublicTab> {
       if (customGrade == null || customSchoolId == null) return;
     }
     filter = value;
-    // fetchUserPosts();
-  }
-
-  // fetchSchool() async {
-  //   final schools = await schoolUserRepository.getAll();
-  //
-  //   if (schools.isNotEmpty) {
-  //     setState(() {
-  //       schoolList = schools;
-  //     });
-  //   }
-  //   print(schoolList.length);
-  // }
-
-  // final List<Map<String, dynamic>> menuItems = [
-  //   {
-  //     "title": "Dance",
-  //     "icon": 'assets/images/trending.png',
-  //     "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
-  //   },
-  //   {
-  //     "title": "Music",
-  //     "icon": 'assets/images/music.png',
-  //     "route": PostFeeds("Music", contentType: PostFeedType.audio.value)
-  //   },
-  //   {
-  //     "title": "Photography",
-  //     "icon": 'assets/images/photography.png',
-  //     "route": PostFeeds("Photography", contentType: PostFeedType.image.value)
-  //   },
-  //   {
-  //     "title": "Art & Crafts",
-  //     "icon": 'assets/images/art.png',
-  //     "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
-  //   },
-  //   {
-  //     "title": "Quiz",
-  //     "icon": 'assets/images/quiz.png',
-  //     "route": const QuizScreen()
-  //   },
-  //   {
-  //     "title": "Painting",
-  //     "icon": 'assets/images/painting.png',
-  //     "route": PostFeeds("Painting", contentType: PostFeedType.image.value)
-  //   },
-  // ];
-
-  late AudioPlayer _audioPlayer;
-  bool isPlaying = false;
-
-  void playAudio(url) async {
-    try {
-      await _audioPlayer.play(UrlSource(url)); // No need to capture result
-      setState(() {
-        isPlaying = true;
-      });
-    } catch (e) {
-      debugPrint("Error while playing audio: $e");
-    }
-  }
-
-  void stopAudio() async {
-    try {
-      await _audioPlayer.stop(); // No need to capture result
-      setState(() {
-        isPlaying = false;
-      });
-    } catch (e) {
-      debugPrint("Error while playing audio: $e");
-    }
   }
 
   @override
@@ -442,89 +364,89 @@ class _PublicTabState extends State<PublicTab> {
                       ),
                     ),
                     Consumer<SubmissionProvider>(builder: (ctxt, ref, child) {
-                      if (_submissionProvider.submissions.isNotEmpty) {
-                        return Expanded(
-                          child: ListView.separated(
-                            padding: EdgeInsets.zero,
-                            itemCount: _submissionProvider.submissions.length,
-                            itemBuilder: (context, index) {
-                              var post = _submissionProvider.submissions[index];
+                      return Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          padding: EdgeInsets.zero,
+                          itemCount: _submissions.length + 1, // +1 for the loader at the bottom
+                          itemBuilder: (context, index) {
+                            if (index == _submissions.length) {
+                              return _isFetchingMore ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
+                            }
 
-                              return PostUiUtilsV2.buildPostTile(
-                                context,
-                                index,
-                                post,
-                                (postId) => CommentBottomSheet.show(
-                                  context,
-                                  postId: post.id!,
-                                ),
-                                () => onLike(index: index),
-                                followUser: () => onFollow(
-                                  index: index,
-                                ),
-                                currentUser: user,
-                                onSchoolTap: (schoolId) {
-                                  filter = PostFilter.other;
-                                  customSchoolId = schoolId;
-                                  customGrade = null;
-                                },
-                              );
-                            },
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                              return const SizedBox(height: 15);
-                            },
-                          ),
-                        );
-                      } else {
-                        return Expanded(
-                          // Ensure "return" is added here
-                          child: Center(
-                            child: Text(
-                              "Loading...",
-                              style: GoogleFonts.poppins(
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        );
-                      }
+                            var post = _submissions[index];
+
+                            return PostUiUtilsV2.buildPostTile(
+                              context,
+                              index,
+                              post,
+                                  (postId) => CommentBottomSheet.show(context, postId: post.id!),
+                                  () => onLike(index: index),
+                              followUser: () => onFollow(index: index),
+                              currentUser: user,
+                              onSchoolTap: (schoolId) {
+                                filter = PostFilter.other;
+                                customSchoolId = schoolId;
+                                customGrade = null;
+                              },
+                            );
+                          },
+                        ),
+                      );
+                      // if (_submissionProvider.submissions.isNotEmpty) {
+                      //   return Expanded(
+                      //     child: ListView.separated(
+                      //       controller: _scrollController,
+                      //       padding: EdgeInsets.zero,
+                      //       itemCount: _submissions.length + 1,
+                      //       itemBuilder: (context, index) {
+                      //         if (index == _submissions.length) {
+                      //           return _isFetchingMore ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
+                      //         }
+                      //         var post = _submissions[index];
+                      //
+                      //         return PostUiUtilsV2.buildPostTile(
+                      //           context,
+                      //           index,
+                      //           post,
+                      //           (postId) => CommentBottomSheet.show(
+                      //             context,
+                      //             postId: post.id!,
+                      //           ),
+                      //           () => onLike(index: index),
+                      //           followUser: () => onFollow(
+                      //             index: index,
+                      //           ),
+                      //           currentUser: user,
+                      //           onSchoolTap: (schoolId) {
+                      //             filter = PostFilter.other;
+                      //             customSchoolId = schoolId;
+                      //             customGrade = null;
+                      //           },
+                      //         );
+                      //       },
+                      //       separatorBuilder:
+                      //           (BuildContext context, int index) {
+                      //         return const SizedBox(height: 15);
+                      //       },
+                      //     ),
+                      //   );
+                      // } else {
+                      //   return Expanded(
+                      //     // Ensure "return" is added here
+                      //     child: Center(
+                      //       child: Text(
+                      //         "Loading...",
+                      //         style: GoogleFonts.poppins(
+                      //           color: AppColors.black,
+                      //           fontWeight: FontWeight.w500,
+                      //           fontSize: 15,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   );
+                      // }
                     }),
-
-                    // Expanded(
-                    //   child: ListView.separated(
-                    //     padding: EdgeInsets.zero,
-                    //     itemCount: postUser.length,
-                    //     itemBuilder: (context, index) {
-                    //       return PostUiUtils.buildPostTile(
-                    //         context,
-                    //         index,
-                    //         postUser[index].post,
-                    //         (postId) => CommentBottomSheet.show(
-                    //           context,
-                    //           postId: postId,
-                    //         ),
-                    //         () => onLike(index: index),
-                    //         followUser: () => onFollow(
-                    //           index: index,
-                    //         ),
-                    //         writerUser: postUser[index].user,
-                    //         currentUser: user,
-                    //         onSchoolTap: (schoolId) {
-                    //           filter = PostFilter.other;
-                    //           customSchoolId = schoolId;
-                    //           customGrade = null;
-                    //           fetchUserPosts();
-                    //         },
-                    //       );
-                    //     },
-                    //     separatorBuilder: (BuildContext context, int index) {
-                    //       return const SizedBox(height: 15);
-                    //     },
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -566,7 +488,5 @@ class _PublicTabState extends State<PublicTab> {
         post: postUser[index].post,
       );
     });
-
-    // userRepository.updateOne(writterUser!);
   }
 }
