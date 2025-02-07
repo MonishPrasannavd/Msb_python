@@ -52,6 +52,7 @@ class AppUrl {
   static const String POST_FEED_ALL = '/submission/by_sub_category';
   static const String GET_CATEGORIES = '/category/get-categories';
   static const String GET_STUDENT_BY_SCHOOL_ID = "/student/get-students-by_school";
+  static const String GET_ALL_SCHOOLS = "/school/all";
 
   static const String GET_SUBCATEGORIES = '/sub-category/get-sub-categories';
 
