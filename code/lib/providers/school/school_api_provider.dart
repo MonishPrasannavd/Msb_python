@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
+import 'package:msb_app/models/school.dart';
 import 'package:msb_app/models/school_dashboard.dart';
 import 'package:msb_app/models/school_rank.dart';
 import 'package:msb_app/models/student.dart';
@@ -108,10 +109,10 @@ class SchoolApiProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
         // var user = MsbUser.fromJson(encodedString);
-        var students = List.castFrom(encodedString).map((e) => Student.fromJson(e)).toList();
+        var schools = List.castFrom(encodedString).map((e) => School.fromJson(e)).toList();
         notifyListeners();
         // result = {'status': true, 'message': 'Successful', 'user': user};
-        result = {'status': true, 'message': 'Successful', 'students': students};
+        result = {'status': true, 'message': 'Successful', 'schools': schools};
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];

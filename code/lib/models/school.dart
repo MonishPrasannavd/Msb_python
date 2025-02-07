@@ -10,6 +10,8 @@ class School {
   int? id;
   @JsonKey(name: "created_by")
   int? createdBy;
+  @JsonKey(name: "rank")
+  int? rank;
 
   School({
     this.name,
