@@ -24,6 +24,8 @@ import 'package:msb_app/providers/master/master_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
+import 'package:msb_app/services/preferences_service.dart';
+import 'package:msb_app/utils/api.dart';
 import 'package:msb_app/utils/constants.dart';
 import 'package:msb_app/utils/extention_text.dart';
 import 'package:provider/provider.dart';
@@ -551,6 +553,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                   if (responseStatus == true) {
                                     Fluttertoast.showToast(msg: responseMessage);
                                     userProvider.setUser(user);
+
+                                    await PrefsService.saveUser(user);
+                                    await PrefsService.setUserId(user.user?.id.toString() ?? "");
+                                    await PrefsService.setToken(user.accessToken);
+                                    AppUrl.addHeader("Authorization", "Bearer ${user.accessToken}");
+
                                     callNextScreen(context, const DashboardSetup());
                                   } else {
                                     Fluttertoast.showToast(msg: responseMessage);
