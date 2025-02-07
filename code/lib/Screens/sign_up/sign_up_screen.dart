@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 // import 'package:csc_picker/csc_picker.dart';
 // import 'package:csc_picker/dropdown_with_search.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -34,10 +35,8 @@ import '../../utils/colours.dart';
 InputDecoration kTextFieldDecoration = InputDecoration(
   labelText: 'Enter value',
   hintText: 'Enter value',
-  labelStyle: GoogleFonts.poppins(
-      color: AppColors.fontHint, fontWeight: FontWeight.w400),
-  hintStyle: GoogleFonts.poppins(
-      color: AppColors.fontHint, fontWeight: FontWeight.w400),
+  labelStyle: GoogleFonts.poppins(color: AppColors.fontHint, fontWeight: FontWeight.w400),
+  hintStyle: GoogleFonts.poppins(color: AppColors.fontHint, fontWeight: FontWeight.w400),
   enabledBorder: OutlineInputBorder(
     borderSide: const BorderSide(color: AppColors.fontHint, width: 1),
     borderRadius: BorderRadius.circular(8.0), // Border radius
@@ -155,8 +154,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // Ensure Provider is available for initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      masterApiProvider =
-          Provider.of<MasterApiProvider>(context, listen: false);
+      masterApiProvider = Provider.of<MasterApiProvider>(context, listen: false);
       masterProvider = Provider.of<MasterProvider>(context, listen: false);
       userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
       userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -226,8 +224,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     if (pickedDate != null) {
       setState(() {
-        dobController.text =
-            "${pickedDate.toLocal()}".split(' ')[0]; // Format as needed
+        dobController.text = "${pickedDate.toLocal()}".split(' ')[0]; // Format as needed
       });
     }
   }
@@ -254,8 +251,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 25.0, vertical: 35),
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 35),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -268,18 +264,12 @@ class _SignUpPageState extends State<SignUpPage> {
                       const SizedBox(height: 20),
                       Text(
                         "sign up",
-                        style: GoogleFonts.poppins(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 36),
+                        style: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 36),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Let’s get your on onboarded.",
-                        style: GoogleFonts.poppins(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16),
+                        style: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w400, fontSize: 16),
                       )
                     ],
                   ),
@@ -288,13 +278,10 @@ class _SignUpPageState extends State<SignUpPage> {
               Container(
                 color: AppColors.white,
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 25.0, right: 25.0, bottom: 10),
+                  padding: const EdgeInsets.only(left: 25.0, right: 25.0, bottom: 10),
                   child: Form(
                     key: _formKey,
-                    autovalidateMode: _validate
-                        ? AutovalidateMode.always
-                        : AutovalidateMode.disabled,
+                    autovalidateMode: _validate ? AutovalidateMode.always : AutovalidateMode.disabled,
                     child: Column(
                       children: [
                         const SizedBox(height: 30),
@@ -355,8 +342,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "ⓘ Enter your confirm password";
-                            } else if (passwordController.text !=
-                                confirmPasswordController.text) {
+                            } else if (passwordController.text != confirmPasswordController.text) {
                               return "ⓘ Password & confirm password do not match";
                             }
                             return null;
@@ -395,8 +381,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             }
                             return null;
                           },
-                          onTap: () =>
-                              _selectDate(context), // Trigger the picker
+                          onTap: () => _selectDate(context), // Trigger the picker
                         ),
                         const SizedBox(height: 15),
 
@@ -418,9 +403,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           // Populate with school names
                           selectedItem: selectedSchool,
                           decoratorProps: const DropDownDecoratorProps(
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Select school')),
+                              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Select school')),
                           popupProps: PopupProps.menu(
                             showSearchBox: true,
                             searchFieldProps: TextFieldProps(
@@ -429,24 +412,20 @@ class _SignUpPageState extends State<SignUpPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 12),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                               ),
                             ),
                             emptyBuilder: (context, searchEntry) {
                               return ListTile(
-                                leading:
-                                    const Icon(Icons.add, color: Colors.blue),
-                                title:
-                                    Text("Add '$searchEntry' as a new school"),
+                                leading: const Icon(Icons.add, color: Colors.blue),
+                                title: Text("Add '$searchEntry' as a new school"),
                                 onTap: () async {
                                   var newSchool = School(name: searchEntry);
                                   setState(() {
                                     masterProvider.addToSchools(newSchool);
                                     selectedSchool = newSchool;
                                   });
-                                  Navigator.of(context)
-                                      .pop(); // Close the dropdown popup
+                                  Navigator.of(context).pop(); // Close the dropdown popup
                                   // showAddSchoolDialog(searchEntry); // Show the add school dialog
                                 },
                               );
@@ -471,9 +450,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           // Populate with school names
                           selectedItem: selectedGrade,
                           decoratorProps: const DropDownDecoratorProps(
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Select Grade')),
+                              decoration: InputDecoration(border: OutlineInputBorder(), hintText: 'Select Grade')),
                           popupProps: PopupProps.menu(
                             showSearchBox: true,
                             searchFieldProps: TextFieldProps(
@@ -482,8 +459,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 12),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                               ),
                             ),
                           ),
@@ -542,8 +518,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               });
                               if (!acceptTerms) {
                                 Fluttertoast.showToast(
-                                  msg:
-                                      "You must accept the Terms and Conditions to proceed.",
+                                  msg: "You must accept the Terms and Conditions to proceed.",
                                   toastLength: Toast.LENGTH_LONG,
                                   gravity: ToastGravity.BOTTOM,
                                   backgroundColor: Colors.red,
@@ -558,8 +533,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   showSpinner = true;
                                 });
                                 try {
-                                  Map<String, dynamic> message =
-                                      await userAuthProvider.register(
+                                  Map<String, dynamic> message = await userAuthProvider.register(
                                     nameController.text,
                                     emailController.text,
                                     passwordController.text,
@@ -575,14 +549,11 @@ class _SignUpPageState extends State<SignUpPage> {
                                   var responseMessage = message['message'];
                                   var responseStatus = message['status'];
                                   if (responseStatus == true) {
-                                    Fluttertoast.showToast(
-                                        msg: responseMessage);
+                                    Fluttertoast.showToast(msg: responseMessage);
                                     userProvider.setUser(user);
-                                    callNextScreen(
-                                        context, const DashboardSetup());
+                                    callNextScreen(context, const DashboardSetup());
                                   } else {
-                                    Fluttertoast.showToast(
-                                        msg: responseMessage);
+                                    Fluttertoast.showToast(msg: responseMessage);
                                   }
                                   // final newUserCredentail = await _auth
                                   //     .createUserWithEmailAndPassword(
@@ -609,11 +580,9 @@ class _SignUpPageState extends State<SignUpPage> {
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(AppColors.primary),
+                              backgroundColor: MaterialStateProperty.all(AppColors.primary),
                               shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0)),
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                               ),
                             ),
                             textStyle: GoogleFonts.poppins(

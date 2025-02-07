@@ -23,6 +23,7 @@ import 'package:msb_app/providers/school/school_api_provider.dart';
 import 'package:msb_app/providers/student_dashboard_provider.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
+import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
@@ -48,10 +49,6 @@ class SchoolDetailPage extends StatefulWidget {
 }
 
 class _SchoolDetailPageState extends State<SchoolDetailPage> {
-  SchoolUserRepository schoolUserRepository = SchoolUserRepository();
-  UserRepository userRepository =
-      UserRepository(usersCollection: FirebaseFirestore.instance.collection(FirestoreCollections.users));
-  PostFeedRepository postFeedRepository = PostFeedRepository();
   SchoolUser? school;
   MsbUser? user;
   int schoolTotalLikes = 0;
@@ -69,32 +66,25 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
   late SubmissionApiProvider _submissionApiProvider;
   late SubmissionProvider _submissionProvider;
   late StudentDashboardProvider studentDashboardProvider;
+  late UserProvider _userProvider;
 
   @override
   void initState() {
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
     super.initState();
     setState(() {
       progress = 0.0;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _schoolApiProvider = Provider.of<SchoolApiProvider>(context, listen: false);
-      studentDashboardProvider =
-          Provider.of<StudentDashboardProvider>(context, listen: false);
+      studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
       fetchDataFuture = fetchScreenData();
       fetchScreenData();
     });
   }
 
   Future<void> fetchScreenData() {
-    return Future.wait([
-      fetchUsersData(),
-      fetchSchoolDetails(),
-      fetchRecentPosts(),
-      fetchPopularPosts(),
-      fetchOtherUsers(),
-      fetchSchoolRank(),
-      getSchoolDashboard()
-    ]);
+    return Future.wait([getSchoolDashboard()]);
   }
 
   Future<void> getSchoolDashboard() async {
@@ -114,90 +104,6 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
     });
   }
 
-  Future<void> fetchSchoolRank() async {
-    try {
-      var fetchedRank = await schoolUserRepository.getSchoolRank(widget.schoolId);
-      setState(() {
-        schoolRank = fetchedRank;
-      });
-    } catch (e) {
-      debugPrint("Error fetching other users: $e");
-    }
-  }
-
-  Future<void> fetchOtherUsers() async {
-    try {
-      // Gather all user IDs to exclude
-      List<String> excludedUserIds = [
-        FirebaseAuth.instance.currentUser!.uid, // Exclude current user
-        ...topUsers.map((user) => user.id!).whereType<String>(), // Exclude top users
-        ...recentPosts.map((post) => post.userId!).whereType<String>(), // Exclude users from recent posts
-        ...popularPosts.map((post) => post.userId!).whereType<String>(), // Exclude users from popular posts
-      ];
-
-      // Remove duplicates
-      excludedUserIds = excludedUserIds.toSet().toList();
-
-      // Fetch all users except those in the excluded list
-      var fetchedOtherUsers = await userRepository.getAllExcept(userIds: excludedUserIds, schoolIds: [widget.schoolId]);
-      setState(() {
-        progress = 1.0;
-        otherUsers = fetchedOtherUsers;
-      });
-    } catch (e) {
-      debugPrint("Error fetching other users: $e");
-    }
-  }
-
-  Future<void> fetchUsersData() async {
-    try {
-      var retrievedUser = await userRepository.getOne(FirebaseAuth.instance.currentUser!.uid);
-      var fetchedTopUsers = await userRepository.getTopUsersBySchoolId(widget.schoolId);
-      setState(() {
-        user = retrievedUser;
-        topUsers = fetchedTopUsers;
-        progress = 0.33;
-      });
-    } catch (e) {
-      debugPrint("Error fetching user details: $e");
-    }
-  }
-
-  Future<void> fetchRecentPosts() async {
-    var posts = await postFeedRepository.getRecentForUserBySchoolId(widget.schoolId, limit: 4);
-    setState(() {
-      recentPosts = posts;
-      progress = 1.0;
-    });
-  }
-
-  Future<void> fetchPopularPosts() async {
-    var posts = await postFeedRepository.getTopPostsByLikesInSchool(widget.schoolId, limit: 4);
-    setState(() {
-      popularPosts = posts;
-      progress = 1.0;
-    });
-  }
-
-  Future<void> fetchSchoolDetails() async {
-    try {
-      var retrievedSchool = await schoolUserRepository.findBySchoolId(widget.schoolId);
-      setState(() {
-        progress = 0.66;
-      });
-      if (retrievedSchool?.schoolId != null) {
-        var retrievedTotalLikes = await postFeedRepository.getTotalLikesBySchoolId(retrievedSchool!.schoolId!);
-        setState(() {
-          school = retrievedSchool;
-          schoolTotalLikes = retrievedTotalLikes;
-          progress = 0.83;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error fetching school details: $e");
-    }
-  }
-
   Widget _buildProfileImage(String? name, String? profileImageUrl) {
     if (profileImageUrl != null) {
       return CircleAvatar(
@@ -212,32 +118,14 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
     }
   }
 
-  // final List<Map<String, dynamic>> menuItems = [
-  //   {
-  //     "title": "Dance",
-  //     "icon": 'assets/images/trending.png',
-  //     "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
-  //   },
-  //   {
-  //     "title": "Art & Crafts",
-  //     "icon": 'assets/images/art.png',
-  //     "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
-  //   },
-  //   {"title": "Quiz", "icon": 'assets/images/quiz.png', "route": const QuizScreen()},
-  //   {
-  //     "title": "Story Telling",
-  //     "icon": 'assets/images/story.png',
-  //     "route": PostFeeds("Story Telling", contentType: PostFeedType.image.value)
-  //   },
-  // ];
-
   @override
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      body: Consumer3<SchoolApiProvider, SubmissionProvider, SubmissionApiProvider>(
-          builder: (ctxt, schoolApiProvider, submissionProvider, submissionApiProvider, child) {
+      body: Consumer4<SchoolApiProvider, SubmissionProvider, SubmissionApiProvider, UserProvider>(
+          builder: (ctxt, schoolApiProvider, submissionProvider, submissionApiProvider, userProvider, child) {
+        var loggedInUser = userProvider.user.user;
         return SingleChildScrollView(
           child: Column(
             children: [
@@ -263,7 +151,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                             Text("Hey Superstar",
                                 style: GoogleFonts.poppins(
                                     color: AppColors.white, fontWeight: FontWeight.w300, fontSize: 12)),
-                            Text(fetchFirstName(user?.name) ?? "User",
+                            Text(fetchFirstName(loggedInUser?.name) ?? "User",
                                 style: GoogleFonts.poppins(
                                     color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 24)),
                           ],
@@ -289,8 +177,8 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                               )),
                           child: Padding(
                             padding: const EdgeInsets.only(left: 7.0, top: 7.0, bottom: 7.0, right: 10.0),
-                            child: user != null
-                                ? _buildProfileImage(user!.name, user!.profileImageUrl)
+                            child: (loggedInUser?.name != null && loggedInUser?.profileUrl != null)
+                                ? _buildProfileImage(loggedInUser!.name, loggedInUser.profileUrl)
                                 : Image.asset(
                                     "assets/images/profile.png",
                                     height: 40,
@@ -670,62 +558,52 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
               height: query.height / 8,
               child: ChangeNotifierProvider.value(
                 value: studentDashboardProvider,
-                child: Consumer<StudentDashboardProvider>(
-                    builder: (context, value, child) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: (value.dashboardCategoryList?.length ?? 0),
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        itemBuilder: (BuildContext context, int index) {
-                          final FutureCategories? menuItem =
-                          value.dashboardCategoryList?[index];
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CompletionScreen(
-                                      categoryId: menuItem?.id ?? 1,
-                                      subcategories: menuItem?.subcategories,
-                                      categoryName: menuItem?.name ?? "",
-                                      contentType: 'menuItem["route"]',
-                                    ),
-                                  ));
-                            },
-                            child: Padding(
-                              padding:
-                              const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(0.0),
-                                      child: CachedNetworkImage(
-                                        imageUrl: menuItem?.iconUrl ?? "",
-                                        placeholder: (context, url) =>
-                                        const Center(
-                                            child:
-                                            CircularProgressIndicator()),
-                                        errorWidget: (context, url, error) =>
-                                        const Center(
-                                            child: Icon(Icons.error)),
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(menuItem?.name ?? "",
-                                      style: GoogleFonts.poppins(
-                                          color: AppColors.black,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14)),
-                                ],
-                              ),
-                            ),
-                          );
+                child: Consumer<StudentDashboardProvider>(builder: (context, value, child) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: (value.dashboardCategoryList?.length ?? 0),
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    itemBuilder: (BuildContext context, int index) {
+                      final FutureCategories? menuItem = value.dashboardCategoryList?[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CompletionScreen(
+                                  categoryId: menuItem?.id ?? 1,
+                                  subcategories: menuItem?.subcategories,
+                                  categoryName: menuItem?.name ?? "",
+                                  contentType: 'menuItem["route"]',
+                                ),
+                              ));
                         },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(0.0),
+                                  child: CachedNetworkImage(
+                                    imageUrl: menuItem?.iconUrl ?? "",
+                                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                              Text(menuItem?.name ?? "",
+                                  style: GoogleFonts.poppins(
+                                      color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14)),
+                            ],
+                          ),
+                        ),
                       );
-                    }),
+                    },
+                  );
+                }),
               ),
             ),
             // SizedBox(

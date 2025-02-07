@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
@@ -121,50 +122,10 @@ class ProfileScreenState extends State<ProfileScreen> {
         var updatedUser = updatedUserRes['user'] as MsbUser;
         _userProvider.updateUserAndSchool(updatedStudent: updatedUser.student, updatedUser: updatedUser.user);
       }
-      // var updatedUser = response['user'] as MsbUser;
-      // _userProvider.updateUserAndSchool(updatedStudent: updatedUser.student, updatedUser: updatedUser.user);
-      // if (userId != null) {
-      //   MsbUser? user = await userRepository.getOne(userId!);
-      //
-      //   if (user != null) {
-      //     MsbUser updatedUser = user.copyWith(
-      //       grade: gradeController.text.isNotEmpty ? gradeController.text : grade,
-      //       schoolName: selectedSchoolId != null
-      //           ? schools.firstWhere((school) => school.id == selectedSchoolId).schoolName
-      //           : schoolName,
-      //       schoolId: selectedSchoolId,
-      //       name: nameController.text.isNotEmpty ? nameController.text : null,
-      //     );
-      //     await userRepository.updateOne(updatedUser);
-      //   } else {
-      //     MsbUser newUser = MsbUser(
-      //       id: userId,
-      //       grade: gradeController.text.isNotEmpty ? gradeController.text : grade,
-      //       schoolName: selectedSchoolId != null
-      //           ? schools.firstWhere((school) => school.id == selectedSchoolId).schoolName
-      //           : schoolName,
-      //       schoolId: selectedSchoolId,
-      //       name: nameController.text.isNotEmpty ? nameController.text : null,
-      //     );
-      //     await userRepository.saveOne(newUser);
-      //   }
-      // }
     } catch (e) {
       debugPrint("Error saving profile details: $e");
     }
   }
-
-  // Future<void> _handleProfileImageUpdate() async {
-  //   if (_profileImage != null) {
-  //     String? imageUrl = await _uploadImage(_profileImage!);
-  //     if (imageUrl != null) {
-  //       await _saveProfileImageUrl(imageUrl);
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Profile image updated successfully!')),
-  //       );
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -211,17 +172,19 @@ class ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       const SizedBox(height: 20),
                       GestureDetector(
-                        onTap: _pickImage,
+                        onTap: () {
+                          if (isEditing) {
+                            _pickImage();
+                          } else {
+                            Fluttertoast.showToast(msg: "Enter edit mode to update image!");
+                          }
+                        },
                         child: isUploadingImage
                             ? const CircularProgressIndicator()
                             : CircleAvatar(
                                 radius: 60,
-                                backgroundImage: _profileImage != null
-                                    ? FileImage(_profileImage!) // Use the newly picked image if available
-                                    : user?.user?.profileUrl != null // Check if a profile image URL exists
-                                        ? CachedNetworkImageProvider(user!.user!.profileUrl!) // Load from URL
-                                        : const AssetImage("assets/images/profile1.png") // Fallback to local asset
-                                            as ImageProvider, // Explicitly cast to ImageProvider
+                                backgroundImage: getUserProfileImage(_profileImage, _userProvider.user.user?.profileUrl),
+                                // Explicitly cast to ImageProvider
                               ),
                       ),
                       const SizedBox(height: 10),
@@ -418,6 +381,16 @@ class ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  ImageProvider getUserProfileImage(File? profileImage, String? profileUrl) {
+    if (profileImage != null) {
+      return FileImage(profileImage);
+    } else if (profileUrl != null && profileUrl.isNotEmpty) {
+      return CachedNetworkImageProvider(profileUrl);
+    } else {
+      return const AssetImage("assets/images/profile1.png");
+    }
   }
 
   Widget _buildGradeDropdown() {

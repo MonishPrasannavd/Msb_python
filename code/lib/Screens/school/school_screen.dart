@@ -13,6 +13,7 @@ import 'package:msb_app/models/school_rank.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/providers/school/school_api_provider.dart';
 import 'package:msb_app/providers/student_dashboard_provider.dart';
+import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/auth.dart';
 import 'package:msb_app/utils/user.dart';
@@ -52,6 +53,7 @@ class SchoolScreenState extends State<SchoolScreen> {
 
   late SchoolApiProvider _schoolApiProvider;
   late StudentDashboardProvider _studentDashboardProvider;
+  late UserProvider _userProvider;
 
   @override
   void initState() {
@@ -60,6 +62,7 @@ class SchoolScreenState extends State<SchoolScreen> {
       progress = 0.0;
     });
 
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _schoolApiProvider =
           Provider.of<SchoolApiProvider>(context, listen: false);
@@ -136,36 +139,14 @@ class SchoolScreenState extends State<SchoolScreen> {
     const Color(0xFF1C8727),
   ];
 
-  // final List<Map<String, dynamic>> menuItems = [
-  //   {
-  //     "title": "Dance",
-  //     "icon": 'assets/images/trending.png',
-  //     "route": PostFeeds("Dance", contentType: PostFeedType.video.value)
-  //   },
-  //   {
-  //     "title": "Art & Crafts",
-  //     "icon": 'assets/images/art.png',
-  //     "route": PostFeeds("Art & Crafts", contentType: PostFeedType.image.value)
-  //   },
-  //   {
-  //     "title": "Quiz",
-  //     "icon": 'assets/images/quiz.png',
-  //     "route": const QuizScreen()
-  //   },
-  //   {
-  //     "title": "Story Telling",
-  //     "icon": 'assets/images/story.png',
-  //     "route": PostFeeds("Story Telling", contentType: PostFeedType.image.value)
-  //   },
-  // ];
-
   @override
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.black12,
-      body: Consumer2<SchoolApiProvider, StudentDashboardProvider>(
-          builder: (ctxt, repo1, repo2, child) {
+      body: Consumer3<SchoolApiProvider, StudentDashboardProvider, UserProvider>(
+          builder: (ctxt, repo1, repo2, userProvider, child) {
+            var loggedInUser = userProvider.user.user;
         return DecoratedBox(
           // BoxDecoration takes the image
           decoration: const BoxDecoration(
@@ -202,7 +183,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                       color: AppColors.white,
                                       fontWeight: FontWeight.w300,
                                       fontSize: 12)),
-                              Text(fetchFirstName(user?.user?.name) ?? "User",
+                              Text(fetchFirstName(loggedInUser?.name) ?? "User",
                                   style: GoogleFonts.poppins(
                                       color: AppColors.white,
                                       fontWeight: FontWeight.w700,
@@ -242,9 +223,9 @@ class SchoolScreenState extends State<SchoolScreen> {
                                     top: 5.0,
                                     bottom: 5.0,
                                     right: 5.0),
-                                child: user != null
-                                    ? _buildProfileImage(user!.user!.name,
-                                        user!.user!.profileUrl)
+                                child: (loggedInUser?.name != null && loggedInUser?.profileUrl != null)
+                                    ? _buildProfileImage(loggedInUser!.name,
+                                    loggedInUser.profileUrl)
                                     : Image.asset(
                                         "assets/images/profile.png",
                                         height: 40,
