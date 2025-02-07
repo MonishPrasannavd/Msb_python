@@ -226,12 +226,12 @@ class SubmissionApiProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> getSubmissionsByUserId(int userId) async {
+  Future<Map<String, dynamic>> getSubmissionsByUserId(int userId, {page = 1, limit = 10}) async {
     Map<String, dynamic> result;
     notifyListeners();
 
     final uri = Uri.parse(
-        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_USER_ID}/${userId.toString()}");
+        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_USER_ID}/${userId.toString()}?page=$page&limit=$limit");
     try {
       //  authToken = await PrefsService.getToken(); // Retrieve token
       //  AppUrl.addHeader('Authorization', 'Bearer $authToken');
@@ -263,12 +263,12 @@ class SubmissionApiProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> getSubmissionsBySchool(int schoolId) async {
+  Future<Map<String, dynamic>> getSubmissionsBySchool(int schoolId, {page = 1, limit = 10}) async {
     Map<String, dynamic> result;
     notifyListeners();
 
     final uri = Uri.parse(
-        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_SCHOOL_ID}/${schoolId.toString()}");
+        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_SCHOOL_ID}/${schoolId.toString()}/?page=$page&limit=$limit");
     try {
       var response = await get(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {

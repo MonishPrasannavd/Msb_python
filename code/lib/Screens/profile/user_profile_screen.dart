@@ -41,6 +41,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   late bool isLoadingPostUser = false;
   late UserSingle postUser;
   late Future<Map<String, dynamic>> _profileFuture;
+  late ScrollController _scrollController;
+  int _currentPage = 1;
+  bool _isFetchingMore = false;
+  bool _hasMoreData = true;
 
   late UserProvider _userProvider;
   late SubmissionProvider _submissionProvider;
@@ -54,9 +58,44 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
     _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
     _userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
+    
+    _scrollController = ScrollController()..addListener(_scrollListener);
 
     // getUser();
     loadAllSubmissions();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (!_isFetchingMore && _hasMoreData) {
+        _fetchMoreSubmissions();
+      }
+    }
+  }
+
+  Future<void> _fetchMoreSubmissions() async {
+    if (_isFetchingMore) return;
+
+    setState(() {
+      _isFetchingMore = true;
+    });
+
+    _currentPage++; // Increase page count
+    Map<String, dynamic> response = await _submissionApiProvider.getSubmissionsByUserId(
+      int.parse(widget.id),
+      page: _currentPage,
+    );
+
+    var newSubmissions = response['submissions'];
+    if (newSubmissions != null && newSubmissions.isNotEmpty) {
+      _submissionProvider.addSubmissions(newSubmissions);
+    } else {
+      _hasMoreData = false; // No more pages left
+    }
+
+    setState(() {
+      _isFetchingMore = false;
+    });
   }
 
   Future<void> loadAllSubmissions() async {
@@ -262,6 +301,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Consumer<SubmissionProvider>(builder: (context, ref, child) {
       return Expanded(
         child: ListView.builder(
+          controller: _scrollController,
           // shrinkWrap: true,
           padding: const EdgeInsets.all(8.0),
           itemCount: _submissionProvider.submissions.length,

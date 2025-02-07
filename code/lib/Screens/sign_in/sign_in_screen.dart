@@ -43,9 +43,14 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   void initState() {
     super.initState();
+    // if (kDebugMode) {
+    //   emailController.text = "vishweshone@gmail.com";
+    //   passwordController.text = "vishweshone";
+    // }
+
     if (kDebugMode) {
-      emailController.text = "vishweshone@gmail.com";
-      passwordController.text = "vishweshone";
+      emailController.text = "monishvd@gmail.com";
+      passwordController.text = "1234567890";
     }
   }
 

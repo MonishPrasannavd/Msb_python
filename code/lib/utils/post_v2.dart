@@ -194,11 +194,16 @@ class PostUiUtilsV2 {
                 //       builder: (context) => PostDetailScreen(post: post,),
                 //     ));
               },
-              child: Text(
-                post.description ?? "No description found",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Text(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  post.description ?? "No description found",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
@@ -219,11 +224,16 @@ class PostUiUtilsV2 {
             SizedBox(
               width: 5,
             ),
-            Text(
-              post.subcategory?.name ?? "Unkown competition",
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  post.subcategory?.name ?? "Unkown competition",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
             const Spacer(),
