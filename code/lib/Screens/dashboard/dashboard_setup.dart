@@ -61,7 +61,6 @@ void checkShNow() async {
 
       // Perform additional actions based on the selected tab
       if (index == 0) {
-        homeScreenKey.currentState?.fetchUserProfile();
         homeScreenKey.currentState?.homeTabKey.currentState?.refetchData();
       } else if (index == 2) {
         schoolScreenKey.currentState?.fetchData();

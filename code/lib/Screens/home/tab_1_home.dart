@@ -52,15 +52,12 @@ class HomeTabState extends State<HomeTab> {
     _dash = Provider.of<Dash>(context, listen: false);
 
     _fetchDataFuture = fetchData();
-    getDashboard();
   }
 
  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
-
-    getDashboard();
   }
 
   Future<void> getDashboard() async {
@@ -709,7 +706,7 @@ class HomeTabState extends State<HomeTab> {
                   ),
                   const SizedBox(height: 5),
                   ButtonBuilder(
-                      text: 'View All Competitions',
+                      text: 'View All Submissions',
                       onPressed: () async {
                         Navigator.push(
                             context,

@@ -864,7 +864,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                         SizedBox(
                                           height: 50,
                                           child: ButtonBuilder(
-                                              text: 'View All Competitions',
+                                              text: 'View All Submissions',
                                               onPressed: () async {
                                                 Navigator.push(
                                                     context,

@@ -776,7 +776,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
             // ),
             const SizedBox(height: 5),
             ButtonBuilder(
-                text: 'View All Competitions',
+                text: 'View All Submissions',
                 onPressed: () {
                   Navigator.push(
                       context,
