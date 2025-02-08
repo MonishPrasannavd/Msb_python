@@ -92,22 +92,11 @@ class ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    loadUserId(); // Ensures user data is reloaded when dependencies change.
-  }
-
-  void loadUserId() async {
-    var fetchedUserId = await PrefsService.getUserId();
-    if (mounted) {
-      setState(() {
-        userId = fetchedUserId;
-      });
-      if (fetchedUserId != null) {
-        // await loadUserProfile(); // Load the profile when the user ID is available
-      }
-    }
+    loadUser();
   }
 
   Future<void> _pickImage() async {

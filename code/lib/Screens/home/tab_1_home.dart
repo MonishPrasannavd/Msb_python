@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,11 +11,7 @@ import 'package:msb_app/models/dashboard.dart' as dashboard;
 import 'package:msb_app/models/dashboard.dart';
 import 'package:msb_app/providers/dash.dart';
 import 'package:msb_app/providers/student_dashboard_provider.dart';
-import 'package:msb_app/repository/posts_repository.dart';
-import 'package:msb_app/repository/school_user_repository.dart';
-import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/utils/colours.dart';
-import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
@@ -28,7 +23,6 @@ class HomeTab extends StatefulWidget {
 
 class HomeTabState extends State<HomeTab> {
   int _selectedMood = 2; // Default selected mood (Neutral)
-  final PostFeedRepository postRepository = PostFeedRepository();
   int totalUsersCount = 0;
   int totalSchoolsCounts = 0;
   List<TopScoreStudents> topStudents = [];
@@ -54,7 +48,7 @@ class HomeTabState extends State<HomeTab> {
     _fetchDataFuture = fetchData();
   }
 
- @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
@@ -65,7 +59,6 @@ class HomeTabState extends State<HomeTab> {
       isLoading = true;
     });
     var response = await studentDashboardProvider.getStudentDashboard();
-    final Future<Map<String, dynamic>> successfulMessage = studentDashboardProvider.getStudentDashboard();
 
     if (response['status'] == true) {
       dashboard.DashboardResponse dashboardData = response['data'];
@@ -81,7 +74,7 @@ class HomeTabState extends State<HomeTab> {
       setState(() {
         if (_dash.tsStudents!.isNotEmpty) {
           top3Students =
-          topStudents.length >= 3 ? topStudents.sublist(0, 3) : topStudents.sublist(0, topStudents.length);
+              topStudents.length >= 3 ? topStudents.sublist(0, 3) : topStudents.sublist(0, topStudents.length);
           remainingTopStudents = topStudents.length > 3 ? topStudents.sublist(3) : [];
 
           isLoading = false;
@@ -538,7 +531,7 @@ class HomeTabState extends State<HomeTab> {
                                                     fit: BoxFit.scaleDown,
                                                     alignment: Alignment.centerRight,
                                                     child: Text(
-                                                      student.schoolId.toString() ?? "Unknown School",
+                                                      student.schoolId.toString(),
                                                       style: GoogleFonts.poppins(
                                                         color: Colors.white70,
                                                         fontWeight: FontWeight.w400,
@@ -673,7 +666,7 @@ class HomeTabState extends State<HomeTab> {
                                         contentType: menuItem?.categoryType?.name,
                                       ),
                                     )).then((value) async {
-                                      await refetchData();
+                                  await refetchData();
                                 });
                               },
                               child: Padding(
@@ -730,7 +723,6 @@ class HomeTabState extends State<HomeTab> {
     );
   }
 
-// Build each carousel item
   Widget _buildCarouselItem(Map<String, String> slide) {
     return Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
