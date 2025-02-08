@@ -8,12 +8,14 @@ class MsbUser {
   final Student student;
   final String accessToken;
   final String tokenType;
+  final int commentsCount;
 
   MsbUser({
     required this.user,
     required this.student,
     required this.accessToken,
     required this.tokenType,
+    this.commentsCount = 0,
   });
 
   MsbUser copyWith({
@@ -21,12 +23,14 @@ class MsbUser {
     Student? student,
     String? accessToken,
     String? tokenType,
+    int? commentsCount
   }) {
     return MsbUser(
       user: user ?? this.user,
       student: student ?? this.student,
       accessToken: accessToken ?? this.accessToken,
       tokenType: tokenType ?? this.tokenType,
+      commentsCount: commentsCount ?? this.commentsCount
     );
   }
 
@@ -46,6 +50,7 @@ class MsbUser {
       student: Student.fromJson(json['student']),
       accessToken: json['access_token'] ?? existingUser?.accessToken,
       tokenType: json['token_type'] ?? existingUser?.tokenType,
+      commentsCount: json['comments_count'] ?? existingUser?.commentsCount ?? 0
     );
   }
 
@@ -55,6 +60,7 @@ class MsbUser {
       'student': student.toJson(),
       'access_token': accessToken,
       'token_type': tokenType,
+      'comments_count': commentsCount
     };
   }
 }

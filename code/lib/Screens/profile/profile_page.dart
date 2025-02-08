@@ -89,7 +89,8 @@ class ProfileScreenState extends State<ProfileScreen> {
         selectedSchool = schoolResolve;
         schoolName = _userProvider.user.student.school?.name ?? "";
         likesCount = _userProvider.user.student.likes.toString();
-        totalPoints = _userProvider.user.student.score.toString();
+        commentsCount = _userProvider.user.commentsCount.toString();
+        totalPoints = _userProvider.user.student.points.toString();
       });
     });
   }
