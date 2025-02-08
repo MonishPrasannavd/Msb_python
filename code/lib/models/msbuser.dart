@@ -114,7 +114,7 @@ class User {
       points: json['points'] ?? 0,
       likes: json['likes'] ?? 0,
       score: json['score'] ?? 0,
-      profileUrl: json['profile_url'],
+      profileUrl: json['profile_url'] ?? json['image_url'],
       roleId: json['role_id'],
       roleName: json['role_name'],
     );
@@ -229,7 +229,8 @@ class Student {
       score: json['score'],
       likes: json['likes'],
       createdAt: json['created_at'],
-      country: json['country'] != null ? MsbCountry.fromJson(json['country']) : null,
+      country:
+          json['country'] != null ? MsbCountry.fromJson(json['country']) : null,
       grade: json['grade'] != null ? Grade.fromJson(json['grade']) : null,
       school: json['school'] != null ? School.fromJson(json['school']) : null,
       state: json['state'] != null ? MsbState.fromJson(json['state']) : null,

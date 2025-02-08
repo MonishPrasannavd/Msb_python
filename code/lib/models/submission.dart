@@ -42,26 +42,25 @@ class Submission {
   @JsonKey(name: "comments")
   List<Comment> comments;
 
-  Submission({
-    this.id,
-    this.categoryId,
-    this.subCategoryId,
-    this.schoolId,
-    this.description,
-    this.createdAt,
-    this.createdBy,
-    this.gradeId,
-    this.title,
-    this.media,
-    this.user,
-    this.category,
-    this.subcategory,
-    this.mediaUrl,
-    this.likesCount,
-    this.isLiked,
-    this.commentsCount,
-    this.comments = const []
-  });
+  Submission(
+      {this.id,
+      this.categoryId,
+      this.subCategoryId,
+      this.schoolId,
+      this.description,
+      this.createdAt,
+      this.createdBy,
+      this.gradeId,
+      this.title,
+      this.media,
+      this.user,
+      this.category,
+      this.subcategory,
+      this.mediaUrl,
+      this.likesCount,
+      this.isLiked,
+      this.commentsCount,
+      this.comments = const []});
 
   Submission copyWith({
     int? id,
@@ -80,6 +79,7 @@ class Submission {
     String? mediaUrl,
     int? likesCount,
     bool? isLiked,
+    List<Comment>? comments,
   }) =>
       Submission(
         id: id ?? this.id,
@@ -98,6 +98,7 @@ class Submission {
         mediaUrl: mediaUrl ?? this.mediaUrl,
         likesCount: likesCount ?? this.likesCount,
         isLiked: isLiked ?? this.isLiked,
+        comments: comments ?? this.comments,
       );
 
   factory Submission.fromJson(Map<String, dynamic> json) =>

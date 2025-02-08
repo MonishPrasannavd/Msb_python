@@ -29,7 +29,8 @@ class AppUrl {
   static const String PATIENT_ID = 'patientID';
   static const String SUBMIT_SPOT_CHECK = '/SpotCheck/SubmitSpotCheck';
   static const String GET_DEVICE_INFO = '/DeviceData/GetSpotCheckDeviceInfo';
-  static const String GET_SPOTCHECK_DEVICE_DATA = '/DeviceData/GetSpotCheckDeviceData';
+  static const String GET_SPOTCHECK_DEVICE_DATA =
+      '/DeviceData/GetSpotCheckDeviceData';
   static const String GET_MASTERDATA = '/masters/all';
   static const String GET_USERME = '/auth/me';
   static const String GET_USER = '/users/get-user';
@@ -37,9 +38,11 @@ class AppUrl {
   static const String UPDATE_USER = '/auth/me/update-profile';
   static const String CREATE_SUBMISSION = "/submission/create";
   static const String GET_ALL_SUBMISSIONS = "/submission/all";
+  static const String GET_SUBMISSIONS_BY_ID = "/submission/by_id";
   static const String GET_SUBMISSIONS_BY_USER_ID = "/submission/by_user";
   static const String GET_SUBMISSIONS_BY_SCHOOL_ID = "/submission/by_school";
-  static const String GET_SUBMISSIONS_BY_SUBCATEGORY = "/submission/by_sub_category";
+  static const String GET_SUBMISSIONS_BY_SUBCATEGORY =
+      "/submission/by_sub_category";
   static const String TOGGLE_LIKE = "/auth/submissions/like";
   static const String ADD_COMMENT = "/auth/submissions/comment";
   static const String REMOVE_COMMENT = "/auth/submissions/comment/remove";
@@ -51,7 +54,8 @@ class AppUrl {
   static const String DASHBOARD_USER = '/auth/student/dashboard';
   static const String POST_FEED_ALL = '/submission/by_sub_category';
   static const String GET_CATEGORIES = '/category/get-categories';
-  static const String GET_STUDENT_BY_SCHOOL_ID = "/student/get-students-by_school";
+  static const String GET_STUDENT_BY_SCHOOL_ID =
+      "/student/get-students-by_school";
   static const String GET_ALL_SCHOOLS = "/school/all";
 
   static const String GET_SUBCATEGORIES = '/sub-category/get-sub-categories';

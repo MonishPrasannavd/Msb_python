@@ -52,7 +52,7 @@ class PostUiUtilsV2 {
   }) {
     final postHeader = customPostHeader ?? _buildPostHeader;
     final postContent = customPostContent ?? _buildPostContent;
-    final postFooter = customPostFooter ?? _buildPostFooter;
+    final postFooter = customPostFooter ?? buildPostFooter;
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -439,7 +439,7 @@ class PostUiUtilsV2 {
   }
 
   // Method to build the footer (e.g., likes, comments, etc.)
-  static Widget _buildPostFooter(
+  static Widget buildPostFooter(
     BuildContext context,
     Submission post,
     Function(int) onCommentButtonPressed,

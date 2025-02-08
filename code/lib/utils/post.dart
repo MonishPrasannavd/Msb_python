@@ -266,7 +266,9 @@ class PostUiUtils {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PostDetailScreen(post: post),
+                        builder: (context) => PostDetailScreen(
+                          postId: int.tryParse(post!.id!),
+                        ),
                       ));
                 },
                 child: Text(
@@ -296,7 +298,7 @@ class PostUiUtils {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PostDetailScreen(
-                        post: post,
+                        postId: int.tryParse(post!.id!),
                       ),
                     ));
               },
