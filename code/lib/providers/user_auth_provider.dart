@@ -189,13 +189,18 @@ class UserAuthProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> updateProfile(
-      String name, int gradeId, int schoolId,
-      {File? profileImage}) async {
+    String name,
+    int gradeId,
+    int schoolId, {
+    File? profileImage,
+    String? schoolName,
+  }) async {
     Map<String, dynamic> result;
 
     try {
       // Prepare the multipart request
-      var uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.UPDATE_USER}");
+      var uri = Uri.parse(
+          "${AppUrl.BASE_URL}${AppUrl.UPDATE_USER}?school_id=$schoolId");
       var request = MultipartRequest("PUT", uri);
 
       // Add headers
@@ -204,7 +209,9 @@ class UserAuthProvider with ChangeNotifier {
       // Add fields
       request.fields['name'] = name;
       request.fields['grade_id'] = gradeId.toString();
-      request.fields['school_id'] = schoolId.toString();
+      if (schoolName != null) {
+        request.fields['school_name'] = schoolName;
+      }
 
       // Add file if it exists
       if (profileImage != null && await profileImage.exists()) {

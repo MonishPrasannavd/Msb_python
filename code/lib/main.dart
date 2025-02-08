@@ -56,6 +56,8 @@ void main() async {
   });
 }
 
+final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
+
 class MyApp extends StatelessWidget {
   final FirebaseFirestore firestore;
 
@@ -82,6 +84,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
+        navigatorObservers: [routeObserver],
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           scaffoldBackgroundColor: AppColors.white,
@@ -203,12 +206,9 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
   }
 
   Future<bool> checkUserLogin(BuildContext context) async {
-    // bool firstCall = await IsFirstRun.isFirstCall();
-    // bool firstRun = await IsFirstRun.isFirstRun();
     // Check the app version first
     await checkAppVersion(context);
 
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
     var userId = await PrefsService.getUserId();
     var token = await PrefsService.getToken();
     var prefsUser = await PrefsService.getUser();
@@ -220,9 +220,8 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
       var user = response['user'] as MsbUser;
       _userProvider.setUser(user);
     }
-    // print("what is user id :-  ${userId}");
     // return firstCall && firstRun ? false : userId != null; // removing this because its outdated library and creating issue
-    return userId != null ? true : false;
+    return userId != null;
   }
 
   @override

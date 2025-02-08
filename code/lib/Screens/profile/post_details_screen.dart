@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/enums/post_feed_type.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user.dart';
@@ -287,7 +288,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         context,
                         widget.post!,
                         (postId) async {
-                          // await CommentBottomSheet.show(context, postId: postId);
+                          await CommentBottomSheet.show(context,
+                              postId: postId);
                         },
                         () => onLike(widget.post!, index: 0),
                       ),

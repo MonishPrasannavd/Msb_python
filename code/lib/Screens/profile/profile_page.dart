@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
 import 'package:msb_app/components/text_builder.dart';
+import 'package:msb_app/main.dart';
 import 'package:msb_app/models/grade.dart';
 import 'package:msb_app/models/msbuser.dart';
 import 'package:msb_app/models/school.dart';
@@ -29,7 +30,7 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => ProfileScreenState();
 }
 
-class ProfileScreenState extends State<ProfileScreen> {
+class ProfileScreenState extends State<ProfileScreen> with RouteAware {
   File? _profileImage;
   bool isUploadingImage = false;
   String? userId;
@@ -59,8 +60,23 @@ class ProfileScreenState extends State<ProfileScreen> {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
     _masterProvider = Provider.of<MasterProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      routeObserver.subscribe(this, ModalRoute.of(context)!);
+    });
+  }
 
-    loadUser();
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      updateUser();
+    });
+    super.didPopNext();
   }
 
   void updateUser() async {
@@ -111,8 +127,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    loadUser();
-    // updateUser();
+    updateUser();
   }
 
   Future<void> _pickImage() async {
@@ -131,6 +146,7 @@ class ProfileScreenState extends State<ProfileScreen> {
         selectedGrade?.id ?? _userProvider.user.student.gradeId,
         selectedSchool?.id ?? _userProvider.user.student.schoolId,
         profileImage: _profileImage,
+        schoolName: schoolName,
       );
       if (response['status'] == true) {
         var updatedUserRes = await _authProvider.getUserMe(_userProvider.user);
@@ -138,6 +154,7 @@ class ProfileScreenState extends State<ProfileScreen> {
         _userProvider.updateUserAndSchool(
             updatedStudent: updatedUser.student, updatedUser: updatedUser.user);
       }
+      updateUser();
     } catch (e) {
       debugPrint("Error saving profile details: $e");
     }
@@ -145,38 +162,28 @@ class ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: Key('profile-screen'),
-      onVisibilityChanged: (info) {
-        if (info.visibleFraction == 1) {
-          // updateUser();
-          loadUser();
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          centerTitle: true,
-          leading: Navigator.canPop(context)
-              ? GestureDetector(
-                  child: const Icon(Icons.arrow_back),
-                  onTap: () => Navigator.pop(context),
-                )
-              : null, // If there's no history, do not show the back button
-          title: Text(
-            "Profile",
-            style: GoogleFonts.poppins(
-                color: AppColors.black,
-                fontWeight: FontWeight.w500,
-                fontSize: 16),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        leading: Navigator.canPop(context)
+            ? GestureDetector(
+                child: const Icon(Icons.arrow_back),
+                onTap: () => Navigator.pop(context),
+              )
+            : null, // If there's no history, do not show the back button
+        title: Text(
+          "Profile",
+          style: GoogleFonts.poppins(
+              color: AppColors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 16),
         ),
-        body: Consumer3<UserProvider, UserAuthProvider, MasterProvider>(
-          builder:
-              (ctxt, userProvider, userAuthProvider, masterProvider, child) {
-            return mainUi();
-          },
-        ),
+      ),
+      body: Consumer3<UserProvider, UserAuthProvider, MasterProvider>(
+        builder: (ctxt, userProvider, userAuthProvider, masterProvider, child) {
+          return mainUi();
+        },
       ),
     );
   }
