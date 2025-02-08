@@ -36,7 +36,7 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreenState extends State<UserProfileScreen> {
   late Future<SchoolUser?> _schoolFuture;
   bool isLoadingPosts = true; // Loading indicator for posts
-  List<PostFeed> posts = [];
+  List<Submission> posts = [];
   late MsbUser currentUser;
   late bool isLoadingPostUser = false;
   late UserSingle postUser;
@@ -55,10 +55,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     _userProvider = Provider.of<UserProvider>(context, listen: false);
-    _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
-    _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
+    _submissionProvider =
+        Provider.of<SubmissionProvider>(context, listen: false);
+    _submissionApiProvider =
+        Provider.of<SubmissionApiProvider>(context, listen: false);
     _userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
-    
+
     _scrollController = ScrollController()..addListener(_scrollListener);
 
     // getUser();
@@ -66,7 +68,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       if (!_isFetchingMore && _hasMoreData) {
         _fetchMoreSubmissions();
       }
@@ -81,7 +84,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
 
     _currentPage++; // Increase page count
-    Map<String, dynamic> response = await _submissionApiProvider.getSubmissionsByUserId(
+    Map<String, dynamic> response =
+        await _submissionApiProvider.getSubmissionsByUserId(
       int.parse(widget.id),
       page: _currentPage,
     );
@@ -111,17 +115,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _submissionProvider.isLoadingSubmissions = true;
     Map<String, dynamic> response = {};
     if (widget.type == "user") {
-      response = await _submissionApiProvider.getSubmissionsByUserId(int.parse(widget.id));
+      response = await _submissionApiProvider
+          .getSubmissionsByUserId(int.parse(widget.id));
     } else if (widget.type == "school") {
-      response = await _submissionApiProvider.getSubmissionsBySchool(int.parse(widget.id));
+      response = await _submissionApiProvider
+          .getSubmissionsBySchool(int.parse(widget.id));
     }
     _submissionProvider.clearSubmissions();
     var fetchedSubmissions = response['submissions'];
-    if(fetchedSubmissions != null) {
+    if (fetchedSubmissions != null) {
       _submissionProvider.addSubmissions(fetchedSubmissions);
     } else {
       _submissionProvider.addSubmissions([]);
     }
+    posts = _submissionProvider.submissions;
     _submissionProvider.isLoadingSubmissions = false;
   }
 
@@ -155,8 +162,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     var query = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      body: Consumer4<UserAuthProvider, SubmissionProvider, SubmissionApiProvider, UserAuthProvider>(
-          builder: (ctxt, authProvider, submissionProvider, submissionApiProvider, userAuthProvider, child) {
+      body: Consumer4<UserAuthProvider, SubmissionProvider,
+              SubmissionApiProvider, UserAuthProvider>(
+          builder: (ctxt, authProvider, submissionProvider,
+              submissionApiProvider, userAuthProvider, child) {
         return Column(
           children: [
             Container(
@@ -165,11 +174,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               decoration: const BoxDecoration(
                   // color: AppColors.primary,
                   color: AppColors.purpleDark,
-                  borderRadius:
-                      BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+                  borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(25.0),
+                      bottomLeft: Radius.circular(25.0))),
               child: Column(
                 children: [
-                  SafeArea(child: widget.type == "user" ? _buildUserProfile() : _buildSchoolProfile()),
+                  SafeArea(
+                      child: widget.type == "user"
+                          ? _buildUserProfile()
+                          : _buildSchoolProfile()),
                 ],
               ),
             ),
@@ -273,7 +286,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text: postUser.student?.school?.name?.toString() ?? "N/A",
+                        text:
+                            postUser.student?.school?.name?.toString() ?? "N/A",
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.normal,
@@ -286,18 +300,42 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text("Likes: ", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold)),
-                    Text(postUser.likesCount.toString(), style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.normal)),
+                    Text("Likes: ",
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.white54,
+                            fontWeight: FontWeight.bold)),
+                    Text(postUser.likesCount.toString(),
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.white54,
+                            fontWeight: FontWeight.normal)),
                     SizedBox(width: 10),
-                    Text("Comments: ", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold)),
-                    Text(postUser.commentsCount.toString(), style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.normal)),
+                    Text("Comments: ",
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.white54,
+                            fontWeight: FontWeight.bold)),
+                    Text(postUser.commentsCount.toString(),
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.white54,
+                            fontWeight: FontWeight.normal)),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Text("Grade: ", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold)),
-                    Text(postUser.student?.grade?.name?.toString() ?? "N/A", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.normal)),
+                    Text("Grade: ",
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.white54,
+                            fontWeight: FontWeight.bold)),
+                    Text(postUser.student?.grade?.name?.toString() ?? "N/A",
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.white54,
+                            fontWeight: FontWeight.normal)),
                   ],
                 ),
               ],
@@ -343,9 +381,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
                   }
                 },
-                () => {
-                  // onLike(post, index: index)
-                },
+                () => {onLike(post, index: index)},
               ),
             );
           },
@@ -354,18 +390,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
-  Future<void> onLike(PostFeed post, {required int index}) async {
-    final userId = await PrefsService.getUserId();
-    final likes = List<String>.from(post.likedBy);
-    final userHasLiked = post.likedBy.contains(userId);
+  Future<void> onLike(Submission post, {required int index}) async {
+    final likes = post.likesCount ?? 0;
+    final userHasLiked = post.isLiked ?? false;
     setState(() {
       posts[index] = post.copyWith(
-        likedBy: userHasLiked
-            ? (likes..remove(userId))
-            : (likes
-              ..add(
-                userId!,
-              )),
+        isLiked: !userHasLiked,
+        likesCount: likes + (userHasLiked ? -1 : 1),
       );
     });
   }
@@ -379,7 +410,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
     }
 
-    final initials = name != null ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase() : '';
+    final initials = name != null
+        ? name.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        : '';
 
     return CircleAvatar(
       radius: 40,

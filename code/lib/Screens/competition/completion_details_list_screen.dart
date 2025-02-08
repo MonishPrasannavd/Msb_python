@@ -13,7 +13,6 @@ import 'package:provider/provider.dart';
 import '../../models/post_feed.dart';
 import '../../utils/colours.dart';
 
-
 class CompletionDetailsListScreen extends StatefulWidget {
   final int categoryId;
   final String categoryName, postCompilation, subCategoryId;
@@ -31,10 +30,12 @@ class CompletionDetailsListScreen extends StatefulWidget {
       super.key});
 
   @override
-  State<CompletionDetailsListScreen> createState() => _CompletionDetailsListScreenState();
+  State<CompletionDetailsListScreen> createState() =>
+      _CompletionDetailsListScreenState();
 }
 
-class _CompletionDetailsListScreenState extends State<CompletionDetailsListScreen> {
+class _CompletionDetailsListScreenState
+    extends State<CompletionDetailsListScreen> {
   bool isLoadingPosts = false; // Loading indicator for posts
 
   late PostFeedsProvider postFeedsProvider;
@@ -50,20 +51,25 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
   @override
   void initState() {
     super.initState();
-    submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
-    submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
-    _submissionsFuture = submissionApiProvider.getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
+    submissionApiProvider =
+        Provider.of<SubmissionApiProvider>(context, listen: false);
+    submissionProvider =
+        Provider.of<SubmissionProvider>(context, listen: false);
+    _submissionsFuture = submissionApiProvider
+        .getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
 
     _scrollController = ScrollController()..addListener(_scrollListener);
     _fetchInitialSubmissions();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      postFeedsProvider = Provider.of<PostFeedsProvider>(context, listen: false);
+      postFeedsProvider =
+          Provider.of<PostFeedsProvider>(context, listen: false);
       postFeedsProvider.getAllPost();
     });
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       if (!_isFetchingMore && _hasMoreData) {
         _fetchMoreSubmissions();
       }
@@ -81,7 +87,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
     if (response['submissions'] != null && response['submissions'].isNotEmpty) {
       setState(() {
         _submissions = response['submissions'];
-        _hasMoreData = response['submissions'].length >= 10; // If less than 10, assume no more data
+        _hasMoreData = response['submissions'].length >=
+            10; // If less than 10, assume no more data
       });
     } else {
       _hasMoreData = false;
@@ -122,7 +129,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
           child: ListView.builder(
             controller: _scrollController,
             padding: const EdgeInsets.all(8.0),
-            itemCount: _submissions.length + 1, // +1 for the loader at the bottom
+            itemCount:
+                _submissions.length + 1, // +1 for the loader at the bottom
             itemBuilder: (context, index) {
               if (index == _submissions.length) {
                 return _isFetchingMore
@@ -139,10 +147,10 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
                   context,
                   index,
                   post,
-                      (postId) async {
+                  (postId) async {
                     await CommentBottomSheet.show(context, postId: postId);
                   },
-                      () => onLike(post, index: index),
+                  () => onLike(post, index: index),
                 ),
               );
             },
@@ -158,7 +166,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
     return Column(
       children: [
         Expanded(
-          child: Consumer3<PostFeedsProvider, SubmissionProvider, SubmissionApiProvider>(builder: (
+          child: Consumer3<PostFeedsProvider, SubmissionProvider,
+              SubmissionApiProvider>(builder: (
             context,
             postFeedsProvider,
             submissionProvider,
@@ -172,11 +181,13 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if(snapshot.data?['submissions'] == null) {
+                if (snapshot.data?['submissions'] == null) {
                   return const Center(child: Text('No posts available'));
                 }
 
-                var submissions = snapshot.data?['submissions'] != null ? snapshot.data!['submissions'] as List<Submission> : [];
+                var submissions = snapshot.data?['submissions'] != null
+                    ? snapshot.data!['submissions'] as List<Submission>
+                    : [];
 
                 return ListView.builder(
                   // shrinkWrap: true,
@@ -198,7 +209,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
                         index,
                         post,
                         (postId) async {
-                          await CommentBottomSheet.show(context, postId: postId);
+                          await CommentBottomSheet.show(context,
+                              postId: postId);
                           // _userFuture =
                           //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
                           // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
@@ -224,12 +236,14 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
     super.didChangeDependencies();
     _refreshSubmissions();
   }
+
   Future<void> _refreshSubmissions() async {
     setState(() {
       isLoadingPosts = true;
     });
 
-    final newSubmissions = await submissionApiProvider.getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
+    final newSubmissions = await submissionApiProvider
+        .getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
 
     setState(() {
       _submissionsFuture = Future.value(newSubmissions);
@@ -245,10 +259,15 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(onTap: () => Navigator.pop(context), child: SvgPicture.asset("assets/svg/back.svg")),
+            GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: SvgPicture.asset("assets/svg/back.svg")),
             Text(
               widget.categoryName,
-              style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.bold, fontSize: 18),
+              style: GoogleFonts.poppins(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
             SvgPicture.asset("assets/svg/dash_1.svg"),
           ],
@@ -256,7 +275,8 @@ class _CompletionDetailsListScreenState extends State<CompletionDetailsListScree
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.9, // Make the FAB span 90% of the screen width
+        width: MediaQuery.of(context).size.width *
+            0.9, // Make the FAB span 90% of the screen width
         child: FloatingActionButton.extended(
           onPressed: () {
             Widget value = PostFeeds(

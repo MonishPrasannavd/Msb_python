@@ -82,7 +82,8 @@ class _PublicTabState extends State<PublicTab> {
   }
 
   Future<void> _scrollListener() async {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       if (!_isFetchingMore && _hasMoreData) {
         await _fetchMoreSubmissions();
       }
@@ -92,12 +93,14 @@ class _PublicTabState extends State<PublicTab> {
   Future<void> _fetchInitialSubmissions() async {
     setState(() => _isFetchingMore = true);
 
-    final response = await _submissionApiProvider.getAllSubmissions(page: _currentPage);
+    final response =
+        await _submissionApiProvider.getAllSubmissions(page: _currentPage);
 
     if (response['submissions'] != null && response['submissions'].isNotEmpty) {
       setState(() {
         _submissions = response['submissions'];
-        _hasMoreData = response['submissions'].length >= 10; // If less than 10, assume no more data
+        _hasMoreData = response['submissions'].length >=
+            10; // If less than 10, assume no more data
       });
     } else {
       _hasMoreData = false;
@@ -114,7 +117,8 @@ class _PublicTabState extends State<PublicTab> {
       _currentPage++;
     });
 
-    final response = await _submissionApiProvider.getAllSubmissions(page: _currentPage);
+    final response =
+        await _submissionApiProvider.getAllSubmissions(page: _currentPage);
 
     if (response['submissions'] != null && response['submissions'].isNotEmpty) {
       setState(() {
@@ -368,10 +372,14 @@ class _PublicTabState extends State<PublicTab> {
                         child: ListView.builder(
                           controller: _scrollController,
                           padding: EdgeInsets.zero,
-                          itemCount: _submissions.length + 1, // +1 for the loader at the bottom
+                          itemCount: _submissions.length +
+                              1, // +1 for the loader at the bottom
                           itemBuilder: (context, index) {
                             if (index == _submissions.length) {
-                              return _isFetchingMore ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
+                              return _isFetchingMore
+                                  ? const Center(
+                                      child: CircularProgressIndicator())
+                                  : const SizedBox.shrink();
                             }
 
                             var post = _submissions[index];
@@ -380,8 +388,9 @@ class _PublicTabState extends State<PublicTab> {
                               context,
                               index,
                               post,
-                                  (postId) => CommentBottomSheet.show(context, postId: post.id!),
-                                  () => onLike(index: index),
+                              (postId) => CommentBottomSheet.show(context,
+                                  postId: post.id!),
+                              () => onLike(index: index),
                               followUser: () => onFollow(index: index),
                               currentUser: user,
                               onSchoolTap: (schoolId) {
