@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
+import 'package:msb_app/Screens/profile/post_details_screen.dart';
 import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user_single.dart';
@@ -8,10 +9,6 @@ import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
-import 'package:msb_app/repository/school_user_repository.dart';
-import 'package:msb_app/models/post_feed.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/post.dart';
 import 'package:msb_app/utils/post_v2.dart';
@@ -359,12 +356,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             Submission post = _submissionProvider.submissions[index];
             return GestureDetector(
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => PostDetailScreen(post: post),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PostDetailScreen(post: post),
+                  ),
+                );
               },
               child: PostUiUtilsV2.buildPostTile(
                 context,
@@ -381,7 +378,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
                   }
                 },
-                () => {onLike(post, index: index)},
+                () => onLike(post, index: index),
               ),
             );
           },
@@ -399,6 +396,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         likesCount: likes + (userHasLiked ? -1 : 1),
       );
     });
+
+    _submissionApiProvider.toggleLike(post.id!);
   }
 
   // Helper function to create profile image based on initials of name
