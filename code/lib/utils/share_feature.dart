@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
-import 'package:msb_app/models/post_feed.dart';
+import 'package:msb_app/models/submission.dart';
 
-sharePost({required String postId, required PostFeed post}) async {
+sharePost({required int postId, required Submission post}) async {
   BranchUniversalObject buo = BranchUniversalObject(
     canonicalIdentifier: 'flutter/branch',
     title: post.title ?? "",

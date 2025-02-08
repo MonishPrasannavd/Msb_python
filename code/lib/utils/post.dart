@@ -180,7 +180,7 @@ class PostUiUtils {
               child: const Icon(Icons.share, color: AppColors.purple),
               onTap: () {
                 if (post.id != null) {
-                  sharePost(postId: post.id!, post: post);
+                  // sharePost(postId: post.id!, post: post);
                 }
               },
             )
@@ -742,7 +742,7 @@ class PostUiUtils {
               child: const Icon(Icons.share, color: AppColors.purple),
               onTap: () {
                 if (post.id != null) {
-                  sharePost(postId: post.id!, post: post);
+                  // sharePost(postId: post.id!, post: post);
                 }
               },
             )
