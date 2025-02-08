@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class Helpers {
   static PageRoute pageRouteBuilder(widget) {
     return MaterialPageRoute(builder: (context) => widget);
@@ -29,7 +28,7 @@ class Helpers {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1,
-        backgroundColor: AppColors.primaryColor.withOpacity(0.9),
+        backgroundColor: AppColors.primaryColor.withValues(alpha:0.9),
         textColor: AppColors.whiteColor,
         fontSize: 16.0);
   }*/

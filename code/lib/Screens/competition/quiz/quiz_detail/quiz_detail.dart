@@ -1,10 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/constants/navigation.dart';
-import 'package:msb_app/models/category.dart';
 
 import '../../../../components/button_builder.dart';
 import '../../../../utils/colours.dart';
@@ -30,10 +27,15 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(onTap: () => Navigator.pop(context), child: SvgPicture.asset("assets/svg/back.svg")),
+            GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: SvgPicture.asset("assets/svg/back.svg")),
             Text(
               widget.title,
-              style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16),
+              style: GoogleFonts.poppins(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16),
             ),
             const Icon(Icons.info_outline)
           ],
@@ -47,14 +49,17 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 18.0),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0)),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(20.0)),
               child: Column(
                 children: [
                   Row(
                     children: [
                       Text("Select Test",
-                          style:
-                              GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
+                          style: GoogleFonts.poppins(
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16)),
                       const Spacer(),
                       SvgPicture.asset(
                         "assets/svg/submission.svg",
@@ -70,25 +75,32 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
-                                return InstructionsDialog(widget.title, e.toString());
+                                return InstructionsDialog(
+                                    widget.title, e.toString());
                               },
                             );
                             //callNextScreen1(context, QuestionsScreen(widget.title, e.toString()));
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 12),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15.0, horizontal: 12),
                             decoration: BoxDecoration(
-                                border: Border.all(width: 1, color: const Color(0xFFCECACA)),
+                                border: Border.all(
+                                    width: 1, color: const Color(0xFFCECACA)),
                                 borderRadius: BorderRadius.circular(8.0)),
                             child: Row(
                               children: [
                                 Text(e.toString(),
                                     style: GoogleFonts.poppins(
-                                        color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14)),
+                                        color: AppColors.black,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14)),
                                 const Spacer(),
                                 Text("25 Mins",
                                     style: GoogleFonts.poppins(
-                                        color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 12)),
+                                        color: const Color(0xFF6A6262),
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12)),
                                 const SizedBox(width: 10),
                                 SvgPicture.asset(
                                   color: const Color(0xFF6A6262),
@@ -129,7 +141,9 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
         ? Dialog(
             surfaceTintColor: AppColors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20.0)),
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(20.0)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -143,7 +157,9 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
                       SizedBox(width: 8),
                       Text('Instructions',
                           style: GoogleFonts.poppins(
-                              color: const Color(0xFF403B3B), fontWeight: FontWeight.w500, fontSize: 16)),
+                              color: const Color(0xFF403B3B),
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16)),
                     ],
                   ),
                   SizedBox(height: 8),
@@ -160,14 +176,22 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
                             text: 'Play Now',
                             onPressed: () {
                               Navigator.pop(context);
-                              callNextScreen1(context, QuestionsScreen(widget.title!, widget.quizId!));
+                              callNextScreen1(
+                                  context,
+                                  QuestionsScreen(
+                                      widget.title!, widget.quizId!));
                             },
                             style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(AppColors.primary),
+                                backgroundColor: MaterialStateProperty.all(
+                                    AppColors.primary),
                                 shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0)))),
                             textStyle: GoogleFonts.poppins(
-                                color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16))),
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16))),
                   ),
                 ],
               ),
@@ -176,7 +200,9 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
         : Dialog(
             surfaceTintColor: AppColors.white,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -188,8 +214,10 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
                   const SizedBox(height: 16),
                   Text(
                     "Ready Instructions Before You Play",
-                    style:
-                        GoogleFonts.poppins(color: const Color(0xFF403B3B), fontWeight: FontWeight.w500, fontSize: 16),
+                    style: GoogleFonts.poppins(
+                        color: const Color(0xFF403B3B),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -206,16 +234,22 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
                                 });
                               },
                               style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(AppColors.primary),
+                                  backgroundColor: MaterialStateProperty.all(
+                                      AppColors.primary),
                                   shape: MaterialStateProperty.all(
-                                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
+                                      RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8.0)))),
                               textStyle: GoogleFonts.poppins(
-                                  color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 14))),
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14))),
                       const SizedBox(height: 8),
                       OutlinedButton(
                         onPressed: () {
                           Navigator.pop(context);
-                          callNextScreen1(context, QuestionsScreen(widget.title!, widget.quizId!));
+                          callNextScreen1(context,
+                              QuestionsScreen(widget.title!, widget.quizId!));
                         },
                         style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 15),
@@ -228,7 +262,9 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
                           child: Text(
                             "Continue Playing",
                             style: GoogleFonts.poppins(
-                                color: const Color(0xFF6A6262), fontWeight: FontWeight.w500, fontSize: 14),
+                                color: const Color(0xFF6A6262),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14),
                           ),
                         ),
                       ),
@@ -248,7 +284,10 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("1. ",
-                style: GoogleFonts.poppins(color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14)),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF6A6262),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14)),
             Expanded(
               child: buildInstructionItem(
                   'This is a multiple choice quiz. There is only one right answer for every question. Think and answer. You get points for doing well.'),
@@ -259,9 +298,13 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("2. ",
-                style: GoogleFonts.poppins(color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14)),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF6A6262),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14)),
             Expanded(
-              child: buildInstructionItem('Attempt all the questions and click Submit.'),
+              child: buildInstructionItem(
+                  'Attempt all the questions and click Submit.'),
             ),
           ],
         ),
@@ -269,7 +312,10 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("3. ",
-                style: GoogleFonts.poppins(color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14)),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF6A6262),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14)),
             Expanded(
               child: buildInstructionItem(
                   'There is a time limit for every quiz. If you fail to submit the quiz within the given time, the quiz will be submitted automatically.'),
@@ -280,7 +326,10 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("4. ",
-                style: GoogleFonts.poppins(color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14)),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF6A6262),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14)),
             Expanded(
               child: buildInstructionItem(
                   'You can participate in a test any number of times to practice, but your first attempt points are valid.'),
@@ -291,9 +340,13 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("5. ",
-                style: GoogleFonts.poppins(color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14)),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF6A6262),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14)),
             Expanded(
-              child: buildInstructionItem('For each correct answer, you will get 2 points.'),
+              child: buildInstructionItem(
+                  'For each correct answer, you will get 2 points.'),
             ),
           ],
         ),
@@ -302,9 +355,13 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text("6. ",
-                style: GoogleFonts.poppins(color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14)),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF6A6262),
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14)),
             Expanded(
-              child: buildInstructionItem('If all answers are correct, you will get 5 bonus points.'),
+              child: buildInstructionItem(
+                  'If all answers are correct, you will get 5 bonus points.'),
             ),
           ],
         ),
@@ -314,7 +371,10 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
 
   Widget buildInstructionItem(String instruction) {
     return Text(instruction,
-        style: GoogleFonts.poppins(color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14));
+        style: GoogleFonts.poppins(
+            color: const Color(0xFF6A6262),
+            fontWeight: FontWeight.w400,
+            fontSize: 14));
   }
 }
 

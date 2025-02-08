@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
 import 'package:msb_app/models/school_dashboard.dart';
-import 'package:msb_app/models/user.dart';
 
 class TopUsersWidget extends StatelessWidget {
   final List<TopStudent> topUsers;
@@ -86,7 +85,8 @@ class UserCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => UserProfileScreen(id: user.user!.id!.toString())));
+                builder: (context) =>
+                    UserProfileScreen(id: user.user!.id!.toString())));
       },
       child: Container(
         decoration: BoxDecoration(

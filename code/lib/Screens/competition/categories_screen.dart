@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,14 +5,10 @@ import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
 import 'package:msb_app/models/competitions.dart';
 import 'package:msb_app/models/msbuser.dart';
 import 'package:msb_app/providers/competitions_provider.dart';
-import 'package:msb_app/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants/navigation.dart';
-import '../../enums/post_feed_type.dart';
 import '../../utils/colours.dart';
 import 'completion_screen.dart';
-import 'post story/post_feed_screen.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -60,7 +55,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Widget build(BuildContext context) {
     var competitions =
         Provider.of<CompetitionsProvider>(context, listen: false);
-    var query = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -101,11 +95,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   crossAxisSpacing: 8.0,
                   crossAxisCount: 3),
               itemBuilder: (BuildContext context, int index) {
-                final FutureCategories? menuItem =competitions.compititions.elementAt(index);
+                final FutureCategories menuItem =
+                    competitions.compititions.elementAt(index);
 
                 return GestureDetector(
                   onTap: () {
-                    if (menuItem?.name  == '') {
+                    if (menuItem.name == '') {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -116,10 +111,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => CompletionScreen(
-                            categoryId: menuItem?.id ?? 1,
-                            categoryName: menuItem?.name ?? '',
-                            contentType: menuItem?.categoryType?.name,
-                            subcategories: menuItem?.subcategories,
+                            categoryId: menuItem.id ?? 1,
+                            categoryName: menuItem.name ?? '',
+                            contentType: menuItem.categoryType?.name,
+                            subcategories: menuItem.subcategories,
                           ),
                         ),
                       );
@@ -140,8 +135,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: CircleAvatar(
-                              backgroundImage: menuItem?.iconUrl != null
-                                  ? NetworkImage(menuItem!.iconUrl!)
+                              backgroundImage: menuItem.iconUrl != null
+                                  ? NetworkImage(menuItem.iconUrl!)
                                   : const AssetImage(
                                           'assets/images/profile1.png')
                                       as ImageProvider,
@@ -152,7 +147,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       const SizedBox(height: 5),
                       FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text(menuItem?.name ?? '',
+                        child: Text(menuItem.name ?? '',
                             style: GoogleFonts.poppins(
                                 color: AppColors.black,
                                 fontWeight: FontWeight.w500,

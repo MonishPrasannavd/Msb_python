@@ -18,19 +18,19 @@ class DashboardResponse {
     if (json['top_score_students'] != null) {
       topScoreStudents = <TopScoreStudents>[];
       json['top_score_students'].forEach((v) {
-        topScoreStudents!.add(new TopScoreStudents.fromJson(v));
+        topScoreStudents!.add(TopScoreStudents.fromJson(v));
       });
     }
     if (json['future_categories'] != null) {
       futureCategories = <FutureCategories>[];
       json['future_categories'].forEach((v) {
-        futureCategories!.add(new FutureCategories.fromJson(v));
+        futureCategories!.add(FutureCategories.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['total_schools'] = totalSchools;
     data['total_student'] = totalStudent;
     if (topScoreStudents != null) {
@@ -94,11 +94,11 @@ class TopScoreStudents {
     id = json['id'];
     dob = json['dob'];
     score = json['score'];
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    user = json['user'] != null ? User.fromJson(json['user']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['user_id'] = userId;
     data['points'] = points;
     data['grade_id'] = gradeId;
@@ -141,7 +141,7 @@ class User {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = name;
     data['email'] = email;
     data['image'] = image;
@@ -181,17 +181,16 @@ class FutureCategories {
     if (json['subcategories'] != null) {
       subcategories = <Subcategories>[];
       json['subcategories'].forEach((v) {
-        subcategories!.add(new Subcategories.fromJson(v));
+        subcategories!.add(Subcategories.fromJson(v));
       });
     }
-    if(json['category_type'] != null){
+    if (json['category_type'] != null) {
       categoryType = CategoryTypeV2.fromJson(json['category_type']);
     }
-
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['is_future'] = isFuture;
     data['name'] = name;
@@ -221,7 +220,7 @@ class Subcategories {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['category_id'] = categoryId;
     data['icon'] = icon;

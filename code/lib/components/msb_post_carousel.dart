@@ -135,7 +135,7 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
             borderRadius: BorderRadius.circular(16.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 8.0,
                 offset: const Offset(0, 4),
               ),
@@ -173,7 +173,7 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
                       borderRadius: BorderRadius.circular(16.0),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withValues(alpha: 0.2),
                           blurRadius: 8.0,
                           offset: const Offset(0, 4),
                         ),
@@ -201,7 +201,7 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
           borderRadius: BorderRadius.circular(16.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8.0,
               offset: const Offset(0, 4),
             ),
@@ -281,7 +281,7 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0)),
-                shadowColor: Colors.black.withOpacity(0.5),
+                shadowColor: Colors.black.withValues(alpha: 0.5),
                 elevation: 10,
                 backgroundColor:
                     _currentIndex > 0 ? Colors.purple : Colors.grey[300],
@@ -346,7 +346,7 @@ class _MsbPostsCarouselState extends State<MsbPostsCarousel> {
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0)),
-                shadowColor: Colors.black.withOpacity(1),
+                shadowColor: Colors.black.withValues(alpha: 1),
                 elevation: 12,
                 backgroundColor: _currentIndex < widget.posts.length - 1
                     ? Colors.purple

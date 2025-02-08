@@ -26,10 +26,12 @@ class _OtpSentScreenState extends State<OtpSentScreen> {
                   width: query.width,
                   decoration: const BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius:
-                          BorderRadius.only(bottomRight: Radius.circular(40.0), bottomLeft: Radius.circular(40.0))),
+                      borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(40.0),
+                          bottomLeft: Radius.circular(40.0))),
                   child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 35),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25.0, vertical: 35),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -41,12 +43,17 @@ class _OtpSentScreenState extends State<OtpSentScreen> {
                             const SizedBox(height: 20),
                             Text("Email Sent", //verified
                                 style: GoogleFonts.poppins(
-                                    color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 36)),
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 36)),
                             const SizedBox(height: 4),
                             // Text("4 digit code sent to your email address.",
-                            Text("Verification link sent to your email address.",
+                            Text(
+                                "Verification link sent to your email address.",
                                 style: GoogleFonts.poppins(
-                                    color: AppColors.white, fontWeight: FontWeight.w400, fontSize: 16))
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16))
                           ])))),
           Expanded(
               child: Container(
@@ -65,11 +72,16 @@ class _OtpSentScreenState extends State<OtpSentScreen> {
                             callNextScreen(context, const SignInScreen());
                           },
                           style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(AppColors.primary),
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
-                          textStyle:
-                              GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16))),
+                              backgroundColor:
+                                  WidgetStateProperty.all(AppColors.primary),
+                              shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(8.0)))),
+                          textStyle: GoogleFonts.poppins(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16))),
                 ],
               ),
             ),

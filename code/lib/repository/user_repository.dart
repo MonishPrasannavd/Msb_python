@@ -58,7 +58,6 @@ class UserRepository implements IRepository<MsbUser> {
   }) async {
     try {
       List<MsbUser> allUsers = [];
-      List<String> validSchoolIds = schoolIds ?? [];
       QuerySnapshot snap = await usersCollection
           // .where('id', whereNotIn: userIds)
           .where('schoolId', whereIn: schoolIds)

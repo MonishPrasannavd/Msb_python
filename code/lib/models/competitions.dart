@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:msb_app/models/category_type_v2.dart';
 import 'package:msb_app/models/dashboard.dart';
 
-
 part 'competitions.g.dart';
 
 @JsonSerializable(explicitToJson: true)
@@ -106,13 +105,13 @@ class FutureCategories {
         subcategories!.add(Subcategories.fromJson(v));
       });
     }
-    if(json['category_type'] != null){
+    if (json['category_type'] != null) {
       categoryType = CategoryTypeV2.fromJson(json['category_type']);
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['is_future'] = isFuture;
     data['name'] = name;

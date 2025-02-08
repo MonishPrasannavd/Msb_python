@@ -13,7 +13,6 @@ import 'package:msb_app/enums/post_feed_type.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/utils/colours.dart';
-import 'package:msb_app/utils/share_feature.dart';
 
 class CachePatch {
   late CachedVideoPlayerPlusController playerPlusController;
@@ -119,7 +118,7 @@ class PostUiUtils {
                     decoration: BoxDecoration(
                       color: post.likedBy
                               .contains(FirebaseAuth.instance.currentUser?.uid)
-                          ? AppColors.primary.withOpacity(0.2)
+                          ? AppColors.primary.withValues(alpha: 0.2)
                           : null,
                       borderRadius: BorderRadius.circular(50.0),
                       border: Border.all(
@@ -266,7 +265,9 @@ class PostUiUtils {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PostDetailScreen(post: post),
+                        builder: (context) => PostDetailScreen(
+                          postId: int.tryParse(post!.id!),
+                        ),
                       ));
                 },
                 child: Text(
@@ -296,7 +297,7 @@ class PostUiUtils {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PostDetailScreen(
-                        post: post,
+                        postId: int.tryParse(post!.id!),
                       ),
                     ));
               },
@@ -681,7 +682,7 @@ class PostUiUtils {
                     decoration: BoxDecoration(
                       color: post.likedBy
                               .contains(FirebaseAuth.instance.currentUser?.uid)
-                          ? AppColors.primary.withOpacity(0.2)
+                          ? AppColors.primary.withValues(alpha: 0.2)
                           : null,
                       borderRadius: BorderRadius.circular(50.0),
                       border: Border.all(

@@ -11,14 +11,13 @@ import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/utils/api.dart';
 
 class SubmissionApiProvider extends ChangeNotifier {
-
   Future<Map<String, dynamic>> createSubmission(
-      int categoryId,
-      int subCategoryId,
-      String title,
-      String description, {
-        XFile? mediaFile, // Accept XFile
-      }) async {
+    int categoryId,
+    int subCategoryId,
+    String title,
+    String description, {
+    XFile? mediaFile, // Accept XFile
+  }) async {
     Map<String, dynamic> result;
 
     try {
@@ -66,7 +65,6 @@ class SubmissionApiProvider extends ChangeNotifier {
     return result;
   }
 
-
   Future<Map<String, dynamic>> getAllSubmissions(
       {int? page = 1, int? limit = 10}) async {
     Map<String, dynamic> result;
@@ -75,7 +73,7 @@ class SubmissionApiProvider extends ChangeNotifier {
     final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.GET_ALL_SUBMISSIONS);
 
     try {
-      var response = await get(uri, headers: AppUrl.headers);
+      var response = await post(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
         var submissions = List.castFrom(encodedString['data'])
@@ -226,16 +224,49 @@ class SubmissionApiProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> getSubmissionsByUserId(int userId, {page = 1, limit = 10}) async {
+  Future<Map<String, dynamic>> getSubmissionById(int id) async {
+    Map<String, dynamic> result;
+    final uri = Uri.parse(
+        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_ID}/${id.toString()}");
+
+    try {
+      var response = await get(uri, headers: AppUrl.headers);
+      if (response.statusCode == 200) {
+        var encodedString = jsonDecode(response.body.toString());
+        final submission = Submission.fromJson(encodedString['submission']);
+        // var user = MsbUser.fromJson(encodedString);
+        notifyListeners();
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {
+          'status': true,
+          'message': 'Successful',
+          'submission': submission
+        };
+      } else {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        var message = responseData['detail'];
+        notifyListeners();
+        result = {'status': false, 'message': message};
+      }
+    } catch (e) {
+      notifyListeners();
+      result = {'status': false, 'message': e.toString()};
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> getSubmissionsByUserId(int userId,
+      {page = 1, limit = 10}) async {
     Map<String, dynamic> result;
     notifyListeners();
 
     final uri = Uri.parse(
-        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_USER_ID}/${userId.toString()}?page=$page&limit=$limit");
+        "${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}?user_id=$userId&page=$page&limit=$limit");
     try {
       //  authToken = await PrefsService.getToken(); // Retrieve token
       //  AppUrl.addHeader('Authorization', 'Bearer $authToken');
-      var response = await get(uri, headers: AppUrl.headers);
+      var response = await post(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
         List<Submission> submissions = List.castFrom(encodedString['data'])
@@ -263,22 +294,21 @@ class SubmissionApiProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> getSubmissionsBySchool(int schoolId, {page = 1, limit = 10}) async {
+  Future<Map<String, dynamic>> getSubmissionsBySchool(int schoolId,
+      {page = 1, limit = 10}) async {
     Map<String, dynamic> result;
     notifyListeners();
 
     final uri = Uri.parse(
-        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_SCHOOL_ID}/${schoolId.toString()}/?page=$page&limit=$limit");
+        "${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}?school_id=$schoolId&page=$page&limit=$limit");
     try {
-      var response = await get(uri, headers: AppUrl.headers);
+      var response = await post(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
         List<Submission> submissions = List.castFrom(encodedString['data'])
             .map((e) => Submission.fromJson(e))
             .toList();
-        // var user = MsbUser.fromJson(encodedString);
         notifyListeners();
-        // result = {'status': true, 'message': 'Successful', 'user': user};
         result = {
           'status': true,
           'message': 'Successful',
@@ -298,14 +328,15 @@ class SubmissionApiProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> getSubmissionsBySubcategory(int subcategoryId, {page = 1, limit = 10}) async {
+  Future<Map<String, dynamic>> getSubmissionsBySubcategory(int subcategoryId,
+      {page = 1, limit = 10}) async {
     Map<String, dynamic> result;
     notifyListeners();
 
     final uri = Uri.parse(
-        "${AppUrl.BASE_URL}${AppUrl.GET_SUBMISSIONS_BY_SUBCATEGORY}/${subcategoryId.toString()}?page=$page&limit=$limit");
+        "${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}?page=$page&limit=$limit&sub_category_id=$subcategoryId");
     try {
-      var response = await get(uri, headers: AppUrl.headers);
+      var response = await post(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
         List<Submission> submissions = List.castFrom(encodedString['data'])

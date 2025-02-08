@@ -55,20 +55,19 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
 
   late SchoolApiProvider _schoolApiProvider;
   late SubmissionApiProvider _submissionApiProvider;
-  late SubmissionProvider _submissionProvider;
   late StudentDashboardProvider studentDashboardProvider;
-  late UserProvider _userProvider;
 
   @override
   void initState() {
-    _userProvider = Provider.of<UserProvider>(context, listen: false);
     super.initState();
     setState(() {
       progress = 0.0;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _schoolApiProvider = Provider.of<SchoolApiProvider>(context, listen: false);
-      studentDashboardProvider = Provider.of<StudentDashboardProvider>(context, listen: false);
+      _schoolApiProvider =
+          Provider.of<SchoolApiProvider>(context, listen: false);
+      studentDashboardProvider =
+          Provider.of<StudentDashboardProvider>(context, listen: false);
       fetchDataFuture = fetchScreenData();
       fetchScreenData();
     });
@@ -79,14 +78,16 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
   }
 
   Future<void> getSchoolDashboard() async {
-    Map<String, dynamic> response = await _schoolApiProvider.getSchoolDashboard(int.parse(widget.schoolId));
+    Map<String, dynamic> response =
+        await _schoolApiProvider.getSchoolDashboard(int.parse(widget.schoolId));
     setState(() {
       schoolDashboard = response['dashboard'];
     });
   }
 
   Future<void> getSchoolPosts() async {
-    Map<String, dynamic> response = await _submissionApiProvider.getSubmissionsBySchool(int.parse(widget.schoolId));
+    Map<String, dynamic> response = await _submissionApiProvider
+        .getSubmissionsBySchool(int.parse(widget.schoolId));
     setState(() {
       submissions.clear();
       if (response['submissions'] != null) {
@@ -114,8 +115,10 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
     var query = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      body: Consumer4<SchoolApiProvider, SubmissionProvider, SubmissionApiProvider, UserProvider>(
-          builder: (ctxt, schoolApiProvider, submissionProvider, submissionApiProvider, userProvider, child) {
+      body: Consumer4<SchoolApiProvider, SubmissionProvider,
+              SubmissionApiProvider, UserProvider>(
+          builder: (ctxt, schoolApiProvider, submissionProvider,
+              submissionApiProvider, userProvider, child) {
         var loggedInUser = userProvider.user.user;
         return SingleChildScrollView(
           child: Column(
@@ -125,8 +128,9 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                 width: query.width,
                 decoration: const BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius:
-                        BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+                    borderRadius: BorderRadius.only(
+                        bottomRight: Radius.circular(25.0),
+                        bottomLeft: Radius.circular(25.0))),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -141,10 +145,14 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                           children: [
                             Text("Hey Superstar",
                                 style: GoogleFonts.poppins(
-                                    color: AppColors.white, fontWeight: FontWeight.w300, fontSize: 12)),
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 12)),
                             Text(fetchFirstName(loggedInUser?.name) ?? "User",
                                 style: GoogleFonts.poppins(
-                                    color: AppColors.white, fontWeight: FontWeight.w700, fontSize: 24)),
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 24)),
                           ],
                         ),
                         const Spacer(),
@@ -167,9 +175,12 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                                 bottomLeft: Radius.circular(50.0),
                               )),
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 7.0, top: 7.0, bottom: 7.0, right: 10.0),
-                            child: (loggedInUser?.name != null && loggedInUser?.profileUrl != null)
-                                ? _buildProfileImage(loggedInUser!.name, loggedInUser.profileUrl)
+                            padding: const EdgeInsets.only(
+                                left: 7.0, top: 7.0, bottom: 7.0, right: 10.0),
+                            child: (loggedInUser?.name != null &&
+                                    loggedInUser?.profileUrl != null)
+                                ? _buildProfileImage(
+                                    loggedInUser!.name, loggedInUser.profileUrl)
                                 : Image.asset(
                                     "assets/images/profile.png",
                                     height: 40,
@@ -228,7 +239,9 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
       child: Container(
         decoration: const BoxDecoration(
           // Image set to background of the body
-          image: DecorationImage(image: AssetImage("assets/images/profile_frame copy.png"), fit: BoxFit.cover),
+          image: DecorationImage(
+              image: AssetImage("assets/images/profile_frame copy.png"),
+              fit: BoxFit.cover),
         ),
         child: Column(
           children: [
@@ -249,7 +262,9 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(widget.schoolRank?.name ?? "School Name",
-                        style: GoogleFonts.poppins(color: const Color(0xFF212121), fontWeight: FontWeight.w600)),
+                        style: GoogleFonts.poppins(
+                            color: const Color(0xFF212121),
+                            fontWeight: FontWeight.w600)),
                   ),
                 ),
                 // const SizedBox.shrink()
@@ -267,10 +282,14 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     text: 'School Ranking #$schoolRank',
                     onPressed: () {},
                     style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(AppColors.black38),
-                        shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)))),
-                    textStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16)),
+                        backgroundColor:
+                            MaterialStateProperty.all(AppColors.black38),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)))),
+                    textStyle: GoogleFonts.poppins(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16)),
               ),
             ],
             const SizedBox(height: 10),
@@ -284,17 +303,22 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     width: query.width,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.0),
-                        image: const DecorationImage(image: AssetImage("assets/images/back.png"))),
+                        image: const DecorationImage(
+                            image: AssetImage("assets/images/back.png"))),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(schoolDashboard?.studentsCount?.toString() ?? "0",
                             style: GoogleFonts.poppins(
-                                color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 24)),
+                                color: const Color(0xFF540D96),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 24)),
                         Text("Total Students",
-                            style:
-                                GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
+                            style: GoogleFonts.poppins(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16)),
                       ],
                     ),
                   ),
@@ -306,17 +330,23 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     width: query.width,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.0),
-                        image: const DecorationImage(image: AssetImage("assets/images/back.png"))),
+                        image: const DecorationImage(
+                            image: AssetImage("assets/images/back.png"))),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(schoolDashboard?.submissionsCount.toString() ?? "0",
+                        Text(
+                            schoolDashboard?.submissionsCount.toString() ?? "0",
                             style: GoogleFonts.poppins(
-                                color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 24)),
+                                color: const Color(0xFF540D96),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 24)),
                         Text("Total Entries",
-                            style:
-                                GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
+                            style: GoogleFonts.poppins(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16)),
                       ],
                     ),
                   ),
@@ -334,7 +364,8 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     width: query.width,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.0),
-                        image: const DecorationImage(image: AssetImage("assets/images/back.png"))),
+                        image: const DecorationImage(
+                            image: AssetImage("assets/images/back.png"))),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -345,10 +376,14 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                             //   studentCount: school?.studentCount,
                             // ).toString(),
                             style: GoogleFonts.poppins(
-                                color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 24)),
+                                color: const Color(0xFF540D96),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 24)),
                         Text("Total Points",
-                            style:
-                                GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
+                            style: GoogleFonts.poppins(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16)),
                       ],
                     ),
                   ),
@@ -360,17 +395,23 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     width: query.width,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.0),
-                        image: const DecorationImage(image: AssetImage("assets/images/back.png"))),
+                        image: const DecorationImage(
+                            image: AssetImage("assets/images/back.png"))),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(schoolDashboard?.submissionsLikes.toString() ?? "0",
+                        Text(
+                            schoolDashboard?.submissionsLikes.toString() ?? "0",
                             style: GoogleFonts.poppins(
-                                color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 24)),
+                                color: const Color(0xFF540D96),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 24)),
                         Text("Appreciation",
-                            style:
-                                GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16)),
+                            style: GoogleFonts.poppins(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16)),
                       ],
                     ),
                   ),
@@ -381,12 +422,17 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
             RichText(
               text: TextSpan(
                 text: "Hall of ",
-                style: GoogleFonts.poppins(color: const Color(0xFF212121), fontWeight: FontWeight.w600, fontSize: 22),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF212121),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 22),
                 children: [
                   TextSpan(
                     text: "Fame  ",
-                    style:
-                        GoogleFonts.poppins(color: const Color(0xFF540D96), fontWeight: FontWeight.w600, fontSize: 22),
+                    style: GoogleFonts.poppins(
+                        color: const Color(0xFF540D96),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 22),
                   ),
                 ],
               ),
@@ -408,14 +454,18 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                               )));
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(AppColors.purpleDark),
-                  shape: MaterialStateProperty.all(
+                  backgroundColor:
+                      WidgetStateProperty.all(AppColors.purpleDark),
+                  shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
                 ),
-                textStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16),
+                textStyle: GoogleFonts.poppins(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16),
               ),
             ),
             const SizedBox(height: 15),
@@ -427,11 +477,17 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                   children: [
                     TextSpan(
                       text: 'Recent ',
-                      style: GoogleFonts.poppins(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
                     ),
                     TextSpan(
                       text: 'Entries',
-                      style: GoogleFonts.poppins(color: AppColors.purple, fontSize: 20, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                          color: AppColors.purple,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -453,11 +509,17 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                   children: [
                     TextSpan(
                       text: 'Popular ',
-                      style: GoogleFonts.poppins(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
                     ),
                     TextSpan(
                       text: 'Posts',
-                      style: GoogleFonts.poppins(color: AppColors.purple, fontSize: 20, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                          color: AppColors.purple,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -472,14 +534,18 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
             /// other students
             if (otherUsers.isNotEmpty)
               Container(
-                decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(8.0)),
+                decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(8.0)),
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Other Students",
                         style: GoogleFonts.poppins(
-                            color: const Color(0xFF094F9A), fontWeight: FontWeight.w600, fontSize: 16)),
+                            color: const Color(0xFF094F9A),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16)),
                     ListView.builder(
                       padding: const EdgeInsets.only(top: 10),
                       shrinkWrap: true,
@@ -492,25 +558,35 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
-                                      context, MaterialPageRoute(builder: (context) => UserProfileScreen(id: user.id!)))
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              UserProfileScreen(id: user.id!)))
                                   .then((val) async => await fetchScreenData());
                             },
                             child: Container(
                               height: 50,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.0),
-                                  border: Border.all(width: 2, color: const Color(0xFFCECACA))),
+                                  border: Border.all(
+                                      width: 2,
+                                      color: const Color(0xFFCECACA))),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18.0),
                                 child: Row(
                                   children: [
                                     Text(user.name ?? user.email ?? 'Unknown',
                                         style: GoogleFonts.poppins(
-                                            color: const Color(0xFF151414), fontWeight: FontWeight.w500, fontSize: 16)),
+                                            color: const Color(0xFF151414),
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16)),
                                     const Spacer(),
                                     Text(user.totalPoints.toString(),
                                         style: GoogleFonts.poppins(
-                                            color: const Color(0xFF6A6262), fontWeight: FontWeight.w400, fontSize: 14)),
+                                            color: const Color(0xFF6A6262),
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 14)),
                                     const SizedBox(width: 15),
                                     SvgPicture.asset(
                                       "assets/svg/right.svg",
@@ -534,12 +610,17 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
             RichText(
               text: TextSpan(
                 text: "Showcase ",
-                style: GoogleFonts.poppins(color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 18),
+                style: GoogleFonts.poppins(
+                    color: const Color(0xFF540D96),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18),
                 children: [
                   TextSpan(
                     text: "Your talents in",
-                    style:
-                        GoogleFonts.poppins(color: const Color(0xFF212121), fontWeight: FontWeight.w600, fontSize: 18),
+                    style: GoogleFonts.poppins(
+                        color: const Color(0xFF212121),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18),
                   ),
                 ],
               ),
@@ -549,14 +630,16 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
               height: query.height / 8,
               child: ChangeNotifierProvider.value(
                 value: studentDashboardProvider,
-                child: Consumer<StudentDashboardProvider>(builder: (context, value, child) {
+                child: Consumer<StudentDashboardProvider>(
+                    builder: (context, value, child) {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: (value.dashboardCategoryList?.length ?? 0),
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     itemBuilder: (BuildContext context, int index) {
-                      final FutureCategories? menuItem = value.dashboardCategoryList?[index];
+                      final FutureCategories? menuItem =
+                          value.dashboardCategoryList?[index];
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -579,15 +662,19 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                                   padding: const EdgeInsets.all(0.0),
                                   child: CachedNetworkImage(
                                     imageUrl: menuItem?.iconUrl ?? "",
-                                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                    errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                                    placeholder: (context, url) => const Center(
+                                        child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) =>
+                                        const Center(child: Icon(Icons.error)),
                                     fit: BoxFit.contain,
                                   ),
                                 ),
                               ),
                               Text(menuItem?.name ?? "",
                                   style: GoogleFonts.poppins(
-                                      color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 14)),
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14)),
                             ],
                           ),
                         ),
@@ -656,10 +743,13 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                               ))).then((val) async => await fetchScreenData());
                 },
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(AppColors.primary),
-                    shape:
-                        MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)))),
-                textStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16)),
+                    backgroundColor: WidgetStateProperty.all(AppColors.primary),
+                    shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0)))),
+                textStyle: GoogleFonts.poppins(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16)),
             const SizedBox(height: 15),
           ],
         ),

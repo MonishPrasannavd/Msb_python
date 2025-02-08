@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
 
 part 'category_type_v2.g.dart';
 
@@ -24,7 +23,8 @@ class CategoryTypeV2 {
         id: id ?? this.id,
       );
 
-  factory CategoryTypeV2.fromJson(Map<String, dynamic> json) => _$CategoryTypeV2FromJson(json);
+  factory CategoryTypeV2.fromJson(Map<String, dynamic> json) =>
+      _$CategoryTypeV2FromJson(json);
 
   Map<String, dynamic> toJson() => _$CategoryTypeV2ToJson(this);
 }

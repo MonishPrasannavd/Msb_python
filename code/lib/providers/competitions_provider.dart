@@ -5,7 +5,6 @@ import 'package:http/http.dart';
 import 'package:msb_app/models/competitions.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/utils/api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CompetitionsProvider with ChangeNotifier {
   List<FutureCategories> _compititions = [];
@@ -30,11 +29,17 @@ class CompetitionsProvider with ChangeNotifier {
       var response = await get(uri, headers: AppUrl.headers);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> encodedString = jsonDecode(response.body.toString());
-        List<FutureCategories> categories =
-            List.castFrom(encodedString['data']).map((e) => FutureCategories.fromJson(e)).toList();
+        final Map<String, dynamic> encodedString =
+            jsonDecode(response.body.toString());
+        List<FutureCategories> categories = List.castFrom(encodedString['data'])
+            .map((e) => FutureCategories.fromJson(e))
+            .toList();
         notifyListeners();
-        result = {'status': true, 'message': 'Success', 'competitions': categories};
+        result = {
+          'status': true,
+          'message': 'Success',
+          'competitions': categories
+        };
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];

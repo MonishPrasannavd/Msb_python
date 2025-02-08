@@ -25,7 +25,11 @@ class CompletionScreen extends StatefulWidget {
   String? contentType;
 
   CompletionScreen(
-      {required this.categoryId, required this.categoryName, this.subcategories, required this.contentType, super.key});
+      {required this.categoryId,
+      required this.categoryName,
+      this.subcategories,
+      required this.contentType,
+      super.key});
 
   @override
   State<CompletionScreen> createState() => _CompletionScreenState();
@@ -65,14 +69,18 @@ class _CompletionScreenState extends State<CompletionScreen> {
   }
 
   // Get all posts for a specific school
-  Future<List<CompetitionType>> getCompetitionByCategory(String categoryName) async {
+  Future<List<CompetitionType>> getCompetitionByCategory(
+      String categoryName) async {
     try {
-      Query query = completionsCollection.where('categoryName', isEqualTo: categoryName);
+      Query query =
+          completionsCollection.where('categoryName', isEqualTo: categoryName);
 
       QuerySnapshot snapshot = await query.get();
 
-      List<Competition> value =
-          snapshot.docs.map((doc) => Competition.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      List<Competition> value = snapshot.docs
+          .map(
+              (doc) => Competition.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
       DateTime today = DateTime.now();
       // value.first.competitionNames.removeWhere((item) => DateTime.parse(item.competitionLastDate).isBefore(today));
 
@@ -92,10 +100,15 @@ class _CompletionScreenState extends State<CompletionScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(onTap: () => Navigator.pop(context), child: SvgPicture.asset("assets/svg/back.svg")),
+            GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: SvgPicture.asset("assets/svg/back.svg")),
             Text(
               widget.categoryName,
-              style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.bold, fontSize: 18),
+              style: GoogleFonts.poppins(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
             SvgPicture.asset("assets/svg/dash_1.svg"),
           ],
@@ -107,7 +120,10 @@ class _CompletionScreenState extends State<CompletionScreen> {
             children: [
               Text(
                 "Competitions List",
-                style: GoogleFonts.poppins(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 18),
+                style: GoogleFonts.poppins(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
               ),
               Expanded(
                 child: ListView.builder(
@@ -133,7 +149,9 @@ class _CompletionScreenState extends State<CompletionScreen> {
                                     [],
                                     index: index,
                                   ),
-                                  subCategoryId: widget.subcategories?[index].id.toString() ?? "")),
+                                  subCategoryId: widget.subcategories?[index].id
+                                          .toString() ??
+                                      "")),
                           //todo: Add list of competition
                           //postsFuture: getPostListForCompletionIndex(userSnapshot.data, index: index),)),
                         )
@@ -150,7 +168,8 @@ class _CompletionScreenState extends State<CompletionScreen> {
                             color: Colors.white,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3), // Shadow color
+                                color: Colors.black
+                                    .withValues(alpha: 0.3), // Shadow color
                                 blurRadius: 6.0, // Softness of the shadow
                                 offset: const Offset(0, 3), // Vertical offset
                               ),
@@ -160,7 +179,8 @@ class _CompletionScreenState extends State<CompletionScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
                                 child: Text(
                                   widget.subcategories?[index].name ?? "",
                                   style: GoogleFonts.poppins(
@@ -171,9 +191,11 @@ class _CompletionScreenState extends State<CompletionScreen> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Total Submissions: ${getTotalSubmissionForCompletionIndex(null, index: index)}",
@@ -197,15 +219,18 @@ class _CompletionScreenState extends State<CompletionScreen> {
                               const Spacer(),
                               Container(
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFF003366), // Blue background for submission date row
+                                  color: Color(
+                                      0xFF003366), // Blue background for submission date row
                                   borderRadius: BorderRadius.only(
                                     bottomLeft: Radius.circular(8.0),
                                     bottomRight: Radius.circular(8.0),
                                   ),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Submission Date: ${DateFormat('d MMM, y, hh:mm a').format(DateTime.parse(DateTime.now().toString()))}",
@@ -218,7 +243,8 @@ class _CompletionScreenState extends State<CompletionScreen> {
                                     SvgPicture.asset(
                                       "assets/svg/right.svg",
                                       height: 20,
-                                      color: Colors.white, // Icon color matches the row background
+                                      color: Colors
+                                          .white, // Icon color matches the row background
                                     ),
                                   ],
                                 ),
@@ -252,30 +278,44 @@ class _CompletionScreenState extends State<CompletionScreen> {
   //   });
   // }
 
-  String getLastDateForCompletionIndex(List<PostFeed>? data, {required int index}) {
+  String getLastDateForCompletionIndex(List<PostFeed>? data,
+      {required int index}) {
     if (data != null) {
-      List<PostFeed> temp = data.where((value) => value.postCompilation == index.toString()).toList();
-      return temp.isNotEmpty ? DateFormat('d MMM y, hh:mm a').format(temp.first.createdAt) : "";
+      List<PostFeed> temp = data
+          .where((value) => value.postCompilation == index.toString())
+          .toList();
+      return temp.isNotEmpty
+          ? DateFormat('d MMM y, hh:mm a').format(temp.first.createdAt)
+          : "";
     }
     return "";
   }
 
-  List<PostFeed> getPostListForCompletionIndex(List<PostFeed>? data, {required int index}) {
+  List<PostFeed> getPostListForCompletionIndex(List<PostFeed>? data,
+      {required int index}) {
     if (data != null) {
-      return data.where((value) => value.postCompilation == index.toString()).toList();
+      return data
+          .where((value) => value.postCompilation == index.toString())
+          .toList();
     }
     return [];
   }
 
-  getTotalSubmissionForCompletionIndex(List<PostFeed>? data, {required int index}) {
+  getTotalSubmissionForCompletionIndex(List<PostFeed>? data,
+      {required int index}) {
     if (data != null) {
-      return data.where((value) => value.postCompilation == index.toString()).toList().length.toString();
+      return data
+          .where((value) => value.postCompilation == index.toString())
+          .toList()
+          .length
+          .toString();
     }
     return "";
   }
 
   void fetchData() {
-    _postsFuture = postFeedRepository.getPostsByCategoryId(postCategory: widget.categoryName);
+    _postsFuture = postFeedRepository.getPostsByCategoryId(
+        postCategory: widget.categoryName);
     _completionFuture = getCompetitionByCategory(widget.categoryName);
   }
 
@@ -315,17 +355,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -335,17 +378,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -355,17 +401,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -375,17 +424,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -395,17 +447,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -415,17 +470,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -435,17 +493,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -455,17 +516,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -475,17 +539,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -495,17 +562,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -515,17 +585,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -535,17 +608,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -555,17 +631,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],
@@ -575,17 +654,20 @@ class _CompletionScreenState extends State<CompletionScreen> {
         competitionNames: [
           CompetitionType(
             competitionNames: "Dummy 1",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 2",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           ),
           CompetitionType(
             competitionNames: "Dummy 3",
-            competitionLastDate: DateTime.now().add(Duration(hours: 5)).toString(),
+            competitionLastDate:
+                DateTime.now().add(Duration(hours: 5)).toString(),
             id: "",
           )
         ],

@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:collection/collection.dart';
 import 'package:flexible_text/flexible_text.dart';
 import 'package:flutter/material.dart';
@@ -11,16 +10,12 @@ import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
-import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/post.dart';
 import 'package:msb_app/utils/post_v2.dart';
 import 'package:provider/provider.dart';
 
-import '../../enums/post_feed_type.dart';
 import '../../models/comment.dart';
 import '../../utils/colours.dart';
-import '../competition/post story/post_feed_screen.dart';
-import '../competition/quiz/quiz_screen.dart';
 
 enum PostFilter {
   all,
@@ -44,7 +39,6 @@ class _PublicTabState extends State<PublicTab> {
   bool isLoading = true;
 
   List<CommentPost> commentList = [];
-  late SubmissionProvider _submissionProvider;
   late SubmissionApiProvider _submissionApiProvider;
 
   bool isSwitched = false;
@@ -64,8 +58,6 @@ class _PublicTabState extends State<PublicTab> {
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
-    _submissionProvider =
-        Provider.of<SubmissionProvider>(context, listen: false);
     _submissionApiProvider =
         Provider.of<SubmissionApiProvider>(context, listen: false);
 
@@ -398,6 +390,7 @@ class _PublicTabState extends State<PublicTab> {
                                 customSchoolId = schoolId;
                                 customGrade = null;
                               },
+                              onTap: _fetchInitialSubmissions,
                             );
                           },
                         ),
@@ -467,8 +460,7 @@ class _PublicTabState extends State<PublicTab> {
   }
 
   Future<void> onLike({required int index}) async {
-    var post = _submissionProvider.submissions[index];
-    var user = post.user;
+    var post = _submissions[index];
     var userHasLiked = post.isLiked!;
 
     post.isLiked = !userHasLiked;
@@ -477,7 +469,7 @@ class _PublicTabState extends State<PublicTab> {
     } else {
       post.likesCount = post.likesCount! + 1;
     }
-    _submissionProvider.updateSubmission(post);
+    setState(() => _submissions[index] = post);
 
     _submissionApiProvider.toggleLike(post.id!);
   }

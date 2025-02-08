@@ -41,7 +41,6 @@ class _CompletionDetailsListScreenState
   late PostFeedsProvider postFeedsProvider;
   late SubmissionApiProvider submissionApiProvider;
   late SubmissionProvider submissionProvider;
-  late Future<Map<String, dynamic>> _submissionsFuture;
   late ScrollController _scrollController;
   int _currentPage = 1;
   bool _isFetchingMore = false;
@@ -55,8 +54,6 @@ class _CompletionDetailsListScreenState
         Provider.of<SubmissionApiProvider>(context, listen: false);
     submissionProvider =
         Provider.of<SubmissionProvider>(context, listen: false);
-    _submissionsFuture = submissionApiProvider
-        .getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
 
     _scrollController = ScrollController()..addListener(_scrollListener);
     _fetchInitialSubmissions();
@@ -151,82 +148,13 @@ class _CompletionDetailsListScreenState
                     await CommentBottomSheet.show(context, postId: postId);
                   },
                   () => onLike(post, index: index),
+                  onTap: _fetchInitialSubmissions,
                 ),
               );
             },
           ),
         ),
         const SizedBox(height: 100),
-      ],
-    );
-  }
-
-  // Helper to build post list for user or school
-  Widget _buildPostList() {
-    return Column(
-      children: [
-        Expanded(
-          child: Consumer3<PostFeedsProvider, SubmissionProvider,
-              SubmissionApiProvider>(builder: (
-            context,
-            postFeedsProvider,
-            submissionProvider,
-            submissionApiProvider,
-            child,
-          ) {
-            return FutureBuilder(
-              future: _submissionsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (snapshot.data?['submissions'] == null) {
-                  return const Center(child: Text('No posts available'));
-                }
-
-                var submissions = snapshot.data?['submissions'] != null
-                    ? snapshot.data!['submissions'] as List<Submission>
-                    : [];
-
-                return ListView.builder(
-                  // shrinkWrap: true,
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: submissions.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    Submission post = submissions[index];
-                    return GestureDetector(
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => PostDetailScreen(post: post),
-                        //   ),
-                        // );
-                      },
-                      child: PostUiUtilsV2.buildPostTile(
-                        context,
-                        index,
-                        post,
-                        (postId) async {
-                          await CommentBottomSheet.show(context,
-                              postId: postId);
-                          // _userFuture =
-                          //     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-                          // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-                        },
-                        () => onLike(post, index: index),
-                      ),
-                    );
-                  },
-                );
-              },
-            );
-          }),
-        ),
-        SizedBox(
-          height: 100,
-        )
       ],
     );
   }
@@ -246,7 +174,7 @@ class _CompletionDetailsListScreenState
         .getSubmissionsBySubcategory(int.parse(widget.subCategoryId));
 
     setState(() {
-      _submissionsFuture = Future.value(newSubmissions);
+      _submissions = newSubmissions['submissions'] as List<Submission>;
       isLoadingPosts = false;
     });
   }
@@ -294,8 +222,8 @@ class _CompletionDetailsListScreenState
               MaterialPageRoute(builder: (_) => value),
             )
                 .then((value) {
-              setState(() async {
-                await _refreshSubmissions();
+              setState(() {
+                _refreshSubmissions();
               });
               // await postFeedsProvider.getAllPost();
               // fetchData();
@@ -326,7 +254,8 @@ class _CompletionDetailsListScreenState
     } else {
       post.likesCount = post.likesCount! + 1;
     }
-    submissionProvider.updateSubmission(post);
+    setState(() => _submissions[index] = post);
+    // submissionProvider.updateSubmission(post);
 
     submissionApiProvider.toggleLike(post.id!);
   }

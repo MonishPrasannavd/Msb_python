@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/school/school_detail.dart';
 import 'package:msb_app/models/school.dart';
-import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/providers/school/school_api_provider.dart';
-import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:provider/provider.dart';
 
@@ -35,9 +33,9 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
     _fetchSchoolsFuture = _schoolApiProvider.getAllSchools();
     // Add a scroll listener for pagination
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-        if (!isLoading && !isSearching) {
-        }
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        if (!isLoading && !isSearching) {}
       }
     });
   }
@@ -68,19 +66,21 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
     return Scaffold(
       body: Consumer<SchoolApiProvider>(
         builder: (context, schoolApiProvider, child) {
-
           return FutureBuilder(
             future: _fetchSchoolsFuture,
             builder: (context, snapshot) {
-              if(snapshot.connectionState == ConnectionState.waiting) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if(snapshot.data?['schools'] == null) {
+              if (snapshot.data?['schools'] == null) {
                 return const Center(child: Text('No schools available'));
               }
 
-              List<School> schools = snapshot.data?['schools'] != null ? snapshot.data!['schools'] as List<School> : [];
+              List<School> schools = snapshot.data?['schools'] != null
+                  ? snapshot.data!['schools'] as List<School>
+                  : [];
+              schools.sort((a, b) => (b.points ?? 0).compareTo(a.points ?? 0));
               return Column(
                 children: [
                   Container(
@@ -88,8 +88,9 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
                     width: query.width,
                     decoration: const BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius:
-                        BorderRadius.only(bottomRight: Radius.circular(25.0), bottomLeft: Radius.circular(25.0))),
+                        borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(25.0),
+                            bottomLeft: Radius.circular(25.0))),
                     child: Column(
                       children: [
                         SafeArea(
@@ -146,7 +147,7 @@ class _ViewAllSchoolsState extends State<ViewAllSchools> {
                           },
                           child: ListTile(
                             title: Text(school.name ?? 'Unknown School'),
-                            subtitle: Text('Students: ${school.rank}'),
+                            subtitle: Text('Students: ${school.studentCount}'),
                           ),
                         );
                       },

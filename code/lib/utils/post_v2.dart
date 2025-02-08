@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:msb_app/Screens/profile/post_details_screen.dart';
 import 'package:msb_app/enums/post_feed_type.dart';
-import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/utils/post_video_viewer.dart';
@@ -49,45 +49,57 @@ class PostUiUtilsV2 {
       MsbUser? currentUser,
       Function()? followUser,
     })? customPostFooter,
+    Function()? onTap,
   }) {
     final postHeader = customPostHeader ?? _buildPostHeader;
     final postContent = customPostContent ?? _buildPostContent;
-    final postFooter = customPostFooter ?? _buildPostFooter;
+    final postFooter = customPostFooter ?? buildPostFooter;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            postHeader(
-              context,
-              index,
-              post,
-              sideMenu: sideMenu,
-              writerUser: writerUser,
-              currentUser: currentUser,
-              onSchoolTap: onSchoolTap,
-              onNavigateBack: onNavigateBack,
-            ),
-            const SizedBox(height: 10),
-            postContent(context, index, post),
-            const SizedBox(height: 10),
-            postFooter(
-              context,
-              post,
-              onCommentButtonPressed,
-              onLike,
-              writerUser: writerUser,
-              currentUser: currentUser,
-              followUser: followUser,
-            ),
-          ],
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PostDetailScreen(post: post),
+          ),
+        );
+        onTap?.call();
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              postHeader(
+                context,
+                index,
+                post,
+                sideMenu: sideMenu,
+                writerUser: writerUser,
+                currentUser: currentUser,
+                onSchoolTap: onSchoolTap,
+                onNavigateBack: onNavigateBack,
+              ),
+              const SizedBox(height: 10),
+              postContent(context, index, post),
+              const SizedBox(height: 10),
+              postFooter(
+                context,
+                post,
+                onCommentButtonPressed,
+                onLike,
+                writerUser: writerUser,
+                currentUser: currentUser,
+                followUser: followUser,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -186,13 +198,38 @@ class PostUiUtilsV2 {
                   post.description ?? "No description found",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                 ),
               ),
             ),
             const Spacer(),
             if (sideMenu != null) sideMenu,
+          ],
+        ),
+        const SizedBox(height: 5),
+        Row(
+          children: [
+            Text(
+              "Talent:",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  post.category?.name ?? "Unkown talent",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+            const Spacer(),
           ],
         ),
         const SizedBox(height: 5),
@@ -406,22 +443,6 @@ class PostUiUtilsV2 {
     );
   }
 
-  // Helper method to build audio post
-  static Widget _buildAudioPost(PostFeed post) {
-    return Container(
-      color: AppColors.primary,
-      height: 150,
-      child: Center(
-        child: Text(
-          'Audio Post: ${post.title ?? 'No title'}',
-          style: GoogleFonts.poppins(
-            color: AppColors.white,
-          ),
-        ),
-      ),
-    );
-  }
-
   // Helper method to build text post
   static Widget _buildTextPost(Submission post) {
     return SizedBox(
@@ -439,7 +460,7 @@ class PostUiUtilsV2 {
   }
 
   // Method to build the footer (e.g., likes, comments, etc.)
-  static Widget _buildPostFooter(
+  static Widget buildPostFooter(
     BuildContext context,
     Submission post,
     Function(int) onCommentButtonPressed,
@@ -462,7 +483,7 @@ class PostUiUtilsV2 {
                   child: Container(
                     decoration: BoxDecoration(
                       color: (post.isLiked != null && post.isLiked!)
-                          ? AppColors.primary.withOpacity(0.2)
+                          ? AppColors.primary.withValues(alpha: 0.2)
                           : null,
                       borderRadius: BorderRadius.circular(50.0),
                       border: Border.all(

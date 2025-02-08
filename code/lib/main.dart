@@ -42,14 +42,16 @@ void main() async {
   final FirebaseFirestore fireStore = FirebaseFirestore.instance;
 
   await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.debug, // Use debug for Android in development
+    androidProvider:
+        AndroidProvider.debug, // Use debug for Android in development
     appleProvider: AppleProvider.debug, // Use debug for iOS in development
   );
   FirebaseFirestore.setLoggingEnabled(false);
 
   ///init Branch.io for deeplink.
   await FlutterBranchSdk.init();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
     runApp(MyApp(firestore: fireStore));
   });
 }
@@ -104,7 +106,8 @@ class _DeepLinkListenerBuilder extends StatefulWidget {
   final Widget child;
 
   @override
-  State<_DeepLinkListenerBuilder> createState() => __DeepLinkListenerBuilderState();
+  State<_DeepLinkListenerBuilder> createState() =>
+      __DeepLinkListenerBuilderState();
 }
 
 class __DeepLinkListenerBuilderState extends State<_DeepLinkListenerBuilder> {
@@ -137,7 +140,7 @@ class __DeepLinkListenerBuilderState extends State<_DeepLinkListenerBuilder> {
           navigatorKey.currentContext!,
           MaterialPageRoute(
             builder: (context) => PostDetailScreen(
-              postId: postId,
+              postId: int.tryParse(postId ?? ''),
               title: title,
               description: description,
             ),
@@ -189,8 +192,10 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
     if (savedVersion == null || savedVersion != currentVersion) {
       debugPrint("is clear version");
       // App version has changed or no version is stored
-      await PrefsService.clear(); // Clear all saved preferences (logs out the user)
-      await PrefsService.setString('app_version', currentVersion); // Save new app version
+      await PrefsService
+          .clear(); // Clear all saved preferences (logs out the user)
+      await PrefsService.setString(
+          'app_version', currentVersion); // Save new app version
       debugPrint("User logged out due to app update.");
     } else {
       debugPrint("App version is up-to-date.");
@@ -250,7 +255,8 @@ class _IsLoginCheckPageState extends State<IsLoginCheckPage> {
     _userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _masterApiProvider = Provider.of<MasterApiProvider>(context, listen: false);
+      _masterApiProvider =
+          Provider.of<MasterApiProvider>(context, listen: false);
       _masterProvider = Provider.of<MasterProvider>(context, listen: false);
 
       fetchMaster();

@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/repository/user_repository.dart';
@@ -162,7 +159,6 @@ class _MyFeedTabState extends State<MyFeedTab> {
 
   @override
   Widget build(BuildContext context) {
-    var query = MediaQuery.of(context).size;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
