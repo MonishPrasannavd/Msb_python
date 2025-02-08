@@ -649,7 +649,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                                   categoryId: menuItem?.id ?? 1,
                                   subcategories: menuItem?.subcategories,
                                   categoryName: menuItem?.name ?? "",
-                                  contentType: 'menuItem["route"]',
+                                  contentType: menuItem?.categoryType?.name,
                                 ),
                               ));
                         },

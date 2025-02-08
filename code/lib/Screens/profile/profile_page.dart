@@ -88,11 +88,6 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
   }
 
   Future<void> loadUser() async {
-    final result = await _authProvider.getUserMe(_userProvider.user);
-    final user = result['user'] as MsbUser?;
-    if (user == null) return;
-    _userProvider.setUser(user);
-
     setState(() {
       nameController.text = _userProvider.user.user?.name ?? "";
       Grade? gradeResolve;
@@ -122,12 +117,6 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
       commentsCount = _userProvider.user.commentsCount.toString();
       totalPoints = _userProvider.user.student.points.toString();
     });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    updateUser();
   }
 
   Future<void> _pickImage() async {

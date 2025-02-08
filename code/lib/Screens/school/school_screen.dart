@@ -708,8 +708,9 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                               categoryName:
                                                                   menuItem?.name ??
                                                                       "",
-                                                              contentType:
-                                                                  'menuItem["route"]',
+                                                              contentType: menuItem
+                                                                  ?.categoryType
+                                                                  ?.name,
                                                             ),
                                                           ));
                                                     },

@@ -143,6 +143,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                     prefixIcon: const Text(""),
                     suffixIcon: IconButton(
                       onPressed: () async {
+                        if (commentController.text.isEmpty) return;
                         await _submissionApiProvider.addComment(
                             widget.postId, commentController.text);
                         // var fetchedUserId = await PrefsService.getUserId();
