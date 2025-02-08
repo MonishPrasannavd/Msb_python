@@ -177,7 +177,7 @@ class UserAuthProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> updateProfile(String name, int gradeId, {File? profileImage}) async {
+  Future<Map<String, dynamic>> updateProfile(String name, int gradeId, int schoolId, {File? profileImage}) async {
     Map<String, dynamic> result;
 
     try {
@@ -191,6 +191,7 @@ class UserAuthProvider with ChangeNotifier {
       // Add fields
       request.fields['name'] = name;
       request.fields['grade_id'] = gradeId.toString();
+      request.fields['school_id'] = schoolId.toString();
 
       // Add file if it exists
       if (profileImage != null && await profileImage.exists()) {

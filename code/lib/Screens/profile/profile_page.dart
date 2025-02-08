@@ -10,6 +10,7 @@ import 'package:msb_app/Screens/profile/user_profile_screen.dart';
 import 'package:msb_app/components/text_builder.dart';
 import 'package:msb_app/models/grade.dart';
 import 'package:msb_app/models/msbuser.dart';
+import 'package:msb_app/models/school.dart';
 import 'package:msb_app/providers/master/master_provider.dart';
 import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
@@ -43,9 +44,9 @@ class ProfileScreenState extends State<ProfileScreen> {
   String commentsCount = "0";
   String totalPoints = "0";
   Grade? selectedGrade;
+  School? selectedSchool;
 
   final ImagePicker _picker = ImagePicker();
-  late Future<void> _initProfile;
 
   late UserProvider _userProvider;
   late UserAuthProvider _authProvider;
@@ -64,6 +65,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       nameController.text = _userProvider.user.user?.name ?? "";
       Grade? gradeResolve;
+      School? schoolResolve;
       if (_userProvider.user.student.grade?.name != null &&
           _userProvider.user.student.grade?.name?.isNotEmpty != null) {
         gradeResolve = _userProvider.user.student.grade!;
@@ -71,10 +73,18 @@ class ProfileScreenState extends State<ProfileScreen> {
         gradeResolve = _masterProvider.grades.firstWhere((grade) => grade.id == _userProvider.user.student.gradeId);
       }
 
+      if (_userProvider.user.student.school?.name != null &&
+          _userProvider.user.student.school?.name?.isNotEmpty != null) {
+        schoolResolve = _userProvider.user.student.school!;
+      } else {
+        schoolResolve = _masterProvider.schools.firstWhere((school) => school.id == _userProvider.user.student.schoolId);
+      }
+
       setState(() {
         gradeController.text = gradeResolve?.name ?? "";
         grade = gradeResolve?.name ?? "";
         selectedGrade = gradeResolve;
+        selectedSchool = schoolResolve;
         schoolName = _userProvider.user.student.school?.name ?? "";
         likesCount = _userProvider.user.student.likes.toString();
         totalPoints = _userProvider.user.student.score.toString();
@@ -115,6 +125,7 @@ class ProfileScreenState extends State<ProfileScreen> {
       Map<String, dynamic> response = await _authProvider.updateProfile(
         nameController.text,
         selectedGrade?.id ?? _userProvider.user.student.gradeId,
+        selectedSchool?.id ?? _userProvider.user.student.schoolId,
         profileImage: _profileImage,
       );
       if (response['status'] == true) {
@@ -183,7 +194,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                             ? const CircularProgressIndicator()
                             : CircleAvatar(
                                 radius: 60,
-                                backgroundImage: getUserProfileImage(_profileImage, _userProvider.user.user?.profileUrl),
+                                backgroundImage:
+                                    getUserProfileImage(_profileImage, _userProvider.user.user?.profileUrl),
                                 // Explicitly cast to ImageProvider
                               ),
                       ),
@@ -223,20 +235,22 @@ class ProfileScreenState extends State<ProfileScreen> {
 
                       /// school name
                       /// Non-editable school name
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          child: Text(
-                            schoolName,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
+                      isEditing
+                          ? _buildSchoolDropdown()
+                          : FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                child: Text(
+                                  schoolName,
+                                  style: GoogleFonts.poppins(
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 20),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -391,6 +405,42 @@ class ProfileScreenState extends State<ProfileScreen> {
     } else {
       return const AssetImage("assets/images/profile1.png");
     }
+  }
+
+  Widget _buildSchoolDropdown() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: DropdownSearch<School>(
+        compareFn: (item1, item2) => item1 == item2,
+        items: (f, cs) => _masterProvider.schools,
+        itemAsString: (item) => item.name!,
+        selectedItem: selectedSchool,
+        onChanged: (School? newSchool) {
+          setState(() {
+            selectedSchool = newSchool;
+          });
+        },
+        popupProps: PopupProps.menu(
+          showSearchBox: true,
+          searchFieldProps: TextFieldProps(
+            decoration: InputDecoration(
+              labelText: "Search School",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            ),
+          ),
+        ),
+        decoratorProps: const DropDownDecoratorProps(
+          baseStyle: TextStyle(color: AppColors.white),
+          decoration: InputDecoration(
+            border: UnderlineInputBorder(),
+            hintText: 'Select School',
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildGradeDropdown() {
