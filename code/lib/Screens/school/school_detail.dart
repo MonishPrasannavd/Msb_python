@@ -1,6 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,19 +22,12 @@ import 'package:msb_app/providers/student_dashboard_provider.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
-import 'package:msb_app/repository/posts_repository.dart';
-import 'package:msb_app/repository/school_user_repository.dart';
-import 'package:msb_app/repository/user_repository.dart';
-import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/loaders.dart';
 import 'package:msb_app/utils/user.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/button_builder.dart';
-import '../../enums/post_feed_type.dart';
 import '../../utils/colours.dart';
-import '../competition/post story/post_feed_screen.dart';
-import '../competition/quiz/quiz_screen.dart';
 
 class SchoolDetailPage extends StatefulWidget {
   final String schoolId;
@@ -130,7 +121,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
           child: Column(
             children: [
               Container(
-                height: query.height / 5,
+                height: query.height / 7,
                 width: query.width,
                 decoration: const BoxDecoration(
                     color: AppColors.primary,
@@ -348,7 +339,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(schoolDashboard?.submissionsCount.toString() ?? '0',
+                        Text(schoolDashboard?.points.toString() ?? '0',
                             // PointsSystem.getTotalScore(
                             //   averagePoints: school?.averagePoints,
                             //   studentCount: school?.studentCount,
@@ -374,7 +365,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(schoolDashboard?.topSubmissionsLikes.toString() ?? "0",
+                        Text(schoolDashboard?.submissionsLikes.toString() ?? "0",
                             style: GoogleFonts.poppins(
                                 color: const Color(0xFF540D96), fontWeight: FontWeight.w700, fontSize: 24)),
                         Text("Appreciation",
@@ -401,7 +392,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
               ),
             ),
             const SizedBox(height: 10),
-            TopUsersWidget(topUsers: topUsers),
+            TopUsersWidget(topUsers: schoolDashboard?.topStudents ?? []),
             const SizedBox(height: 15),
 
             SizedBox(

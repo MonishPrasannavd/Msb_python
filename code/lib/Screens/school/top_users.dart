@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/profile/user_profile_screen.dart';
+import 'package:msb_app/models/school_dashboard.dart';
 import 'package:msb_app/models/user.dart';
 
 class TopUsersWidget extends StatelessWidget {
-  final List<MsbUser> topUsers;
+  final List<TopStudent> topUsers;
 
   const TopUsersWidget({super.key, required this.topUsers});
 
@@ -67,7 +68,7 @@ Widget _buildProfileImage(String? name, String? profileImageUrl) {
 }
 
 class UserCard extends StatelessWidget {
-  final MsbUser user;
+  final TopStudent user;
   final int rank;
   final bool isCenter;
 
@@ -85,7 +86,7 @@ class UserCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => UserProfileScreen(id: user.id!)));
+                builder: (context) => UserProfileScreen(id: user.user!.id!.toString())));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -97,12 +98,12 @@ class UserCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              user != null
-                  ? _buildProfileImage(user!.name, user!.profileImageUrl)
+              (user.user?.name != null && user.user?.imageUrl != null)
+                  ? _buildProfileImage(user.user?.name, user.user?.imageUrl)
                   : Image.asset("assets/images/profile.png"),
               SizedBox(height: isCenter ? 15 : 10),
               Text(
-                "$rank. ${user.name ?? 'Unknown'}",
+                "$rank. ${user.user?.name ?? 'Unknown'}",
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -112,7 +113,7 @@ class UserCard extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               Text(
-                "(${user.grade ?? 'N/A'})",
+                "(${user.gradeId ?? 'N/A'})",
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
@@ -122,7 +123,7 @@ class UserCard extends StatelessWidget {
               ),
               if (isCenter) // Only show points for the top user
                 Text(
-                  "Points: ${user.totalPoints ?? 0}",
+                  "Points: ${user.points ?? 0}",
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
