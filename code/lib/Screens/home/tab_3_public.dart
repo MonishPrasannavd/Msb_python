@@ -398,6 +398,7 @@ class _PublicTabState extends State<PublicTab> {
                                 customSchoolId = schoolId;
                                 customGrade = null;
                               },
+                              onTap: _fetchInitialSubmissions,
                             );
                           },
                         ),

@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
 
 part 'user_single.g.dart';
 
@@ -64,7 +63,8 @@ class UserSingle {
         likesCount: likesCount ?? this.likesCount,
       );
 
-  factory UserSingle.fromJson(Map<String, dynamic> json) => _$UserSingleFromJson(json);
+  factory UserSingle.fromJson(Map<String, dynamic> json) =>
+      _$UserSingleFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserSingleToJson(this);
 }
@@ -216,7 +216,8 @@ class Student {
         grade: grade ?? this.grade,
       );
 
-  factory Student.fromJson(Map<String, dynamic> json) => _$StudentFromJson(json);
+  factory Student.fromJson(Map<String, dynamic> json) =>
+      _$StudentFromJson(json);
 
   Map<String, dynamic> toJson() => _$StudentToJson(this);
 }

@@ -30,7 +30,11 @@ class PostFeeds extends StatefulWidget {
   final String? contentType, postCompilation;
 
   const PostFeeds(this.type,
-      {required this.categoryId, required this.subcategoryId, super.key, this.postCompilation, this.contentType});
+      {required this.categoryId,
+      required this.subcategoryId,
+      super.key,
+      this.postCompilation,
+      this.contentType});
 
   @override
   State<PostFeeds> createState() => _PostFeedsState();
@@ -55,8 +59,10 @@ class _PostFeedsState extends State<PostFeeds> {
   void initState() {
     super.initState();
 
-    _submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
-    _submissionProvider = Provider.of<SubmissionProvider>(context, listen: false);
+    _submissionApiProvider =
+        Provider.of<SubmissionApiProvider>(context, listen: false);
+    _submissionProvider =
+        Provider.of<SubmissionProvider>(context, listen: false);
     _userProvider = Provider.of<UserProvider>(context, listen: false);
 
     loadUserId();
@@ -86,7 +92,9 @@ class _PostFeedsState extends State<PostFeeds> {
       );
     }
     pickedFile = XFile(result!.files.first.path!,
-        name: result.files.first.name, bytes: result.files.first.bytes, length: result.files.first.size);
+        name: result.files.first.name,
+        bytes: result.files.first.bytes,
+        length: result.files.first.size);
     setState(() {
       _videoFile = pickedFile;
     });
@@ -147,7 +155,9 @@ class _PostFeedsState extends State<PostFeeds> {
       List<String> mediaUrls = [];
       if (_videoFile != null) {
         FirebaseStorage storage = FirebaseStorage.instance;
-        Reference ref = storage.ref().child("$userId/media/${DateTime.now().millisecondsSinceEpoch}");
+        Reference ref = storage
+            .ref()
+            .child("$userId/media/${DateTime.now().millisecondsSinceEpoch}");
         File file = File(_videoFile!.path);
 
         UploadTask uploadTask = ref.putFile(file);
@@ -200,10 +210,15 @@ class _PostFeedsState extends State<PostFeeds> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(onTap: () => Navigator.pop(context), child: SvgPicture.asset("assets/svg/back.svg")),
+            GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: SvgPicture.asset("assets/svg/back.svg")),
             Text(
               widget.type,
-              style: GoogleFonts.poppins(color: AppColors.black, fontWeight: FontWeight.w500, fontSize: 16),
+              style: GoogleFonts.poppins(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16),
             ),
             const SizedBox(width: 24), // Spacer for symmetry
           ],
@@ -214,7 +229,8 @@ class _PostFeedsState extends State<PostFeeds> {
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
-            autovalidateMode: _validate ? AutovalidateMode.always : AutovalidateMode.disabled,
+            autovalidateMode:
+                _validate ? AutovalidateMode.always : AutovalidateMode.disabled,
             child: Column(
               children: [
                 const SizedBox(height: 15),
@@ -233,14 +249,16 @@ class _PostFeedsState extends State<PostFeeds> {
                   },
                 ),
                 const SizedBox(height: 15),
-                if (widget.contentType == "video" || widget.contentType == "audio" || widget.contentType == "image")
+                if (widget.contentType == "video" ||
+                    widget.contentType == "audio" ||
+                    widget.contentType == "image")
                   GestureDetector(
                     onTap: pickMedia,
                     child: Container(
                       height: 200,
                       width: query.width,
                       decoration: BoxDecoration(
-                        color: AppColors.fontHint.withOpacity(0.2),
+                        color: AppColors.fontHint.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: Center(
@@ -262,7 +280,8 @@ class _PostFeedsState extends State<PostFeeds> {
                   decoration: const InputDecoration(
                     hintText: "Description",
                     labelText: "Description",
-                    prefixIcon: Icon(Icons.description, color: AppColors.fontHint),
+                    prefixIcon:
+                        Icon(Icons.description, color: AppColors.fontHint),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -293,10 +312,14 @@ class _PostFeedsState extends State<PostFeeds> {
                       backgroundColor:
                           MaterialStateProperty.all(AppColors.primary),
                       shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
                       ),
                     ),
-                    textStyle: GoogleFonts.poppins(color: AppColors.white, fontWeight: FontWeight.w500, fontSize: 16),
+                    textStyle: GoogleFonts.poppins(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16),
                   ),
                 ),
               ],

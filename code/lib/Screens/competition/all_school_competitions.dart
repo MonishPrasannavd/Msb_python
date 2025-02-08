@@ -1,10 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
-import 'package:flexible_text/flexible_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/models/post_feed.dart';
@@ -12,7 +8,6 @@ import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
-import 'package:msb_app/providers/submission/submission_provider.dart';
 import 'package:msb_app/repository/posts_repository.dart';
 import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/services/preferences_service.dart';
@@ -20,14 +15,11 @@ import 'package:msb_app/utils/post.dart';
 import 'package:msb_app/utils/post_v2.dart';
 import 'package:provider/provider.dart';
 
-import '../../enums/post_feed_type.dart';
 import '../../models/comment.dart';
 import '../../repository/comment_repository.dart';
 import '../../repository/school_user_repository.dart';
 import '../../utils/colours.dart';
 import '../../utils/firestore_collections.dart';
-import '../competition/post story/post_feed_screen.dart';
-import '../competition/quiz/quiz_screen.dart';
 
 enum PostFilter {
   all,
@@ -86,7 +78,6 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
   String? customSchoolId;
   String? customGrade;
 
-  late SubmissionProvider _submissionProvider;
   late SubmissionApiProvider _submissionApiProvider;
 
   Future<void> fetchUserPosts() async {
@@ -126,8 +117,6 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
     fetchSchool();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _submissionProvider =
-          Provider.of<SubmissionProvider>(context, listen: false);
       _submissionApiProvider =
           Provider.of<SubmissionApiProvider>(context, listen: false);
     });
@@ -295,6 +284,7 @@ class _AllSchoolCompetitionsState extends State<AllSchoolCompetitions> {
                               customGrade = null;
                               fetchUserPosts();
                             },
+                            onTap: loadSubmissions,
                             onNavigateBack: () {
                               fetchUserPosts();
                             });

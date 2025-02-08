@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:msb_app/models/dashboard.dart';
-import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/api.dart';
 
 class StudentDashboardProvider with ChangeNotifier {
@@ -27,7 +26,11 @@ class StudentDashboardProvider with ChangeNotifier {
         dashboardCategoryList = dashboardResponseData?.futureCategories;
         notifyListeners();
 
-        result = {'status': true, 'message': 'Successful', 'data': dashboardResponseData};
+        result = {
+          'status': true,
+          'message': 'Successful',
+          'data': dashboardResponseData
+        };
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];

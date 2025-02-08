@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/utils/colours.dart';
 
@@ -46,10 +45,10 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
       _videoController = CachedVideoPlayerPlusController.networkUrl(
         Uri.parse(widget.posts[_currentIndex].mediaUrl!),
       )..initialize().then((_) {
-        setState(() {});
-      }).catchError((error) {
-        debugPrint("Video initialization error: $error");
-      });
+          setState(() {});
+        }).catchError((error) {
+          debugPrint("Video initialization error: $error");
+        });
     } else {
       _videoController = null;
     }
@@ -136,7 +135,7 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
             borderRadius: BorderRadius.circular(16.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 8.0,
                 offset: const Offset(0, 4),
               ),
@@ -147,7 +146,7 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
             child: CachedNetworkImage(
               imageUrl: post.mediaUrl!,
               placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
+                  const Center(child: CircularProgressIndicator()),
               errorWidget: (context, url, error) => const Icon(Icons.error),
               fit: BoxFit.cover,
               width: double.infinity,
@@ -165,34 +164,34 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
         },
         child: _videoController!.value.isInitialized
             ? Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Container(
-              width: double.infinity, // Adjust width as needed
-              height: 250, // Set a fixed height
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8.0,
-                    offset: const Offset(0, 4),
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    width: double.infinity, // Adjust width as needed
+                    height: 250, // Set a fixed height
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 8.0,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: AspectRatio(
+                        aspectRatio: _videoController!.value.aspectRatio,
+                        child: CachedVideoPlayerPlus(_videoController!),
+                      ),
+                    ),
                   ),
+                  if (_isOverlayVisible) ...[
+                    _buildOverlayControls(),
+                  ]
                 ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: AspectRatio(
-                  aspectRatio: _videoController!.value.aspectRatio,
-                  child: CachedVideoPlayerPlus(_videoController!),
-                ),
-              ),
-            ),
-            if (_isOverlayVisible) ...[
-              _buildOverlayControls(),
-            ]
-          ],
-        )
+              )
             : const CircularProgressIndicator(),
       );
     } else if (post.category?.categoryType?.name == 'text') {
@@ -202,7 +201,7 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
           borderRadius: BorderRadius.circular(16.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8.0,
               offset: const Offset(0, 4),
             ),
@@ -235,7 +234,7 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
                 placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
+                    const Center(child: CircularProgressIndicator()),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
                 fit: BoxFit.contain,
               ),
@@ -282,19 +281,19 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0)),
-                shadowColor: Colors.black.withOpacity(0.5),
+                shadowColor: Colors.black.withValues(alpha: 0.5),
                 elevation: 10,
                 backgroundColor:
-                _currentIndex > 0 ? Colors.purple : Colors.grey[300],
+                    _currentIndex > 0 ? Colors.purple : Colors.grey[300],
               ),
               onPressed: _currentIndex > 0
                   ? () {
-                setState(() {
-                  _currentIndex =
-                      (_currentIndex - 1) % widget.posts.length;
-                  _initializeVideoController();
-                });
-              }
+                      setState(() {
+                        _currentIndex =
+                            (_currentIndex - 1) % widget.posts.length;
+                        _initializeVideoController();
+                      });
+                    }
                   : null,
               child: const Icon(Icons.arrow_back_ios,
                   size: 20, color: Colors.white),
@@ -347,7 +346,7 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0)),
-                shadowColor: Colors.black.withOpacity(1),
+                shadowColor: Colors.black.withValues(alpha: 1),
                 elevation: 12,
                 backgroundColor: _currentIndex < widget.posts.length - 1
                     ? Colors.purple
@@ -355,12 +354,12 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
               ),
               onPressed: _currentIndex < widget.posts.length - 1
                   ? () {
-                setState(() {
-                  _currentIndex =
-                      (_currentIndex + 1) % widget.posts.length;
-                  _initializeVideoController();
-                });
-              }
+                      setState(() {
+                        _currentIndex =
+                            (_currentIndex + 1) % widget.posts.length;
+                        _initializeVideoController();
+                      });
+                    }
                   : null,
               child: const Icon(Icons.arrow_forward_ios,
                   size: 20, color: Colors.white),

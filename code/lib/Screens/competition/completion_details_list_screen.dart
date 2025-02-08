@@ -148,6 +148,7 @@ class _CompletionDetailsListScreenState
                     await CommentBottomSheet.show(context, postId: postId);
                   },
                   () => onLike(post, index: index),
+                  onTap: _fetchInitialSubmissions,
                 ),
               );
             },

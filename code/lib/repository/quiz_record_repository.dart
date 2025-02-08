@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:msb_app/enums/point_type.dart';
 import 'package:msb_app/models/quiz_record.dart';
 import 'package:msb_app/repository/repository.dart';
-import 'package:msb_app/services/points_system.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
 
 class QuizRecordRepository implements IRepository<QuizRecord> {
@@ -79,7 +77,6 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
     try {
       await quizRecordsCollection.doc(entry.quizId).update(entry.toJson());
       return true;
-      return false;
     } catch (e) {
       debugPrint(e.toString());
       return false;
@@ -104,7 +101,6 @@ class QuizRecordRepository implements IRepository<QuizRecord> {
     try {
       await quizRecordsCollection.doc(entry.quizId).delete();
       return true;
-      return false;
     } catch (e) {
       debugPrint(e.toString());
       return false;

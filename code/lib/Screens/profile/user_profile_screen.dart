@@ -354,32 +354,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           itemCount: _submissionProvider.submissions.length,
           itemBuilder: (BuildContext context, int index) {
             Submission post = _submissionProvider.submissions[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostDetailScreen(post: post),
-                  ),
-                );
+            return PostUiUtilsV2.buildPostTile(
+              context,
+              index,
+              post,
+              (postId) async {
+                await CommentBottomSheet.show(context, postId: postId);
+                if (widget.type == "user") {
+                  // _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'))
+                  //     .getOne(widget.id);
+                  // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
+                } else if (widget.type == "school") {
+                  // _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
+                  // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
+                }
               },
-              child: PostUiUtilsV2.buildPostTile(
-                context,
-                index,
-                post,
-                (postId) async {
-                  await CommentBottomSheet.show(context, postId: postId);
-                  if (widget.type == "user") {
-                    // _userFuture = UserRepository(usersCollection: FirebaseFirestore.instance.collection('users'))
-                    //     .getOne(widget.id);
-                    // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-                  } else if (widget.type == "school") {
-                    // _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-                    // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
-                  }
-                },
-                () => onLike(post, index: index),
-              ),
+              () => onLike(post, index: index),
+              onTap: loadAllSubmissions,
             );
           },
         ),
