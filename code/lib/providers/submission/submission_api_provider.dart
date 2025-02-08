@@ -233,7 +233,7 @@ class SubmissionApiProvider extends ChangeNotifier {
       var response = await get(uri, headers: AppUrl.headers);
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
-        final submission = Submission.fromJson(encodedString['data']);
+        final submission = Submission.fromJson(encodedString['submission']);
         // var user = MsbUser.fromJson(encodedString);
         notifyListeners();
         // result = {'status': true, 'message': 'Successful', 'user': user};
