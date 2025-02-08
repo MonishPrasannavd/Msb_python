@@ -429,7 +429,10 @@ class ProfileScreenState extends State<ProfileScreen> {
     if (profileImage != null) {
       return FileImage(profileImage);
     } else if (profileUrl != null && profileUrl.isNotEmpty) {
-      return CachedNetworkImageProvider(profileUrl);
+      return CachedNetworkImageProvider(
+        profileUrl,
+        cacheKey: profileUrl,
+      );
     } else {
       return const AssetImage("assets/images/profile1.png");
     }

@@ -186,13 +186,38 @@ class PostUiUtilsV2 {
                   post.description ?? "No description found",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                 ),
               ),
             ),
             const Spacer(),
             if (sideMenu != null) sideMenu,
+          ],
+        ),
+        const SizedBox(height: 5),
+        Row(
+          children: [
+            Text(
+              "Talent:",
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  post.category?.name ?? "Unkown talent",
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+            const Spacer(),
           ],
         ),
         const SizedBox(height: 5),
