@@ -80,7 +80,6 @@ class CategoryRepository implements IRepository<Category> {
     try {
       await categoriesCollection.doc(entry.id).update(entry.toJson());
       return true;
-      return false;
     } catch (e) {
       debugPrint(e.toString());
       return false;
@@ -105,7 +104,6 @@ class CategoryRepository implements IRepository<Category> {
     try {
       await categoriesCollection.doc(entry.id).delete();
       return true;
-      return false;
     } catch (e) {
       debugPrint(e.toString());
       return false;

@@ -144,9 +144,10 @@ class SchoolScreenState extends State<SchoolScreen> {
     var query = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: AppColors.black12,
-      body: Consumer3<SchoolApiProvider, StudentDashboardProvider, UserProvider>(
-          builder: (ctxt, repo1, repo2, userProvider, child) {
-            var loggedInUser = userProvider.user.user;
+      body:
+          Consumer3<SchoolApiProvider, StudentDashboardProvider, UserProvider>(
+              builder: (ctxt, repo1, repo2, userProvider, child) {
+        var loggedInUser = userProvider.user.user;
         return DecoratedBox(
           // BoxDecoration takes the image
           decoration: const BoxDecoration(
@@ -223,9 +224,10 @@ class SchoolScreenState extends State<SchoolScreen> {
                                     top: 5.0,
                                     bottom: 5.0,
                                     right: 5.0),
-                                child: (loggedInUser?.name != null && loggedInUser?.profileUrl != null)
+                                child: (loggedInUser?.name != null &&
+                                        loggedInUser?.profileUrl != null)
                                     ? _buildProfileImage(loggedInUser!.name,
-                                    loggedInUser.profileUrl)
+                                        loggedInUser.profileUrl)
                                     : Image.asset(
                                         "assets/images/profile.png",
                                         height: 40,
@@ -316,7 +318,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppColors.peachLight
-                                                .withOpacity(0.50),
+                                                .withValues(alpha: 0.50),
                                             spreadRadius: 0,
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
@@ -366,7 +368,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppColors.peachLight
-                                                .withOpacity(0.50),
+                                                .withValues(alpha: 0.50),
                                             spreadRadius: 0,
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
@@ -481,7 +483,8 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                   boxShadow: [
                                                     BoxShadow(
                                                       color: Colors.black
-                                                          .withOpacity(0.50),
+                                                          .withValues(
+                                                              alpha: 0.50),
                                                       spreadRadius: 0,
                                                       blurRadius: 8,
                                                       offset:
@@ -489,7 +492,8 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                     ),
                                                     BoxShadow(
                                                       color: Colors.black
-                                                          .withOpacity(0.50),
+                                                          .withValues(
+                                                              alpha: 0.50),
                                                       spreadRadius: 0,
                                                       blurRadius: 8,
                                                       offset:
@@ -571,7 +575,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                             const SizedBox(
                                                                 height: 4),
                                                             Text(
-                                                              "Total Point: ${school.rank.toString()}",
+                                                              "Total Point: ${(school.points ?? 0).toString()}",
                                                               style: GoogleFonts
                                                                   .poppins(
                                                                 color: AppColors
@@ -672,62 +676,100 @@ class SchoolScreenState extends State<SchoolScreen> {
                                           height: query.height / 8,
                                           child: ChangeNotifierProvider.value(
                                             value: studentDashboardProvider,
-                                            child: Consumer<StudentDashboardProvider>(
-                                                builder: (context, value, child) {
-                                                  return ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount: (value.dashboardCategoryList?.length ?? 0),
-                                                    scrollDirection: Axis.horizontal,
-                                                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                                                    itemBuilder: (BuildContext context, int index) {
-                                                      final FutureCategories? menuItem =
-                                                      value.dashboardCategoryList?[index];
-                                                      return GestureDetector(
-                                                        onTap: () {
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) => CompletionScreen(
-                                                                  categoryId: menuItem?.id ?? 1,
-                                                                  subcategories: menuItem?.subcategories,
-                                                                  categoryName: menuItem?.name ?? "",
-                                                                  contentType: 'menuItem["route"]',
-                                                                ),
-                                                              ));
-                                                        },
-                                                        child: Padding(
-                                                          padding:
-                                                          const EdgeInsets.symmetric(horizontal: 8.0),
-                                                          child: Column(
-                                                            children: [
-                                                              Expanded(
-                                                                child: Padding(
-                                                                  padding: const EdgeInsets.all(0.0),
-                                                                  child: CachedNetworkImage(
-                                                                    imageUrl: menuItem?.iconUrl ?? "",
-                                                                    placeholder: (context, url) =>
+                                            child: Consumer<
+                                                    StudentDashboardProvider>(
+                                                builder:
+                                                    (context, value, child) {
+                                              return ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: (value
+                                                        .dashboardCategoryList
+                                                        ?.length ??
+                                                    0),
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 2),
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  final FutureCategories?
+                                                      menuItem =
+                                                      value.dashboardCategoryList?[
+                                                          index];
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                CompletionScreen(
+                                                              categoryId:
+                                                                  menuItem?.id ??
+                                                                      1,
+                                                              subcategories:
+                                                                  menuItem
+                                                                      ?.subcategories,
+                                                              categoryName:
+                                                                  menuItem?.name ??
+                                                                      "",
+                                                              contentType:
+                                                                  'menuItem["route"]',
+                                                            ),
+                                                          ));
+                                                    },
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8.0),
+                                                      child: Column(
+                                                        children: [
+                                                          Expanded(
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(0.0),
+                                                              child:
+                                                                  CachedNetworkImage(
+                                                                imageUrl: menuItem
+                                                                        ?.iconUrl ??
+                                                                    "",
+                                                                placeholder: (context,
+                                                                        url) =>
                                                                     const Center(
                                                                         child:
-                                                                        CircularProgressIndicator()),
-                                                                    errorWidget: (context, url, error) =>
+                                                                            CircularProgressIndicator()),
+                                                                errorWidget: (context,
+                                                                        url,
+                                                                        error) =>
                                                                     const Center(
-                                                                        child: Icon(Icons.error)),
-                                                                    fit: BoxFit.contain,
-                                                                  ),
-                                                                ),
+                                                                        child: Icon(
+                                                                            Icons.error)),
+                                                                fit: BoxFit
+                                                                    .contain,
                                                               ),
-                                                              Text(menuItem?.name ?? "",
-                                                                  style: GoogleFonts.poppins(
-                                                                      color: AppColors.black,
-                                                                      fontWeight: FontWeight.w500,
-                                                                      fontSize: 14)),
-                                                            ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      );
-                                                    },
+                                                          Text(
+                                                              menuItem?.name ??
+                                                                  "",
+                                                              style: GoogleFonts.poppins(
+                                                                  color:
+                                                                      AppColors
+                                                                          .black,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize:
+                                                                      14)),
+                                                        ],
+                                                      ),
+                                                    ),
                                                   );
-                                                }),
+                                                },
+                                              );
+                                            }),
                                           ),
                                         ),
                                         // SizedBox(

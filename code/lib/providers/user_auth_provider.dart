@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -50,8 +49,17 @@ class UserAuthProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> register(String name, String email, String password, String gradeId, String countryId,
-      String stateId, String city, String? schoolId, String? schoolName, String dob) async {
+  Future<Map<String, dynamic>> register(
+      String name,
+      String email,
+      String password,
+      String gradeId,
+      String countryId,
+      String stateId,
+      String city,
+      String? schoolId,
+      String? schoolName,
+      String dob) async {
     Map<String, dynamic> result;
 
     Map<String, dynamic> registerData = {
@@ -62,7 +70,9 @@ class UserAuthProvider with ChangeNotifier {
       "country_id": int.parse(countryId),
       "state_id": int.parse(stateId),
       "city": city,
-      "school_id": (schoolId != null && schoolId.isNotEmpty) ? int.tryParse(schoolId) : null,
+      "school_id": (schoolId != null && schoolId.isNotEmpty)
+          ? int.tryParse(schoolId)
+          : null,
       "school_name": schoolName,
       "dob": dob
     };
@@ -105,7 +115,8 @@ class UserAuthProvider with ChangeNotifier {
       );
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
-        MsbUser user = MsbUser.fromJson(encodedString, existingUser: existingUser);
+        MsbUser user =
+            MsbUser.fromJson(encodedString, existingUser: existingUser);
         notifyListeners();
         result = {'status': true, 'message': 'Successful', 'user': user};
       } else {
@@ -177,7 +188,9 @@ class UserAuthProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String, dynamic>> updateProfile(String name, int gradeId, int schoolId, {File? profileImage}) async {
+  Future<Map<String, dynamic>> updateProfile(
+      String name, int gradeId, int schoolId,
+      {File? profileImage}) async {
     Map<String, dynamic> result;
 
     try {
@@ -199,7 +212,8 @@ class UserAuthProvider with ChangeNotifier {
           await MultipartFile.fromPath(
             'profile_image', // Field name for the image
             profileImage.path,
-            contentType: MediaType('image', 'jpeg'), // Adjust the content type if needed
+            contentType:
+                MediaType('image', 'jpeg'), // Adjust the content type if needed
           ),
         );
       } else {
@@ -240,11 +254,17 @@ class UserAuthProvider with ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> encodedString = jsonDecode(response.body.toString());
-      List<FutureCategories> categories =
-          List.castFrom(encodedString['data']).map((e) => FutureCategories.fromJson(e)).toList();
+      final Map<String, dynamic> encodedString =
+          jsonDecode(response.body.toString());
+      List<FutureCategories> categories = List.castFrom(encodedString['data'])
+          .map((e) => FutureCategories.fromJson(e))
+          .toList();
       notifyListeners();
-      result = {'status': true, 'message': 'Success', 'competitions': categories};
+      result = {
+        'status': true,
+        'message': 'Success',
+        'competitions': categories
+      };
     } else {
       notifyListeners();
       result = {'status': true, 'message': 'Failed', 'competitions': 'null'};

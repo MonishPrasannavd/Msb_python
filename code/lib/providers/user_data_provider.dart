@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:msb_app/models/competition_data.dart';
 import 'package:msb_app/models/competitions.dart';
 import 'package:msb_app/models/currentstudent.dart';
-import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/utils/api.dart';
 
 class UserDataProvider with ChangeNotifier {

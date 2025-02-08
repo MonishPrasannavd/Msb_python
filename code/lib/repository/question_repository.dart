@@ -89,7 +89,6 @@ class QuestionRepository implements IRepository<Question> {
     try {
       await questionsCollection.doc(entry.id).update(entry.toJson());
       return true;
-      return false;
     } catch (e) {
       debugPrint(e.toString());
       return false;
@@ -114,7 +113,6 @@ class QuestionRepository implements IRepository<Question> {
     try {
       await questionsCollection.doc(entry.id).delete();
       return true;
-      return false;
     } catch (e) {
       debugPrint(e.toString());
       return false;
