@@ -15,8 +15,8 @@ class UserSingle {
   int? roleId;
   @JsonKey(name: "image_url")
   String? imageUrl;
-  @JsonKey(name: "students")
-  List<Student>? students;
+  @JsonKey(name: "student")
+  Student? student;
   @JsonKey(name: "role")
   Role? role;
   @JsonKey(name: "submissions_count")
@@ -32,7 +32,7 @@ class UserSingle {
     this.email,
     this.roleId,
     this.imageUrl,
-    this.students,
+    this.student,
     this.role,
     this.submissionsCount,
     this.commentsCount,
@@ -45,7 +45,7 @@ class UserSingle {
     String? email,
     int? roleId,
     String? imageUrl,
-    List<Student>? students,
+    Student? student,
     Role? role,
     int? submissionsCount,
     int? commentsCount,
@@ -57,7 +57,7 @@ class UserSingle {
         email: email ?? this.email,
         roleId: roleId ?? this.roleId,
         imageUrl: imageUrl ?? this.imageUrl,
-        students: students ?? this.students,
+        student: student ?? this.student,
         role: role ?? this.role,
         submissionsCount: submissionsCount ?? this.submissionsCount,
         commentsCount: commentsCount ?? this.commentsCount,
@@ -77,22 +77,32 @@ class Role {
   int? id;
   @JsonKey(name: "created_by")
   int? createdBy;
+  @JsonKey(name: "points")
+  double? points;
+  @JsonKey(name: "country_id")
+  int? countryId;
 
   Role({
     this.name,
     this.id,
     this.createdBy,
+    this.points,
+    this.countryId,
   });
 
   Role copyWith({
     String? name,
     int? id,
     int? createdBy,
+    double? points,
+    int? countryId,
   }) =>
       Role(
         name: name ?? this.name,
         id: id ?? this.id,
         createdBy: createdBy ?? this.createdBy,
+        points: points ?? this.points,
+        countryId: countryId ?? this.countryId,
       );
 
   factory Role.fromJson(Map<String, dynamic> json) => _$RoleFromJson(json);
@@ -102,6 +112,10 @@ class Role {
 
 @JsonSerializable()
 class Student {
+  @JsonKey(name: "grade_id")
+  int? gradeId;
+  @JsonKey(name: "created_at")
+  DateTime? createdAt;
   @JsonKey(name: "dob")
   DateTime? dob;
   @JsonKey(name: "updated_at")
@@ -117,7 +131,7 @@ class Student {
   @JsonKey(name: "country_id")
   int? countryId;
   @JsonKey(name: "city")
-  String? city;
+  dynamic city;
   @JsonKey(name: "rank")
   dynamic rank;
   @JsonKey(name: "school_id")
@@ -128,12 +142,18 @@ class Student {
   int? id;
   @JsonKey(name: "created_by")
   dynamic createdBy;
-  @JsonKey(name: "grade_id")
-  int? gradeId;
-  @JsonKey(name: "created_at")
-  DateTime? createdAt;
+  @JsonKey(name: "school")
+  Role? school;
+  @JsonKey(name: "state")
+  Role? state;
+  @JsonKey(name: "country")
+  Role? country;
+  @JsonKey(name: "grade")
+  Role? grade;
 
   Student({
+    this.gradeId,
+    this.createdAt,
     this.dob,
     this.updatedAt,
     this.score,
@@ -147,11 +167,15 @@ class Student {
     this.likes,
     this.id,
     this.createdBy,
-    this.gradeId,
-    this.createdAt,
+    this.school,
+    this.state,
+    this.country,
+    this.grade,
   });
 
   Student copyWith({
+    int? gradeId,
+    DateTime? createdAt,
     DateTime? dob,
     DateTime? updatedAt,
     int? score,
@@ -159,16 +183,20 @@ class Student {
     int? stateId,
     int? points,
     int? countryId,
-    String? city,
+    dynamic city,
     dynamic rank,
     int? schoolId,
     int? likes,
     int? id,
     dynamic createdBy,
-    int? gradeId,
-    DateTime? createdAt,
+    Role? school,
+    Role? state,
+    Role? country,
+    Role? grade,
   }) =>
       Student(
+        gradeId: gradeId ?? this.gradeId,
+        createdAt: createdAt ?? this.createdAt,
         dob: dob ?? this.dob,
         updatedAt: updatedAt ?? this.updatedAt,
         score: score ?? this.score,
@@ -182,8 +210,10 @@ class Student {
         likes: likes ?? this.likes,
         id: id ?? this.id,
         createdBy: createdBy ?? this.createdBy,
-        gradeId: gradeId ?? this.gradeId,
-        createdAt: createdAt ?? this.createdAt,
+        school: school ?? this.school,
+        state: state ?? this.state,
+        country: country ?? this.country,
+        grade: grade ?? this.grade,
       );
 
   factory Student.fromJson(Map<String, dynamic> json) => _$StudentFromJson(json);

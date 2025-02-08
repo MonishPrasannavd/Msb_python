@@ -273,7 +273,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text: postUser.students?.first.schoolId.toString() ?? "N/A",
+                        text: postUser.student?.school?.name?.toString() ?? "N/A",
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.normal,
@@ -284,9 +284,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  postUser.students?.first.userId.toString() ?? "N/A",
-                  style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    Text("Likes: ", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold)),
+                    Text(postUser.likesCount.toString(), style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.normal)),
+                    SizedBox(width: 10),
+                    Text("Comments: ", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold)),
+                    Text(postUser.commentsCount.toString(), style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.normal)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text("Grade: ", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold)),
+                    Text(postUser.student?.grade?.name?.toString() ?? "N/A", style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.normal)),
+                  ],
                 ),
               ],
             ),
@@ -342,47 +354,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     });
   }
 
-  // Widget _buildPostsGrid(List<PostFeed> posts) {
-  //   return SizedBox(
-  //     height: MediaQuery.of(context).size.height * 0.7, // Example height
-  //     child: ListView.builder(
-  //       // shrinkWrap: true,
-  //       padding: const EdgeInsets.all(8.0),
-  //       itemCount: posts.length,
-  //       itemBuilder: (BuildContext context, int index) {
-  //         PostFeed post = posts[index];
-  //         return GestureDetector(
-  //           onTap: () {
-  //             Navigator.push(
-  //               context,
-  //               MaterialPageRoute(
-  //                 builder: (context) => PostDetailScreen(post: post),
-  //               ),
-  //             );
-  //           },
-  //           child: PostUiUtils.buildPostTile(
-  //             context,
-  //             index,
-  //             post,
-  //                 (postId) async {
-  //               await CommentBottomSheet.show(context, postId: postId);
-  //               if (widget.type == "user") {
-  //                 _userFuture =
-  //                     UserRepository(usersCollection: FirebaseFirestore.instance.collection('users')).getOne(widget.id);
-  //                 _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
-  //               } else if (widget.type == "school") {
-  //                 _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
-  //                 _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
-  //               }
-  //             },
-  //                 () => onLike(post, index: index),
-  //           ),
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
-
   Future<void> onLike(PostFeed post, {required int index}) async {
     final userId = await PrefsService.getUserId();
     final likes = List<String>.from(post.likedBy);
@@ -397,108 +368,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               )),
       );
     });
-    // await postFeedRepository.addLikedByForPost(
-    //   post.id!,
-    //   userId ?? '',
-    //   userHasLiked,
-    // );
-  }
-
-  // Helper function to build post tile based on post type
-  Widget _buildPostTile(PostFeed post) {
-    switch (post.postType) {
-      case 'video':
-        return _buildVideoTile(post);
-      case 'image':
-        return _buildImageTile(post);
-      case 'audio':
-        return _buildAudioTile(post);
-      case 'text':
-        return _buildTextTile(post);
-      default:
-        return _buildImageTile(post); // Default to image if type is unknown
-    }
-  }
-
-  // Helper function to build video tile
-  Widget _buildVideoTile(PostFeed post) {
-    return Stack(
-      children: [
-        _buildImageBackground(post), // Use image background for the video
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.3), // Light black overlay
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        const Center(
-          child: Icon(Icons.play_circle_outline, color: Colors.white, size: 40),
-        ),
-      ],
-    );
-  }
-
-  // Helper function to build image tile
-  Widget _buildImageTile(PostFeed post) {
-    return _buildImageBackground(post);
-  }
-
-  // Helper function to build text tile
-  Widget _buildTextTile(PostFeed post) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.blueGrey[100],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.all(8.0),
-      child: Center(
-        child: Text(
-          post.title ?? 'No Title',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  // Helper function to build audio tile
-  Widget _buildAudioTile(PostFeed post) {
-    return Stack(
-      children: [
-        _buildImageBackground(post), // Background image for the audio post
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.3), // Light black overlay
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        const Center(
-          child: Icon(Icons.music_note, color: Colors.white, size: 40),
-        ),
-      ],
-    );
-  }
-
-  // Helper function to build image background
-  Widget _buildImageBackground(PostFeed post) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        image: DecorationImage(
-          image: post.mediaUrls != null && post.mediaUrls!.isNotEmpty
-              ? CachedNetworkImageProvider(post.mediaUrls!.first)
-              : const AssetImage("assets/images/image_placeholder.png") as ImageProvider,
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
   }
 
   // Helper function to create profile image based on initials of name

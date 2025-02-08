@@ -12,9 +12,9 @@ UserSingle _$UserSingleFromJson(Map<String, dynamic> json) => UserSingle(
       email: json['email'] as String?,
       roleId: (json['role_id'] as num?)?.toInt(),
       imageUrl: json['image_url'] as String?,
-      students: (json['students'] as List<dynamic>?)
-          ?.map((e) => Student.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      student: json['student'] == null
+          ? null
+          : Student.fromJson(json['student'] as Map<String, dynamic>),
       role: json['role'] == null
           ? null
           : Role.fromJson(json['role'] as Map<String, dynamic>),
@@ -30,7 +30,7 @@ Map<String, dynamic> _$UserSingleToJson(UserSingle instance) =>
       'email': instance.email,
       'role_id': instance.roleId,
       'image_url': instance.imageUrl,
-      'students': instance.students,
+      'student': instance.student,
       'role': instance.role,
       'submissions_count': instance.submissionsCount,
       'comments_count': instance.commentsCount,
@@ -41,15 +41,23 @@ Role _$RoleFromJson(Map<String, dynamic> json) => Role(
       name: json['name'] as String?,
       id: (json['id'] as num?)?.toInt(),
       createdBy: (json['created_by'] as num?)?.toInt(),
+      points: (json['points'] as num?)?.toDouble(),
+      countryId: (json['country_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$RoleToJson(Role instance) => <String, dynamic>{
       'name': instance.name,
       'id': instance.id,
       'created_by': instance.createdBy,
+      'points': instance.points,
+      'country_id': instance.countryId,
     };
 
 Student _$StudentFromJson(Map<String, dynamic> json) => Student(
+      gradeId: (json['grade_id'] as num?)?.toInt(),
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.parse(json['created_at'] as String),
       dob: json['dob'] == null ? null : DateTime.parse(json['dob'] as String),
       updatedAt: json['updated_at'] == null
           ? null
@@ -59,19 +67,29 @@ Student _$StudentFromJson(Map<String, dynamic> json) => Student(
       stateId: (json['state_id'] as num?)?.toInt(),
       points: (json['points'] as num?)?.toInt(),
       countryId: (json['country_id'] as num?)?.toInt(),
-      city: json['city'] as String?,
+      city: json['city'],
       rank: json['rank'],
       schoolId: (json['school_id'] as num?)?.toInt(),
       likes: (json['likes'] as num?)?.toInt(),
       id: (json['id'] as num?)?.toInt(),
       createdBy: json['created_by'],
-      gradeId: (json['grade_id'] as num?)?.toInt(),
-      createdAt: json['created_at'] == null
+      school: json['school'] == null
           ? null
-          : DateTime.parse(json['created_at'] as String),
+          : Role.fromJson(json['school'] as Map<String, dynamic>),
+      state: json['state'] == null
+          ? null
+          : Role.fromJson(json['state'] as Map<String, dynamic>),
+      country: json['country'] == null
+          ? null
+          : Role.fromJson(json['country'] as Map<String, dynamic>),
+      grade: json['grade'] == null
+          ? null
+          : Role.fromJson(json['grade'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
+      'grade_id': instance.gradeId,
+      'created_at': instance.createdAt?.toIso8601String(),
       'dob': instance.dob?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'score': instance.score,
@@ -85,6 +103,8 @@ Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
       'likes': instance.likes,
       'id': instance.id,
       'created_by': instance.createdBy,
-      'grade_id': instance.gradeId,
-      'created_at': instance.createdAt?.toIso8601String(),
+      'school': instance.school,
+      'state': instance.state,
+      'country': instance.country,
+      'grade': instance.grade,
     };
