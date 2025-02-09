@@ -59,6 +59,8 @@ class ProfileScreenState extends State<ProfileScreen> {
     _userProvider = Provider.of<UserProvider>(context, listen: false);
     _authProvider = Provider.of<UserAuthProvider>(context, listen: false);
     _masterProvider = Provider.of<MasterProvider>(context, listen: false);
+
+    loadUser();
   }
 
   void updateUser() async {
@@ -69,7 +71,12 @@ class ProfileScreenState extends State<ProfileScreen> {
     loadUser();
   }
 
-  void loadUser() {
+  Future<void> loadUser() async {
+    final result = await _authProvider.getUserMe(_userProvider.user);
+    final user = result['user'] as MsbUser?;
+    if (user == null) return;
+    _userProvider.setUser(user);
+
     setState(() {
       nameController.text = _userProvider.user.user?.name ?? "";
       Grade? gradeResolve;
@@ -96,14 +103,16 @@ class ProfileScreenState extends State<ProfileScreen> {
       selectedSchool = schoolResolve;
       schoolName = _userProvider.user.student.school?.name ?? "";
       likesCount = _userProvider.user.student.likes.toString();
-      totalPoints = _userProvider.user.student.score.toString();
+      commentsCount = _userProvider.user.commentsCount.toString();
+      totalPoints = _userProvider.user.student.points.toString();
     });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    updateUser();
+    loadUser();
+    // updateUser();
   }
 
   Future<void> _pickImage() async {
@@ -140,7 +149,8 @@ class ProfileScreenState extends State<ProfileScreen> {
       key: Key('profile-screen'),
       onVisibilityChanged: (info) {
         if (info.visibleFraction == 1) {
-          updateUser();
+          // updateUser();
+          loadUser();
         }
       },
       child: Scaffold(
