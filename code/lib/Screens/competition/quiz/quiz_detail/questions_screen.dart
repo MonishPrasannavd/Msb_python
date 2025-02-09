@@ -10,7 +10,6 @@ import 'package:msb_app/models/quiz_record.dart';
 import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/services/points_system.dart';
 import 'package:msb_app/services/preferences_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../components/button_builder.dart';
 import '../../../../models/question.dart';
@@ -311,12 +310,11 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                               moveToNextPage();
                             },
                             style: ButtonStyle(
-                                side: MaterialStateProperty.all(
-                                    const BorderSide(
-                                        color: AppColors.primary, width: 1)),
-                                backgroundColor: MaterialStateProperty.all(
-                                    AppColors.primary),
-                                shape: MaterialStateProperty.all(
+                                side: WidgetStateProperty.all(const BorderSide(
+                                    color: AppColors.primary, width: 1)),
+                                backgroundColor:
+                                    WidgetStateProperty.all(AppColors.primary),
+                                shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(8.0)))),
@@ -336,9 +334,9 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                                   context, ResultScreen(resultScore, wrongAns));
                             },
                             style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    AppColors.primary),
-                                shape: MaterialStateProperty.all(
+                                backgroundColor:
+                                    WidgetStateProperty.all(AppColors.primary),
+                                shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(8.0)))),
@@ -428,8 +426,8 @@ class ExitConfirmationDialog extends StatelessWidget {
                         onPressed: () => Navigator.pop(context),
                         style: ButtonStyle(
                             backgroundColor:
-                                MaterialStateProperty.all(AppColors.primary),
-                            shape: MaterialStateProperty.all(
+                                WidgetStateProperty.all(AppColors.primary),
+                            shape: WidgetStateProperty.all(
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0)))),
                         textStyle: GoogleFonts.poppins(

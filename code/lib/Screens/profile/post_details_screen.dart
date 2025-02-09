@@ -1,26 +1,19 @@
 import 'dart:async';
 
-import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:chewie/chewie.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/enums/post_feed_type.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/repository/comment_repository.dart';
-import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:msb_app/utils/post.dart';
 import 'package:msb_app/utils/post_v2.dart';
 import 'package:msb_app/utils/post_video_viewer.dart';
-import 'package:video_player/video_player.dart' as VPlayer;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:msb_app/models/post_feed.dart';
 
 import '../../repository/posts_repository.dart';
 
@@ -44,7 +37,7 @@ class PostDetailScreen extends StatefulWidget {
   });
 
   @override
-  _PostDetailScreenState createState() => _PostDetailScreenState();
+  State<PostDetailScreen> createState() => _PostDetailScreenState();
 }
 
 class _PostDetailScreenState extends State<PostDetailScreen> {
@@ -141,7 +134,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           }
         }
       case PostFeedType.text:
-        return _buildTextPost(post!);
+        return _buildTextPost(post);
       default:
         return const Text("No content available");
     }
@@ -219,22 +212,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           ),
         );
       },
-    );
-  }
-
-  // Helper method to build audio post
-  static Widget _buildAudioPost(PostFeed post) {
-    return Container(
-      color: AppColors.primary,
-      height: 150,
-      child: Center(
-        child: Text(
-          'Audio Post: ${post.title ?? 'No title'}',
-          style: GoogleFonts.poppins(
-            color: AppColors.white,
-          ),
-        ),
-      ),
     );
   }
 
@@ -399,31 +376,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildProfileImage(String? name, String? profileImageUrl) {
-    if (profileImageUrl != null) {
-      return CircleAvatar(
-        radius: 20,
-        backgroundImage: NetworkImage(profileImageUrl),
-      );
-    } else {
-      return Image.asset(
-        "assets/images/profile.png",
-        height: 40,
-      );
-    }
-  }
-
-  Widget _buildPostImage() {
-    return Container(
-      width: double.infinity,
-      height: 400,
-      child: Image.network(
-        'https://example.com/post_image.jpg',
-        fit: BoxFit.cover,
       ),
     );
   }

@@ -6,15 +6,16 @@ class MsbCarousel extends StatefulWidget {
   final List<MsbCarouselSlide> slides;
   final double height;
   final ValueChanged<int>? onPageChanged;
-  final Widget Function(int currentIndex, MsbCarouselSlide slide)? customIndicator;
+  final Widget Function(int currentIndex, MsbCarouselSlide slide)?
+      customIndicator;
 
   const MsbCarousel({
-    Key? key,
+    super.key,
     required this.slides,
     this.height = 250.0,
     this.onPageChanged,
     this.customIndicator,
-  }) : super(key: key);
+  });
 
   @override
   State<MsbCarousel> createState() => _MsbCarouselState();
@@ -42,7 +43,9 @@ class _MsbCarouselState extends State<MsbCarousel> {
             margin: const EdgeInsets.symmetric(horizontal: 4.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.0),
-              color: _currentIndex == entry.key ? Colors.grey : Colors.grey.shade400,
+              color: _currentIndex == entry.key
+                  ? Colors.grey
+                  : Colors.grey.shade400,
             ),
           ),
         );
@@ -83,7 +86,9 @@ class _MsbCarouselState extends State<MsbCarousel> {
             },
           ),
         ),
-        widget.customIndicator?.call(_currentIndex, widget.slides[_currentIndex]) ?? _defaultIndicator(),
+        widget.customIndicator
+                ?.call(_currentIndex, widget.slides[_currentIndex]) ??
+            _defaultIndicator(),
       ],
     );
   }

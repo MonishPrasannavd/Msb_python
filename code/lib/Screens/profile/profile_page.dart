@@ -16,9 +16,9 @@ import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
 import 'package:msb_app/utils/user.dart';
 import 'package:provider/provider.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import '../../components/button_builder.dart';
 import '../../utils/colours.dart';
-import 'package:msb_app/services/preferences_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   final VoidCallback onLogout;
@@ -61,6 +61,14 @@ class ProfileScreenState extends State<ProfileScreen> {
     _masterProvider = Provider.of<MasterProvider>(context, listen: false);
   }
 
+  void updateUser() async {
+    final result = await _authProvider.getUserMe(_userProvider.user);
+    final user = result['user'] as MsbUser?;
+    if (user == null) return;
+    _userProvider.setUser(user);
+    loadUser();
+  }
+
   void loadUser() {
     setState(() {
       nameController.text = _userProvider.user.user?.name ?? "";
@@ -82,23 +90,20 @@ class ProfileScreenState extends State<ProfileScreen> {
             (school) => school.id == _userProvider.user.student.schoolId);
       }
 
-      setState(() {
-        gradeController.text = gradeResolve?.name ?? "";
-        grade = gradeResolve?.name ?? "";
-        selectedGrade = gradeResolve;
-        selectedSchool = schoolResolve;
-        schoolName = _userProvider.user.student.school?.name ?? "";
-        likesCount = _userProvider.user.student.likes.toString();
-        commentsCount = _userProvider.user.commentsCount.toString();
-        totalPoints = _userProvider.user.student.points.toString();
-      });
+      gradeController.text = gradeResolve.name ?? "";
+      grade = gradeResolve.name ?? "";
+      selectedGrade = gradeResolve;
+      selectedSchool = schoolResolve;
+      schoolName = _userProvider.user.student.school?.name ?? "";
+      likesCount = _userProvider.user.student.likes.toString();
+      totalPoints = _userProvider.user.student.score.toString();
     });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    loadUser();
+    updateUser();
   }
 
   Future<void> _pickImage() async {
@@ -131,28 +136,37 @@ class ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        leading: Navigator.canPop(context)
-            ? GestureDetector(
-                child: const Icon(Icons.arrow_back),
-                onTap: () => Navigator.pop(context),
-              )
-            : null, // If there's no history, do not show the back button
-        title: Text(
-          "Profile",
-          style: GoogleFonts.poppins(
-              color: AppColors.black,
-              fontWeight: FontWeight.w500,
-              fontSize: 16),
+    return VisibilityDetector(
+      key: Key('profile-screen'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction == 1) {
+          updateUser();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          leading: Navigator.canPop(context)
+              ? GestureDetector(
+                  child: const Icon(Icons.arrow_back),
+                  onTap: () => Navigator.pop(context),
+                )
+              : null, // If there's no history, do not show the back button
+          title: Text(
+            "Profile",
+            style: GoogleFonts.poppins(
+                color: AppColors.black,
+                fontWeight: FontWeight.w500,
+                fontSize: 16),
+          ),
         ),
-      ),
-      body: Consumer3<UserProvider, UserAuthProvider, MasterProvider>(
-        builder: (ctxt, userProvider, userAuthProvider, masterProvider, child) {
-          return mainUi();
-        },
+        body: Consumer3<UserProvider, UserAuthProvider, MasterProvider>(
+          builder:
+              (ctxt, userProvider, userAuthProvider, masterProvider, child) {
+            return mainUi();
+          },
+        ),
       ),
     );
   }

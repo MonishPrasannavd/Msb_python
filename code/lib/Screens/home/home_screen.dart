@@ -1,13 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/tab_1_home.dart';
 import 'package:msb_app/Screens/profile/profile_page.dart';
-import 'package:msb_app/models/user.dart';
-import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
-import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/user.dart';
 import 'package:provider/provider.dart';
@@ -91,7 +86,9 @@ class HomeScreenState extends State<HomeScreen>
                                   fontSize: 12)),
                           Text(
                               userProvider.user.user?.name != null
-                                  ? fetchFirstName(userProvider.user.user?.name) ?? "User"
+                                  ? fetchFirstName(
+                                          userProvider.user.user?.name) ??
+                                      "User"
                                   : "User",
                               style: GoogleFonts.poppins(
                                   color: AppColors.white,
@@ -125,8 +122,8 @@ class HomeScreenState extends State<HomeScreen>
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProfileScreen(
-                                    onLogout: widget.onLogout,
-                                  )));
+                                        onLogout: widget.onLogout,
+                                      )));
                         },
                         child: Container(
                           decoration: const BoxDecoration(
@@ -138,13 +135,15 @@ class HomeScreenState extends State<HomeScreen>
                           child: Padding(
                             padding: const EdgeInsets.only(
                                 left: 7.0, top: 7.0, bottom: 7.0, right: 10.0),
-                            child: (userProvider.user.user?.name != null && userProvider.user.user?.profileUrl != null)
+                            child: (userProvider.user.user?.name != null &&
+                                    userProvider.user.user?.profileUrl != null)
                                 ? _buildProfileImage(
-                                userProvider.user.user!.name, userProvider.user.user!.profileUrl)
+                                    userProvider.user.user!.name,
+                                    userProvider.user.user!.profileUrl)
                                 : Image.asset(
-                              "assets/images/profile.png",
-                              height: 40,
-                            ),
+                                    "assets/images/profile.png",
+                                    height: 40,
+                                  ),
                           ),
                         ),
                       )

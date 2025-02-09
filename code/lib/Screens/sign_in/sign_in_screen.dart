@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -61,7 +59,6 @@ class _SignInScreenState extends State<SignInScreen> {
     passwordController.dispose();
   }
 
-  final _auth = FirebaseAuth.instance;
   bool showSpinner = false;
 
   void showToast(String message, {Color backgroundColor = Colors.red}) {
@@ -83,7 +80,7 @@ class _SignInScreenState extends State<SignInScreen> {
         userAuth.login(emailController.text, passwordController.text);
     DialogBuilder(context).showLoadingIndicator('');
     successfulMessage.then((response) async {
-      var errorMessage = response['message'].toString();
+      response['message'].toString();
       if (response['status'] == true) {
         DialogBuilder(context).hideOpenDialog();
         msb.MsbUser user = response['user'];
@@ -283,9 +280,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                   }
                                 },
                                 style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
+                                    backgroundColor: WidgetStateProperty.all(
                                         AppColors.primary),
-                                    shape: MaterialStateProperty.all(
+                                    shape: WidgetStateProperty.all(
                                         RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(8.0)))),

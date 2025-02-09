@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/school/school_detail.dart';
 import 'package:msb_app/models/school.dart';
-import 'package:msb_app/models/school_user.dart';
 import 'package:msb_app/providers/school/school_api_provider.dart';
-import 'package:msb_app/repository/school_user_repository.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:provider/provider.dart';
 

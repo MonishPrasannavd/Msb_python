@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 class ApiConfig {
   // static const String baseUrl = "localhost:8080";
   static const String baseUrl = "35.163.101.210:8080";
@@ -39,10 +41,6 @@ class AppUrl {
   static const String CREATE_SUBMISSION = "/submission/create";
   static const String GET_ALL_SUBMISSIONS = "/submission/all";
   static const String GET_SUBMISSIONS_BY_ID = "/submission/by_id";
-  static const String GET_SUBMISSIONS_BY_USER_ID = "/submission/by_user";
-  static const String GET_SUBMISSIONS_BY_SCHOOL_ID = "/submission/by_school";
-  static const String GET_SUBMISSIONS_BY_SUBCATEGORY =
-      "/submission/by_sub_category";
   static const String TOGGLE_LIKE = "/auth/submissions/like";
   static const String ADD_COMMENT = "/auth/submissions/comment";
   static const String REMOVE_COMMENT = "/auth/submissions/comment/remove";

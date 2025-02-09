@@ -95,12 +95,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   crossAxisSpacing: 8.0,
                   crossAxisCount: 3),
               itemBuilder: (BuildContext context, int index) {
-                final FutureCategories? menuItem =
+                final FutureCategories menuItem =
                     competitions.compititions.elementAt(index);
 
                 return GestureDetector(
                   onTap: () {
-                    if (menuItem?.name == '') {
+                    if (menuItem.name == '') {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -111,10 +111,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => CompletionScreen(
-                            categoryId: menuItem?.id ?? 1,
-                            categoryName: menuItem?.name ?? '',
-                            contentType: menuItem?.categoryType?.name,
-                            subcategories: menuItem?.subcategories,
+                            categoryId: menuItem.id ?? 1,
+                            categoryName: menuItem.name ?? '',
+                            contentType: menuItem.categoryType?.name,
+                            subcategories: menuItem.subcategories,
                           ),
                         ),
                       );
@@ -135,8 +135,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: CircleAvatar(
-                              backgroundImage: menuItem?.iconUrl != null
-                                  ? NetworkImage(menuItem!.iconUrl!)
+                              backgroundImage: menuItem.iconUrl != null
+                                  ? NetworkImage(menuItem.iconUrl!)
                                   : const AssetImage(
                                           'assets/images/profile1.png')
                                       as ImageProvider,
@@ -147,7 +147,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       const SizedBox(height: 5),
                       FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text(menuItem?.name ?? '',
+                        child: Text(menuItem.name ?? '',
                             style: GoogleFonts.poppins(
                                 color: AppColors.black,
                                 fontWeight: FontWeight.w500,

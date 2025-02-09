@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/competition/completion_screen.dart';
@@ -19,10 +18,7 @@ import 'package:msb_app/utils/auth.dart';
 import 'package:msb_app/utils/user.dart';
 import 'package:provider/provider.dart';
 import '../../components/button_builder.dart';
-import '../../enums/post_feed_type.dart';
 import '../../utils/colours.dart';
-import '../competition/post story/post_feed_screen.dart';
-import '../competition/quiz/quiz_screen.dart';
 
 class SchoolScreen extends StatefulWidget {
   final VoidCallback onLogout;
@@ -53,7 +49,6 @@ class SchoolScreenState extends State<SchoolScreen> {
 
   late SchoolApiProvider _schoolApiProvider;
   late StudentDashboardProvider _studentDashboardProvider;
-  late UserProvider _userProvider;
 
   @override
   void initState() {
@@ -62,7 +57,6 @@ class SchoolScreenState extends State<SchoolScreen> {
       progress = 0.0;
     });
 
-    _userProvider = Provider.of<UserProvider>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _schoolApiProvider =
           Provider.of<SchoolApiProvider>(context, listen: false);
@@ -902,10 +896,10 @@ class SchoolScreenState extends State<SchoolScreen> {
                                               },
                                               style: ButtonStyle(
                                                   backgroundColor:
-                                                      MaterialStateProperty.all(
+                                                      WidgetStateProperty.all(
                                                           AppColors.black54),
-                                                  shape: MaterialStateProperty
-                                                      .all(RoundedRectangleBorder(
+                                                  shape: WidgetStateProperty.all(
+                                                      RoundedRectangleBorder(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(

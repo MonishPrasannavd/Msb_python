@@ -675,7 +675,8 @@ class HomeTabState extends State<HomeTab> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               UserProfileScreen(
-                                                  id: student.id.toString()),
+                                                  id: student.user!.id
+                                                      .toString()),
                                         )).then((val) => refetchData());
                                   },
                                   child: Padding(
@@ -835,10 +836,9 @@ class HomeTabState extends State<HomeTab> {
                       },
                       style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(AppColors.primary),
-                          shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50.0)))),
+                              WidgetStateProperty.all(AppColors.primary),
+                          shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50.0)))),
                       textStyle: GoogleFonts.poppins(
                           color: AppColors.white,
                           fontWeight: FontWeight.w500,

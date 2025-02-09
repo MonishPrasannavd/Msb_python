@@ -37,7 +37,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   late MsbUser currentUser;
   late bool isLoadingPostUser = false;
   late UserSingle postUser;
-  late Future<Map<String, dynamic>> _profileFuture;
   late ScrollController _scrollController;
   int _currentPage = 1;
   bool _isFetchingMore = false;

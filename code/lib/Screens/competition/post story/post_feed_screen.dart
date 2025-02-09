@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -9,16 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:msb_app/models/post_feed.dart';
 import 'package:msb_app/models/user.dart';
 import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/providers/submission/submission_provider.dart';
-import 'package:msb_app/providers/user_auth_provider.dart';
 import 'package:msb_app/providers/user_provider.dart';
-import 'package:msb_app/repository/posts_repository.dart';
-import 'package:msb_app/repository/user_repository.dart';
 import 'package:msb_app/utils/auth.dart';
-import 'package:msb_app/utils/firestore_collections.dart';
 import 'package:provider/provider.dart';
 
 import '../../../components/button_builder.dart';

@@ -15,17 +15,17 @@ class PostFeeds {
     if (json['data'] != null) {
       data = <PostFeedDataList>[];
       json['data'].forEach((v) {
-        data!.add(new PostFeedDataList.fromJson(v));
+        data!.add(PostFeedDataList.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['page'] = this.page;
-    data['limit'] = this.limit;
-    data['total'] = this.total;
-    data['total_pages'] = this.totalPages;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['page'] = page;
+    data['limit'] = limit;
+    data['total'] = total;
+    data['total_pages'] = totalPages;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -53,21 +53,21 @@ class PostFeedDataList {
 
   PostFeedDataList(
       {this.id,
-        this.createdBy,
-        this.categoryId,
-        this.gradeId,
-        this.title,
-        this.media,
-        this.subCategoryId,
-        this.schoolId,
-        this.description,
-        this.createdAt,
-        this.user,
-        this.subcategory,
-        this.category,
-        this.mediaUrl,
-        this.likesCount,
-        this.isLiked});
+      this.createdBy,
+      this.categoryId,
+      this.gradeId,
+      this.title,
+      this.media,
+      this.subCategoryId,
+      this.schoolId,
+      this.description,
+      this.createdAt,
+      this.user,
+      this.subcategory,
+      this.category,
+      this.mediaUrl,
+      this.likesCount,
+      this.isLiked});
 
   PostFeedDataList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -80,42 +80,41 @@ class PostFeedDataList {
     schoolId = json['school_id'];
     description = json['description'];
     createdAt = json['created_at'];
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    user = json['user'] != null ? User.fromJson(json['user']) : null;
     subcategory = json['subcategory'] != null
-        ? new Subcategory.fromJson(json['subcategory'])
+        ? Subcategory.fromJson(json['subcategory'])
         : null;
-    category = json['category'] != null
-        ? new Category.fromJson(json['category'])
-        : null;
+    category =
+        json['category'] != null ? Category.fromJson(json['category']) : null;
     mediaUrl = json['media_url'];
     likesCount = json['likes_count'];
     isLiked = json['is_liked'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['created_by'] = this.createdBy;
-    data['category_id'] = this.categoryId;
-    data['grade_id'] = this.gradeId;
-    data['title'] = this.title;
-    data['media'] = this.media;
-    data['sub_category_id'] = this.subCategoryId;
-    data['school_id'] = this.schoolId;
-    data['description'] = this.description;
-    data['created_at'] = this.createdAt;
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['created_by'] = createdBy;
+    data['category_id'] = categoryId;
+    data['grade_id'] = gradeId;
+    data['title'] = title;
+    data['media'] = media;
+    data['sub_category_id'] = subCategoryId;
+    data['school_id'] = schoolId;
+    data['description'] = description;
+    data['created_at'] = createdAt;
+    if (user != null) {
+      data['user'] = user!.toJson();
     }
-    if (this.subcategory != null) {
-      data['subcategory'] = this.subcategory!.toJson();
+    if (subcategory != null) {
+      data['subcategory'] = subcategory!.toJson();
     }
-    if (this.category != null) {
-      data['category'] = this.category!.toJson();
+    if (category != null) {
+      data['category'] = category!.toJson();
     }
-    data['media_url'] = this.mediaUrl;
-    data['likes_count'] = this.likesCount;
-    data['is_liked'] = this.isLiked;
+    data['media_url'] = mediaUrl;
+    data['likes_count'] = likesCount;
+    data['is_liked'] = isLiked;
     return data;
   }
 }
@@ -140,20 +139,20 @@ class User {
     if (json['students'] != null) {
       students = <Students>[];
       json['students'].forEach((v) {
-        students!.add(new Students.fromJson(v));
+        students!.add(Students.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['image'] = this.image;
-    data['role_id'] = this.roleId;
-    data['id'] = this.id;
-    if (this.students != null) {
-      data['students'] = this.students!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['email'] = email;
+    data['image'] = image;
+    data['role_id'] = roleId;
+    data['id'] = id;
+    if (students != null) {
+      data['students'] = students!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -177,19 +176,19 @@ class Students {
 
   Students(
       {this.id,
-        this.score,
-        this.userId,
-        this.points,
-        this.gradeId,
-        this.likes,
-        this.schoolId,
-        this.createdBy,
-        this.countryId,
-        this.createdAt,
-        this.stateId,
-        this.updatedAt,
-        this.city,
-        this.dob});
+      this.score,
+      this.userId,
+      this.points,
+      this.gradeId,
+      this.likes,
+      this.schoolId,
+      this.createdBy,
+      this.countryId,
+      this.createdAt,
+      this.stateId,
+      this.updatedAt,
+      this.city,
+      this.dob});
 
   Students.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -209,21 +208,21 @@ class Students {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['score'] = this.score;
-    data['user_id'] = this.userId;
-    data['points'] = this.points;
-    data['grade_id'] = this.gradeId;
-    data['likes'] = this.likes;
-    data['school_id'] = this.schoolId;
-    data['created_by'] = this.createdBy;
-    data['country_id'] = this.countryId;
-    data['created_at'] = this.createdAt;
-    data['state_id'] = this.stateId;
-    data['updated_at'] = this.updatedAt;
-    data['city'] = this.city;
-    data['dob'] = this.dob;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['score'] = score;
+    data['user_id'] = userId;
+    data['points'] = points;
+    data['grade_id'] = gradeId;
+    data['likes'] = likes;
+    data['school_id'] = schoolId;
+    data['created_by'] = createdBy;
+    data['country_id'] = countryId;
+    data['created_at'] = createdAt;
+    data['state_id'] = stateId;
+    data['updated_at'] = updatedAt;
+    data['city'] = city;
+    data['dob'] = dob;
     return data;
   }
 }
@@ -244,11 +243,11 @@ class Subcategory {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['category_id'] = this.categoryId;
-    data['name'] = this.name;
-    data['id'] = this.id;
-    data['icon'] = this.icon;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['category_id'] = categoryId;
+    data['name'] = name;
+    data['id'] = id;
+    data['icon'] = icon;
     return data;
   }
 }
@@ -264,12 +263,12 @@ class Category {
 
   Category(
       {this.name,
-        this.icon,
-        this.type,
-        this.id,
-        this.isFuture,
-        this.categoryType,
-        this.iconUrl});
+      this.icon,
+      this.type,
+      this.id,
+      this.isFuture,
+      this.categoryType,
+      this.iconUrl});
 
   Category.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -278,22 +277,22 @@ class Category {
     id = json['id'];
     isFuture = json['is_future'];
     categoryType = json['category_type'] != null
-        ? new CategoryType.fromJson(json['category_type'])
+        ? CategoryType.fromJson(json['category_type'])
         : null;
     iconUrl = json['icon_url'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['icon'] = this.icon;
-    data['type'] = this.type;
-    data['id'] = this.id;
-    data['is_future'] = this.isFuture;
-    if (this.categoryType != null) {
-      data['category_type'] = this.categoryType!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['icon'] = icon;
+    data['type'] = type;
+    data['id'] = id;
+    data['is_future'] = isFuture;
+    if (categoryType != null) {
+      data['category_type'] = categoryType!.toJson();
     }
-    data['icon_url'] = this.iconUrl;
+    data['icon_url'] = iconUrl;
     return data;
   }
 }
@@ -310,9 +309,9 @@ class CategoryType {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
-    data['id'] = this.id;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['id'] = id;
     return data;
   }
 }

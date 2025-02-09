@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/blog/blog_screen.dart';
-import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
 import 'package:msb_app/services/preferences_service.dart';
 import 'package:msb_app/utils/auth.dart';
 import 'package:msb_app/utils/colours.dart';
-import 'package:sizer/sizer.dart';
 
 import '../competition/categories_screen.dart';
 import '../home/home_screen.dart';
@@ -24,8 +21,10 @@ class _DashboardSetupState extends State<DashboardSetup> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentIndex = 0;
   final GlobalKey<HomeScreenState> homeScreenKey = GlobalKey<HomeScreenState>();
-  final GlobalKey<SchoolScreenState> schoolScreenKey = GlobalKey<SchoolScreenState>();
-  final GlobalKey<ProfileScreenState> profileScreenKey = GlobalKey<ProfileScreenState>();
+  final GlobalKey<SchoolScreenState> schoolScreenKey =
+      GlobalKey<SchoolScreenState>();
+  final GlobalKey<ProfileScreenState> profileScreenKey =
+      GlobalKey<ProfileScreenState>();
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
@@ -36,15 +35,14 @@ class _DashboardSetupState extends State<DashboardSetup> {
   ];
 
   final List<Widget> _screens = [];
-void checkShNow() async {
+  void checkShNow() async {
+    // Debugging: Check if data is saved correctly
+    String? storedUserId = await PrefsService.getUserId();
+    String? storedEmail = await PrefsService.getUserNameEmail();
 
- // Debugging: Check if data is saved correctly
-      String? storedUserId = await PrefsService.getUserId();
-      String? storedEmail = await PrefsService.getUserNameEmail();
-
-      print("Stored User ID: $storedUserId");  // Should print actual user ID
-      print("Stored Email: $storedEmail");    // Should print email
-}
+    print("Stored User ID: $storedUserId"); // Should print actual user ID
+    print("Stored Email: $storedEmail"); // Should print email
+  }
 
   void _onItemTapped(int index) {
     if (_currentIndex == index) {
@@ -52,7 +50,9 @@ void checkShNow() async {
       _navigatorKeys[index].currentState?.popUntil((route) => route.isFirst);
     } else {
       // Reset the stack of the current tab before switching
-      _navigatorKeys[_currentIndex].currentState?.popUntil((route) => route.isFirst);
+      _navigatorKeys[_currentIndex]
+          .currentState
+          ?.popUntil((route) => route.isFirst);
 
       // Update the current index to the new tab
       setState(() {
@@ -312,7 +312,8 @@ class BottomNavyBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? (Theme.of(context).bottomAppBarTheme.color ?? Colors.white);
+    final bgColor = backgroundColor ??
+        (Theme.of(context).bottomAppBarTheme.color ?? Colors.white);
 
     return Container(
       decoration: BoxDecoration(
@@ -389,8 +390,12 @@ class _ItemWidget extends StatelessWidget {
       selected: isSelected,
       child: AnimatedContainer(
         width: (showInactiveTitle)
-            ? ((isSelected) ? MediaQuery.of(context).size.width * 0.25 : MediaQuery.of(context).size.width * 0.2)
-            : ((isSelected) ? MediaQuery.of(context).size.width * 0.3 : MediaQuery.of(context).size.width * 0.1),
+            ? ((isSelected)
+                ? MediaQuery.of(context).size.width * 0.25
+                : MediaQuery.of(context).size.width * 0.2)
+            : ((isSelected)
+                ? MediaQuery.of(context).size.width * 0.3
+                : MediaQuery.of(context).size.width * 0.1),
         height: double.maxFinite,
         duration: animationDuration,
         curve: curve,
@@ -403,8 +408,12 @@ class _ItemWidget extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           child: Container(
             width: (showInactiveTitle)
-                ? ((isSelected) ? MediaQuery.of(context).size.width * 0.25 : MediaQuery.of(context).size.width * 0.2)
-                : ((isSelected) ? MediaQuery.of(context).size.width * 0.3 : MediaQuery.of(context).size.width * 0.1),
+                ? ((isSelected)
+                    ? MediaQuery.of(context).size.width * 0.25
+                    : MediaQuery.of(context).size.width * 0.2)
+                : ((isSelected)
+                    ? MediaQuery.of(context).size.width * 0.3
+                    : MediaQuery.of(context).size.width * 0.1),
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -414,7 +423,9 @@ class _ItemWidget extends StatelessWidget {
                 IconTheme(
                   data: IconThemeData(
                     size: iconSize,
-                    color: isSelected ? AppColors.white : item.inactiveColor ?? item.activeColor,
+                    color: isSelected
+                        ? AppColors.white
+                        : item.inactiveColor ?? item.activeColor,
                   ),
                   child: item.icon,
                 ),
