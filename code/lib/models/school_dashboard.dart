@@ -10,8 +10,8 @@ class SchoolDashboard {
   int? submissionsCount;
   @JsonKey(name: "submissions_likes")
   int? submissionsLikes;
-  @JsonKey(name: "points")
-  int? points;
+  @JsonKey(name: "avg_points")
+  int? averagePoints;
   @JsonKey(name: "top_students")
   List<TopStudent>? topStudents;
 
@@ -19,7 +19,7 @@ class SchoolDashboard {
     this.studentsCount,
     this.submissionsCount,
     this.submissionsLikes,
-    this.points,
+    this.averagePoints,
     this.topStudents,
   });
 
@@ -34,7 +34,7 @@ class SchoolDashboard {
         studentsCount: studentsCount ?? this.studentsCount,
         submissionsCount: submissionsCount ?? this.submissionsCount,
         submissionsLikes: submissionsLikes ?? this.submissionsLikes,
-        points: points ?? this.points,
+        averagePoints: points ?? this.averagePoints,
         topStudents: topStudents ?? this.topStudents,
       );
 

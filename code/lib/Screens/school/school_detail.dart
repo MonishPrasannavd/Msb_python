@@ -370,7 +370,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(schoolDashboard?.points.toString() ?? '0',
+                        Text(schoolDashboard?.averagePoints.toString() ?? '0',
                             // PointsSystem.getTotalScore(
                             //   averagePoints: school?.averagePoints,
                             //   studentCount: school?.studentCount,

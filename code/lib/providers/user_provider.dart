@@ -91,7 +91,7 @@ class UserProvider with ChangeNotifier {
       );
     }
 
-    if (updatedStudent != null) {
+    if (updatedStudent  != null) {
       _user = _user.copyWith(
         student: updatedStudent
       );

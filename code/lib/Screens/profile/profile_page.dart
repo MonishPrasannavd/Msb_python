@@ -79,6 +79,12 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
     super.didPopNext();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    updateUser();
+  }
+
   void updateUser() async {
     final result = await _authProvider.getUserMe(_userProvider.user);
     final user = result['user'] as MsbUser?;

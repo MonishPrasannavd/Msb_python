@@ -11,7 +11,7 @@ SchoolDashboard _$SchoolDashboardFromJson(Map<String, dynamic> json) =>
       studentsCount: (json['students_count'] as num?)?.toInt(),
       submissionsCount: (json['submissions_count'] as num?)?.toInt(),
       submissionsLikes: (json['submissions_likes'] as num?)?.toInt(),
-      points: (json['points'] as num?)?.toInt(),
+      averagePoints: (json['avg_points'] as num?)?.toInt(),
       topStudents: (json['top_students'] as List<dynamic>?)
           ?.map((e) => TopStudent.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -22,7 +22,7 @@ Map<String, dynamic> _$SchoolDashboardToJson(SchoolDashboard instance) =>
       'students_count': instance.studentsCount,
       'submissions_count': instance.submissionsCount,
       'submissions_likes': instance.submissionsLikes,
-      'points': instance.points,
+      'avg_points': instance.averagePoints,
       'top_students': instance.topStudents,
     };
 
