@@ -12,15 +12,16 @@ class SchoolRank {
   String? name;
   @JsonKey(name: "rank")
   int? rank;
-  @JsonKey(name: 'points')
-  double? points;
+  @JsonKey(name: 'avg_points')
+  double? averagePoints;
+  
 
   SchoolRank({
     this.id,
     this.createdBy,
     this.name,
     this.rank,
-    this.points,
+    this.averagePoints,
   });
 
   SchoolRank copyWith({
@@ -35,7 +36,7 @@ class SchoolRank {
         createdBy: createdBy ?? this.createdBy,
         name: name ?? this.name,
         rank: rank ?? this.rank,
-        points: points ?? this.points,
+        averagePoints: points ?? this.averagePoints,
       );
 
   factory SchoolRank.fromJson(Map<String, dynamic> json) =>

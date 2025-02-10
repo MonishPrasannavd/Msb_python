@@ -275,90 +275,90 @@ class _PublicTabState extends State<PublicTab> {
                 ),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 18.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: FlexibleText(
-                              text: switch (filter) {
-                                PostFilter.myClass => "Class ${user?.grade}",
-                                PostFilter.mySchool =>
-                                  "${user?.schoolName?.split(',').first}",
-                                PostFilter.other =>
-                                  '${schoolList.firstWhereOrNull((e) => e.schoolId == customSchoolId)?.schoolName?.split(',').first}${[
-                                    '0',
-                                    null
-                                  ].contains(customGrade) ? '' : '\n:Class $customGrade:'}',
-                                _ => "All Submissions",
-                              },
-                              style: GoogleFonts.poppins(
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15,
-                              ),
-                              richStyles: [
-                                GoogleFonts.poppins(
-                                  color: AppColors.black54,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ],
-                            ),
-                          ),
-                          PopupMenuButton<PostFilter>(
-                            onSelected: handleClick,
-                            child: SvgPicture.asset(
-                              "assets/svg/submission.svg",
-                              color: const Color(0xFF938A8A),
-                            ),
-                            itemBuilder: (BuildContext context) {
-                              return PostFilter.values.map((PostFilter choice) {
-                                return PopupMenuItem<PostFilter>(
-                                  value: choice,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 7),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 2.0),
-                                    child: Container(
-                                      width: query.width,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.white,
-                                        border: Border.all(
-                                            color: const Color(0xFFE2DFDF),
-                                            width: 1),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            choice.name
-                                                .split(RegExp(r'(?=[A-Z])'))
-                                                .map((e) =>
-                                                    e[0].toUpperCase() +
-                                                    e.substring(1))
-                                                .join(' '),
-                                            style: GoogleFonts.poppins(
-                                              color: AppColors.black,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList();
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(vertical: 18.0),
+                    //   child: Row(
+                    //     children: [
+                    //       Expanded(
+                    //         child: FlexibleText(
+                    //           text: switch (filter) {
+                    //             PostFilter.myClass => "Class ${user?.grade}",
+                    //             PostFilter.mySchool =>
+                    //               "${user?.schoolName?.split(',').first}",
+                    //             PostFilter.other =>
+                    //               '${schoolList.firstWhereOrNull((e) => e.schoolId == customSchoolId)?.schoolName?.split(',').first}${[
+                    //                 '0',
+                    //                 null
+                    //               ].contains(customGrade) ? '' : '\n:Class $customGrade:'}',
+                    //             _ => "All Submissions",
+                    //           },
+                    //           style: GoogleFonts.poppins(
+                    //             color: AppColors.black,
+                    //             fontWeight: FontWeight.w500,
+                    //             fontSize: 15,
+                    //           ),
+                    //           richStyles: [
+                    //             GoogleFonts.poppins(
+                    //               color: AppColors.black54,
+                    //               fontWeight: FontWeight.w500,
+                    //               fontSize: 12,
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //       PopupMenuButton<PostFilter>(
+                    //         onSelected: handleClick,
+                    //         child: SvgPicture.asset(
+                    //           "assets/svg/submission.svg",
+                    //           color: const Color(0xFF938A8A),
+                    //         ),
+                    //         itemBuilder: (BuildContext context) {
+                    //           return PostFilter.values.map((PostFilter choice) {
+                    //             return PopupMenuItem<PostFilter>(
+                    //               value: choice,
+                    //               padding:
+                    //                   const EdgeInsets.symmetric(horizontal: 7),
+                    //               child: Padding(
+                    //                 padding: const EdgeInsets.symmetric(
+                    //                     vertical: 2.0),
+                    //                 child: Container(
+                    //                   width: query.width,
+                    //                   height: 50,
+                    //                   decoration: BoxDecoration(
+                    //                     color: AppColors.white,
+                    //                     border: Border.all(
+                    //                         color: const Color(0xFFE2DFDF),
+                    //                         width: 1),
+                    //                     borderRadius:
+                    //                         BorderRadius.circular(8.0),
+                    //                   ),
+                    //                   child: Row(
+                    //                     children: [
+                    //                       const SizedBox(width: 15),
+                    //                       Text(
+                    //                         choice.name
+                    //                             .split(RegExp(r'(?=[A-Z])'))
+                    //                             .map((e) =>
+                    //                                 e[0].toUpperCase() +
+                    //                                 e.substring(1))
+                    //                             .join(' '),
+                    //                         style: GoogleFonts.poppins(
+                    //                           color: AppColors.black,
+                    //                           fontWeight: FontWeight.w500,
+                    //                           fontSize: 14,
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             );
+                    //           }).toList();
+                    //         },
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     Consumer<SubmissionProvider>(builder: (ctxt, ref, child) {
                       return Expanded(
                         child: ListView.builder(

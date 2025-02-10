@@ -569,7 +569,7 @@ class SchoolScreenState extends State<SchoolScreen> {
                                                             const SizedBox(
                                                                 height: 4),
                                                             Text(
-                                                              "Total Point: ${(school.points ?? 0).toString()}",
+                                                              "Total Point: ${(school.averagePoints ?? 0).toString()}",
                                                               style: GoogleFonts
                                                                   .poppins(
                                                                 color: AppColors

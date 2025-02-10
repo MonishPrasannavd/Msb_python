@@ -11,7 +11,7 @@ SchoolRank _$SchoolRankFromJson(Map<String, dynamic> json) => SchoolRank(
       createdBy: (json['created_by'] as num?)?.toInt(),
       name: json['name'] as String?,
       rank: (json['rank'] as num?)?.toInt(),
-      points: (json['points'] as num?)?.toDouble(),
+      averagePoints: (json['avg_points'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$SchoolRankToJson(SchoolRank instance) =>
@@ -20,5 +20,5 @@ Map<String, dynamic> _$SchoolRankToJson(SchoolRank instance) =>
       'created_by': instance.createdBy,
       'name': instance.name,
       'rank': instance.rank,
-      'points': instance.points,
+      'avg_points': instance.averagePoints,
     };
