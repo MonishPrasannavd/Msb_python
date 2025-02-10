@@ -388,34 +388,34 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                    height: 120,
-                    width: query.width,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.0),
-                        image: const DecorationImage(
-                            image: AssetImage("assets/images/back.png"))),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                            schoolDashboard?.submissionsLikes.toString() ?? "0",
-                            style: GoogleFonts.poppins(
-                                color: const Color(0xFF540D96),
-                                fontWeight: FontWeight.w700,
-                                fontSize: 24)),
-                        Text("Appreciation",
-                            style: GoogleFonts.poppins(
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16)),
-                      ],
-                    ),
-                  ),
-                )
+                // Expanded(
+                //   child: Container(
+                //     padding: EdgeInsets.zero,
+                //     height: 120,
+                //     width: query.width,
+                //     decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(12.0),
+                //         image: const DecorationImage(
+                //             image: AssetImage("assets/images/back.png"))),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.center,
+                //       mainAxisAlignment: MainAxisAlignment.center,
+                //       children: [
+                //         Text(
+                //             schoolDashboard?.submissionsLikes.toString() ?? "0",
+                //             style: GoogleFonts.poppins(
+                //                 color: const Color(0xFF540D96),
+                //                 fontWeight: FontWeight.w700,
+                //                 fontSize: 24)),
+                //         Text("Appreciation",
+                //             style: GoogleFonts.poppins(
+                //                 color: AppColors.black,
+                //                 fontWeight: FontWeight.w500,
+                //                 fontSize: 16)),
+                //       ],
+                //     ),
+                //   ),
+                // )
               ],
             ),
             const SizedBox(height: 10),

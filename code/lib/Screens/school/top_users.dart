@@ -17,7 +17,8 @@ class TopUsersWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Second Top User (Left)
-        Expanded(
+        SizedBox(
+          width: query.width / 3.5,
           child: topUsers.length > 1
               ? UserCard(
                   user: topUsers[1],
@@ -39,7 +40,8 @@ class TopUsersWidget extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         // Third Top User (Right)
-        Expanded(
+        SizedBox(
+          width: query.width / 3.5,
           child: topUsers.length > 2
               ? UserCard(
                   user: topUsers[2],
@@ -52,10 +54,10 @@ class TopUsersWidget extends StatelessWidget {
   }
 }
 
-Widget _buildProfileImage(String? name, String? profileImageUrl) {
+Widget _buildProfileImage( String? name, String? profileImageUrl, {bool isCenter= false}) {
   if (profileImageUrl != null) {
     return CircleAvatar(
-      radius: 20,
+      radius: isCenter ? 40 : 30,
       backgroundImage: NetworkImage(profileImageUrl),
     );
   } else {
@@ -99,7 +101,7 @@ class UserCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               (user.user?.name != null && user.user?.imageUrl != null)
-                  ? _buildProfileImage(user.user?.name, user.user?.imageUrl)
+                  ? _buildProfileImage(user.user?.name, user.user?.imageUrl, isCenter: isCenter)
                   : Image.asset("assets/images/profile.png"),
               SizedBox(height: isCenter ? 15 : 10),
               Text(
@@ -113,23 +115,13 @@ class UserCard extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               Text(
-                "(${user.gradeId ?? 'N/A'})",
+                "Points: ${user.points ?? 0}",
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
                 ),
-                textAlign: TextAlign.center,
               ),
-              if (isCenter) // Only show points for the top user
-                Text(
-                  "Points: ${user.points ?? 0}",
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
-                ),
             ],
           ),
         ),

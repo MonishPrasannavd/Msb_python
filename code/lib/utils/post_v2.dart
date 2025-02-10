@@ -338,7 +338,7 @@ class PostUiUtilsV2 {
   static Widget _buildPostContent(
       BuildContext context, int index, Submission post) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(
+      borderRadius: (getPostFeedType(post) == null || getPostFeedType(post) == PostFeedType.text) ? BorderRadius.zero : BorderRadius.circular(
           16), // Increased corner radius for more rounded edges
       child: SizedBox(
         width: double.infinity,
@@ -538,7 +538,7 @@ class PostUiUtilsV2 {
                   },
                   child: _buildIconText(
                     Icons.comment_outlined,
-                    post.commentsCount?.toString() ?? "0",
+                    post.comments.length.toString() ?? "0",
                   ),
                 ),
                 // if (post.commentsEnabled) ...[
