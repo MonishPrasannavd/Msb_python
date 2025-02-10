@@ -63,6 +63,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       routeObserver.subscribe(this, ModalRoute.of(context)!);
     });
+    loadUser();
   }
 
   @override
@@ -74,7 +75,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
   @override
   void didPopNext() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      updateUser();
+      loadUser();
     });
     super.didPopNext();
   }
@@ -82,18 +83,14 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    updateUser();
-  }
-
-  void updateUser() async {
-    final result = await _authProvider.getUserMe(_userProvider.user);
-    final user = result['user'] as MsbUser?;
-    if (user == null) return;
-    _userProvider.setUser(user);
     loadUser();
   }
 
   Future<void> loadUser() async {
+    final result = await _authProvider.getUserMe(_userProvider.user);
+    final user = result['user'] as MsbUser?;
+    if (user == null) return;
+    _userProvider.setUser(user);
     setState(() {
       nameController.text = _userProvider.user.user?.name ?? "";
       Grade? gradeResolve;
@@ -149,7 +146,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
         _userProvider.updateUserAndSchool(
             updatedStudent: updatedUser.student, updatedUser: updatedUser.user);
       }
-      updateUser();
+      loadUser();
     } catch (e) {
       debugPrint("Error saving profile details: $e");
     }
