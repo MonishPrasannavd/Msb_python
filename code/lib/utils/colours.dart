@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  static const Color scaffoldBackgroundColor = Color(0xFFF5F4F4);
   // misc
   static const Color transparent = Colors.transparent;
 
@@ -125,10 +126,12 @@ class AppColors {
   static const Color msbColor1 = Color(0xFF0447AB); // #0447AB
   static const Color msbColor2 = Color(0xFF0498AF); // #0498AF
   static const Color msbColor3 = Color(0xFF847DB0); // #847DB0
-  static const Color msbColor4 = Color(0x59000000); // #00000059 (Semi-transparent black)
+  static const Color msbColor4 =
+      Color(0x59000000); // #00000059 (Semi-transparent black)
   static const Color msbColor5 = Color(0xFF000000); // #000000
   static const Color msbColor6 = Color(0xFF525252); // #525252
-  static const Color msbColor7 = Color(0x60000000); // #00000059 (Semi-transparent black)
+  static const Color msbColor7 =
+      Color(0x60000000); // #00000059 (Semi-transparent black)
 
   // msb misc colors
   static const Color msbGold = Color(0xFFFFDC64);

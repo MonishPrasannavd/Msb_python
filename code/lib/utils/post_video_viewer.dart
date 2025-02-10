@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/utils/colours.dart';
 import 'package:msb_app/utils/post_v2.dart';
@@ -91,8 +92,11 @@ class _PostVideoViewerState extends State<PostVideoViewer> {
               ],
             ),
           )
-        : const Center(
-            child: CircularProgressIndicator(),
+        : Center(
+            child: LoadingAnimationWidget.staggeredDotsWave(
+              color: Colors.black,
+              size: 50,
+            ),
           );
   }
 }

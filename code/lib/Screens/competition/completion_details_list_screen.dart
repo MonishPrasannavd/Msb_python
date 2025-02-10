@@ -183,14 +183,17 @@ class _CompletionDetailsListScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBackgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: AppColors.scaffoldBackgroundColor,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: SvgPicture.asset("assets/svg/back.svg")),
+              onTap: () => Navigator.pop(context),
+              child: SvgPicture.asset("assets/svg/back.svg"),
+            ),
             Text(
               widget.categoryName,
               style: GoogleFonts.poppins(
@@ -198,7 +201,7 @@ class _CompletionDetailsListScreenState
                   fontWeight: FontWeight.bold,
                   fontSize: 18),
             ),
-            SvgPicture.asset("assets/svg/dash_1.svg"),
+            SizedBox(width: 24),
           ],
         ),
       ),
@@ -226,8 +229,6 @@ class _CompletionDetailsListScreenState
               setState(() {
                 _refreshSubmissions();
               });
-              // await postFeedsProvider.getAllPost();
-              // fetchData();
             });
           },
           backgroundColor: AppColors.purpleDark,

@@ -3,16 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:msb_app/Screens/home/tab_1_home.dart';
 import 'package:msb_app/Screens/profile/profile_page.dart';
 import 'package:msb_app/providers/user_provider.dart';
-import 'package:msb_app/services/preferences_service.dart';
+import 'package:msb_app/utils/auth.dart';
 import 'package:msb_app/utils/user.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/colours.dart';
 
 class HomeScreen extends StatefulWidget {
-  final VoidCallback onLogout;
-
-  const HomeScreen({required this.onLogout, super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -24,11 +22,9 @@ class HomeScreenState extends State<HomeScreen>
   GlobalKey<HomeTabState> homeTabKey = GlobalKey<HomeTabState>();
   GlobalKey<ProfileScreenState> profileScreenState =
       GlobalKey<ProfileScreenState>();
-  late UserProvider _userProvider;
 
   @override
   void initState() {
-    _userProvider = Provider.of<UserProvider>(context, listen: false);
     tabController = TabController(length: 3, vsync: this);
     tabController.addListener(() {
       setState(() {
@@ -97,14 +93,7 @@ class HomeScreenState extends State<HomeScreen>
                         ],
                       ),
                       const Spacer(),
-                      InkWell(
-                        onTap: () async {
-                          await PrefsService.clear();
-                          widget.onLogout();
-                        },
-                        child: const Icon(Icons.logout,
-                            color: Color(0xFFCDA1F7), size: 28),
-                      ),
+
                       // SvgPicture.asset(
                       //   "assets/svg/chat.svg",
                       //   height: 36,
@@ -119,11 +108,13 @@ class HomeScreenState extends State<HomeScreen>
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProfileScreen(
-                                        onLogout: widget.onLogout,
-                                      )));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(
+                                onLogout: AuthUtils.handleLogout(context),
+                              ),
+                            ),
+                          );
                         },
                         child: Container(
                           decoration: const BoxDecoration(

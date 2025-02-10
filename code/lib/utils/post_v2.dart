@@ -50,6 +50,7 @@ class PostUiUtilsV2 {
       Function()? followUser,
     })? customPostFooter,
     Function()? onTap,
+    bool enableOnTapNavigation = true,
   }) {
     final postHeader = customPostHeader ?? _buildPostHeader;
     final postContent = customPostContent ?? _buildPostContent;
@@ -57,21 +58,21 @@ class PostUiUtilsV2 {
 
     return GestureDetector(
       onTap: () async {
-        var currentPostType = getPostFeedType(post);
-        // if(currentPostType == null || currentPostType == PostFeedType.text) return;
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PostDetailScreen(post: post),
-          ),
-        );
+        if (enableOnTapNavigation) {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PostDetailScreen(post: post),
+            ),
+          );
+        }
         onTap?.call();
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         elevation: 3,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: BorderRadius.circular(12.0),
         ),
         child: Padding(
           padding: const EdgeInsets.all(12.0),

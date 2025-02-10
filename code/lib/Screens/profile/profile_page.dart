@@ -165,7 +165,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
               )
             : null, // If there's no history, do not show the back button
         title: Text(
-          "Profile",
+          "My Profile",
           style: GoogleFonts.poppins(
               color: AppColors.black,
               fontWeight: FontWeight.w500,
@@ -188,10 +188,10 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
           Image.asset("assets/images/profile_frame.png"),
           Column(
             children: [
-              SizedBox(height: query.height * 0.15),
+              SizedBox(height: query.height * 0.1),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
                 child: Container(
                   // height: isEditing ? query.height * 1 : query.height * 1,
                   // width: query.width,
@@ -201,7 +201,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
                       borderRadius: BorderRadius.circular(20.0)),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       GestureDetector(
                         onTap: () {
                           if (isEditing) {
@@ -288,19 +288,40 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildStatCard(likesCount, "Likes", "unLike.svg"),
-                            // _buildStatCard(user?.follower.length.toString() ?? "0", "Followers", "users.svg"),
-                            _buildStatCard(
-                                commentsCount, "Comments", "comment.svg"),
+                            Expanded(
+                              child: Center(
+                                child: _buildStatCard(
+                                  likesCount,
+                                  "Likes",
+                                  "unLike.svg",
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Center(
+                                child: _buildStatCard(
+                                  commentsCount,
+                                  "Comments",
+                                  "comment.svg",
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Center(
+                                child: _buildStatCard(
+                                  totalPoints,
+                                  "Your Stars",
+                                  "star",
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
 
-                      /// stars card
-                      _buildStarsCard(context),
                       const SizedBox(height: 20),
 
                       Padding(
@@ -395,7 +416,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 20),
                                 SizedBox(
                                   width: constraints
                                       .maxWidth, // Full width of the Row
@@ -437,6 +458,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
                           },
                         ),
                       ),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
@@ -573,8 +595,8 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Container(
-        // width: double.infinity,
-        // margin: const EdgeInsets.symmetric(horizontal: 16.0),
+        width: 100,
+        height: 110,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         decoration: BoxDecoration(
           color: AppColors.msbMain100,
@@ -613,7 +635,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
   Widget _buildStatCard(String value, String label, String iconPath) {
     return Container(
       height: 100,
-      width: 110,
+      width: 100,
       decoration: BoxDecoration(
         color: const Color(0xFF3F0A70),
         borderRadius: BorderRadius.circular(8.0),
@@ -621,10 +643,16 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(
-            "assets/svg/$iconPath",
-            color: AppColors.white,
-          ),
+          switch (iconPath) {
+            'star' => Icon(
+                Icons.star_outline,
+                color: Colors.white,
+              ),
+            _ => SvgPicture.asset(
+                "assets/svg/$iconPath",
+                color: AppColors.white,
+              ),
+          },
           const SizedBox(height: 10),
           Text(
             value,

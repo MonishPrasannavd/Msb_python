@@ -114,7 +114,7 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
   Widget build(BuildContext context) {
     var query = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.scaffoldBackgroundColor,
       body: Consumer4<SchoolApiProvider, SubmissionProvider,
               SubmissionApiProvider, UserProvider>(
           builder: (ctxt, schoolApiProvider, submissionProvider,

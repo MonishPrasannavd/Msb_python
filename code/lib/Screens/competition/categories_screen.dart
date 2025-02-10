@@ -58,22 +58,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            /*GestureDetector(
-              onTap: () => Navigator.pop(context),
-                child: SvgPicture.asset("assets/svg/back.svg")),*/
-            const SizedBox.shrink(),
-            Text(
-              "Talent",
-              style: GoogleFonts.poppins(
-                  color: AppColors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-            ),
-            SvgPicture.asset("assets/svg/dash_1.svg"),
-          ],
+        centerTitle: true,
+        title: Text(
+          "Talent",
+          style: GoogleFonts.poppins(
+            color: AppColors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
       ),
       body: Padding(

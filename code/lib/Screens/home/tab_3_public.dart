@@ -261,201 +261,187 @@ class _PublicTabState extends State<PublicTab> {
 
   @override
   Widget build(BuildContext context) {
-    var query = MediaQuery.of(context).size;
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Column(
           children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12.0,
-                  vertical: 8.0,
-                ),
-                child: Column(
-                  children: [
-                    // Padding(
-                    //   padding: const EdgeInsets.symmetric(vertical: 18.0),
-                    //   child: Row(
-                    //     children: [
-                    //       Expanded(
-                    //         child: FlexibleText(
-                    //           text: switch (filter) {
-                    //             PostFilter.myClass => "Class ${user?.grade}",
-                    //             PostFilter.mySchool =>
-                    //               "${user?.schoolName?.split(',').first}",
-                    //             PostFilter.other =>
-                    //               '${schoolList.firstWhereOrNull((e) => e.schoolId == customSchoolId)?.schoolName?.split(',').first}${[
-                    //                 '0',
-                    //                 null
-                    //               ].contains(customGrade) ? '' : '\n:Class $customGrade:'}',
-                    //             _ => "All Submissions",
-                    //           },
-                    //           style: GoogleFonts.poppins(
-                    //             color: AppColors.black,
-                    //             fontWeight: FontWeight.w500,
-                    //             fontSize: 15,
-                    //           ),
-                    //           richStyles: [
-                    //             GoogleFonts.poppins(
-                    //               color: AppColors.black54,
-                    //               fontWeight: FontWeight.w500,
-                    //               fontSize: 12,
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       ),
-                    //       PopupMenuButton<PostFilter>(
-                    //         onSelected: handleClick,
-                    //         child: SvgPicture.asset(
-                    //           "assets/svg/submission.svg",
-                    //           color: const Color(0xFF938A8A),
-                    //         ),
-                    //         itemBuilder: (BuildContext context) {
-                    //           return PostFilter.values.map((PostFilter choice) {
-                    //             return PopupMenuItem<PostFilter>(
-                    //               value: choice,
-                    //               padding:
-                    //                   const EdgeInsets.symmetric(horizontal: 7),
-                    //               child: Padding(
-                    //                 padding: const EdgeInsets.symmetric(
-                    //                     vertical: 2.0),
-                    //                 child: Container(
-                    //                   width: query.width,
-                    //                   height: 50,
-                    //                   decoration: BoxDecoration(
-                    //                     color: AppColors.white,
-                    //                     border: Border.all(
-                    //                         color: const Color(0xFFE2DFDF),
-                    //                         width: 1),
-                    //                     borderRadius:
-                    //                         BorderRadius.circular(8.0),
-                    //                   ),
-                    //                   child: Row(
-                    //                     children: [
-                    //                       const SizedBox(width: 15),
-                    //                       Text(
-                    //                         choice.name
-                    //                             .split(RegExp(r'(?=[A-Z])'))
-                    //                             .map((e) =>
-                    //                                 e[0].toUpperCase() +
-                    //                                 e.substring(1))
-                    //                             .join(' '),
-                    //                         style: GoogleFonts.poppins(
-                    //                           color: AppColors.black,
-                    //                           fontWeight: FontWeight.w500,
-                    //                           fontSize: 14,
-                    //                         ),
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             );
-                    //           }).toList();
-                    //         },
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    Consumer<SubmissionProvider>(builder: (ctxt, ref, child) {
-                      return Expanded(
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          padding: EdgeInsets.zero,
-                          itemCount: _submissions.length +
-                              1, // +1 for the loader at the bottom
-                          itemBuilder: (context, index) {
-                            if (index == _submissions.length) {
-                              return _isFetchingMore
-                                  ? const Center(
-                                      child: CircularProgressIndicator())
-                                  : const SizedBox.shrink();
-                            }
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 18.0),
+            //   child: Row(
+            //     children: [
+            //       Expanded(
+            //         child: FlexibleText(
+            //           text: switch (filter) {
+            //             PostFilter.myClass => "Class ${user?.grade}",
+            //             PostFilter.mySchool =>
+            //               "${user?.schoolName?.split(',').first}",
+            //             PostFilter.other =>
+            //               '${schoolList.firstWhereOrNull((e) => e.schoolId == customSchoolId)?.schoolName?.split(',').first}${[
+            //                 '0',
+            //                 null
+            //               ].contains(customGrade) ? '' : '\n:Class $customGrade:'}',
+            //             _ => "All Submissions",
+            //           },
+            //           style: GoogleFonts.poppins(
+            //             color: AppColors.black,
+            //             fontWeight: FontWeight.w500,
+            //             fontSize: 15,
+            //           ),
+            //           richStyles: [
+            //             GoogleFonts.poppins(
+            //               color: AppColors.black54,
+            //               fontWeight: FontWeight.w500,
+            //               fontSize: 12,
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //       PopupMenuButton<PostFilter>(
+            //         onSelected: handleClick,
+            //         child: SvgPicture.asset(
+            //           "assets/svg/submission.svg",
+            //           color: const Color(0xFF938A8A),
+            //         ),
+            //         itemBuilder: (BuildContext context) {
+            //           return PostFilter.values.map((PostFilter choice) {
+            //             return PopupMenuItem<PostFilter>(
+            //               value: choice,
+            //               padding:
+            //                   const EdgeInsets.symmetric(horizontal: 7),
+            //               child: Padding(
+            //                 padding: const EdgeInsets.symmetric(
+            //                     vertical: 2.0),
+            //                 child: Container(
+            //                   width: query.width,
+            //                   height: 50,
+            //                   decoration: BoxDecoration(
+            //                     color: AppColors.white,
+            //                     border: Border.all(
+            //                         color: const Color(0xFFE2DFDF),
+            //                         width: 1),
+            //                     borderRadius:
+            //                         BorderRadius.circular(8.0),
+            //                   ),
+            //                   child: Row(
+            //                     children: [
+            //                       const SizedBox(width: 15),
+            //                       Text(
+            //                         choice.name
+            //                             .split(RegExp(r'(?=[A-Z])'))
+            //                             .map((e) =>
+            //                                 e[0].toUpperCase() +
+            //                                 e.substring(1))
+            //                             .join(' '),
+            //                         style: GoogleFonts.poppins(
+            //                           color: AppColors.black,
+            //                           fontWeight: FontWeight.w500,
+            //                           fontSize: 14,
+            //                         ),
+            //                       ),
+            //                     ],
+            //                   ),
+            //                 ),
+            //               ),
+            //             );
+            //           }).toList();
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            Consumer<SubmissionProvider>(builder: (ctxt, ref, child) {
+              return Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: EdgeInsets.zero,
+                  itemCount: _submissions.length +
+                      1, // +1 for the loader at the bottom
+                  itemBuilder: (context, index) {
+                    if (index == _submissions.length) {
+                      return _isFetchingMore
+                          ? const Center(child: CircularProgressIndicator())
+                          : const SizedBox.shrink();
+                    }
 
-                            var post = _submissions[index];
+                    var post = _submissions[index];
 
-                            return PostUiUtilsV2.buildPostTile(
-                              context,
-                              index,
-                              post,
-                              (postId) async {
-                                await CommentBottomSheet.show(context,
-                                    postId: post.id!);
-                                await _fetchInitialSubmissions();
-                              },
-                              () => onLike(index: index),
-                              followUser: () => onFollow(index: index),
-                              currentUser: user,
-                              onSchoolTap: (schoolId) {
-                                filter = PostFilter.other;
-                                customSchoolId = schoolId;
-                                customGrade = null;
-                              },
-                              onTap: _fetchInitialSubmissions,
-                            );
-                          },
-                        ),
-                      );
-                      // if (_submissionProvider.submissions.isNotEmpty) {
-                      //   return Expanded(
-                      //     child: ListView.separated(
-                      //       controller: _scrollController,
-                      //       padding: EdgeInsets.zero,
-                      //       itemCount: _submissions.length + 1,
-                      //       itemBuilder: (context, index) {
-                      //         if (index == _submissions.length) {
-                      //           return _isFetchingMore ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
-                      //         }
-                      //         var post = _submissions[index];
-                      //
-                      //         return PostUiUtilsV2.buildPostTile(
-                      //           context,
-                      //           index,
-                      //           post,
-                      //           (postId) => CommentBottomSheet.show(
-                      //             context,
-                      //             postId: post.id!,
-                      //           ),
-                      //           () => onLike(index: index),
-                      //           followUser: () => onFollow(
-                      //             index: index,
-                      //           ),
-                      //           currentUser: user,
-                      //           onSchoolTap: (schoolId) {
-                      //             filter = PostFilter.other;
-                      //             customSchoolId = schoolId;
-                      //             customGrade = null;
-                      //           },
-                      //         );
-                      //       },
-                      //       separatorBuilder:
-                      //           (BuildContext context, int index) {
-                      //         return const SizedBox(height: 15);
-                      //       },
-                      //     ),
-                      //   );
-                      // } else {
-                      //   return Expanded(
-                      //     // Ensure "return" is added here
-                      //     child: Center(
-                      //       child: Text(
-                      //         "Loading...",
-                      //         style: GoogleFonts.poppins(
-                      //           color: AppColors.black,
-                      //           fontWeight: FontWeight.w500,
-                      //           fontSize: 15,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   );
-                      // }
-                    }),
-                  ],
+                    return PostUiUtilsV2.buildPostTile(
+                      context,
+                      index,
+                      post,
+                      (postId) async {
+                        await CommentBottomSheet.show(context,
+                            postId: post.id!);
+                        await _fetchInitialSubmissions();
+                      },
+                      () => onLike(index: index),
+                      followUser: () => onFollow(index: index),
+                      currentUser: user,
+                      onSchoolTap: (schoolId) {
+                        filter = PostFilter.other;
+                        customSchoolId = schoolId;
+                        customGrade = null;
+                      },
+                      onTap: _fetchInitialSubmissions,
+                    );
+                  },
                 ),
-              ),
-            ),
+              );
+              // if (_submissionProvider.submissions.isNotEmpty) {
+              //   return Expanded(
+              //     child: ListView.separated(
+              //       controller: _scrollController,
+              //       padding: EdgeInsets.zero,
+              //       itemCount: _submissions.length + 1,
+              //       itemBuilder: (context, index) {
+              //         if (index == _submissions.length) {
+              //           return _isFetchingMore ? const Center(child: CircularProgressIndicator()) : const SizedBox.shrink();
+              //         }
+              //         var post = _submissions[index];
+              //
+              //         return PostUiUtilsV2.buildPostTile(
+              //           context,
+              //           index,
+              //           post,
+              //           (postId) => CommentBottomSheet.show(
+              //             context,
+              //             postId: post.id!,
+              //           ),
+              //           () => onLike(index: index),
+              //           followUser: () => onFollow(
+              //             index: index,
+              //           ),
+              //           currentUser: user,
+              //           onSchoolTap: (schoolId) {
+              //             filter = PostFilter.other;
+              //             customSchoolId = schoolId;
+              //             customGrade = null;
+              //           },
+              //         );
+              //       },
+              //       separatorBuilder:
+              //           (BuildContext context, int index) {
+              //         return const SizedBox(height: 15);
+              //       },
+              //     ),
+              //   );
+              // } else {
+              //   return Expanded(
+              //     // Ensure "return" is added here
+              //     child: Center(
+              //       child: Text(
+              //         "Loading...",
+              //         style: GoogleFonts.poppins(
+              //           color: AppColors.black,
+              //           fontWeight: FontWeight.w500,
+              //           fontSize: 15,
+              //         ),
+              //       ),
+              //     ),
+              //   );
+              // }
+            }),
           ],
         ),
       ),

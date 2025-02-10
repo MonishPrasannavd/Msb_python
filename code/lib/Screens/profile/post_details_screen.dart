@@ -141,16 +141,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
-  Future<void> onLike(Submission post, {required int index}) async {
-    final likes = post.likesCount ?? 0;
-    final userHasLiked = post.isLiked ?? false;
+  Future<void> onLike() async {
+    final likes = widget.post!.likesCount ?? 0;
+    final userHasLiked = widget.post!.isLiked ?? false;
     setState(() {
-      widget.post = post.copyWith(
+      widget.post = widget.post!.copyWith(
         isLiked: !userHasLiked,
         likesCount: likes + (userHasLiked ? -1 : 1),
       );
     });
-    submissionApiProvider.toggleLike(post.id!);
+    submissionApiProvider.toggleLike(widget.post!.id!);
   }
 
 // Helper method to build image post using CachedNetworkImage
@@ -245,86 +245,49 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBackgroundColor,
       appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: AppColors.scaffoldBackgroundColor,
         title: _buildPostHeader(),
-        backgroundColor: AppColors.primary,
         elevation: 0,
       ),
       body: widget.post == null
           ? Center(child: CircularProgressIndicator())
-          : Container(
-              padding: const EdgeInsets.all(10.0),
-              decoration: const BoxDecoration(
-                // Image set to background of the body
-                image: DecorationImage(
-                    image: AssetImage("assets/images/profile_frame copy.png"),
-                    fit: BoxFit.cover),
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(5.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildPostHeaderTitle(),
-                    const SizedBox(height: 10),
-                    _buildPostContent(),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(5.0),
-                      // height: 45,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.black12,
-                            Colors.black12,
-                            Colors.blueGrey
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      child: PostUiUtilsV2.buildPostFooter(
-                        context,
-                        widget.post!,
-                        (postId) async {
-                          await CommentBottomSheet.show(context,
-                              postId: postId);
-                        },
-                        () => onLike(widget.post!, index: 0),
-                      ),
-                    ),
-
-                    //_buildPostActions(),
-                    const SizedBox(height: 5),
-                    //_buildPostLikesAndComments(),
-                    const SizedBox(height: 100),
-                  ],
-                ),
+          : SingleChildScrollView(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
+              child: PostUiUtilsV2.buildPostTile(
+                context,
+                0,
+                widget.post!,
+                (postId) async {
+                  await CommentBottomSheet.show(context, postId: postId);
+                },
+                onLike,
+                enableOnTapNavigation: false,
               ),
             ),
     );
   }
 
   Widget _buildPostHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Image.asset(
-            "assets/images/profile.png",
-            height: 40,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          "assets/images/profile.png",
+          height: 40,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          widget.post != null ? widget.post!.user!.name ?? 'Unknown' : "",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(width: 8),
-          Text(
-            widget.post != null ? widget.post!.user!.name ?? 'Unknown' : "",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

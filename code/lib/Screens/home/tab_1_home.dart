@@ -217,8 +217,10 @@ class HomeTabState extends State<HomeTab> {
                       },
                     ),
                   ),
+                  const SizedBox(height: 10),
+
                   _buildIndicator(),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 12),
 
                   // Mood text display
                   Center(
@@ -255,7 +257,7 @@ class HomeTabState extends State<HomeTab> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 20),
                   // Row of mood icons (now using asset images)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -433,232 +435,186 @@ class HomeTabState extends State<HomeTab> {
                             ),
                           ),
 
-                          // top 3 leaderboard listview
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            child: ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: top3Students.length,
-                              itemBuilder: (context, index) {
-                                var student = top3Students[index];
-                                bool isOdd = index % 2 !=
-                                    0; // Corrected logic for odd-even
-                                var backgroundColor =
-                                    colors[index % colors.length];
-                                var borderColor =
-                                    colorsBorder[index % colorsBorder.length];
+                          SizedBox(height: 15),
 
-                                return Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // Navigation to UserProfileScreen
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              UserProfileScreen(
-                                                  id: student.userId
-                                                      .toString()),
-                                        ),
-                                      ).then((val) => refetchData());
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        color: backgroundColor,
-                                        borderRadius: BorderRadius.only(
-                                          // Correctly alternate shapes based on isOdd condition
-                                          topRight: Radius.circular(
-                                              isOdd ? 60.0 : 12.0),
-                                          topLeft: Radius.circular(
-                                              isOdd ? 12.0 : 60.0),
-                                          bottomLeft: Radius.circular(
-                                              isOdd ? 12.0 : 60.0),
-                                          bottomRight: Radius.circular(
-                                              isOdd ? 60.0 : 12.0),
-                                        ),
+                          // top 3 leaderboard listview
+                          ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: top3Students.length,
+                            itemBuilder: (context, index) {
+                              var student = top3Students[index];
+                              bool isOdd = index % 2 !=
+                                  0; // Corrected logic for odd-even
+                              var backgroundColor =
+                                  colors[index % colors.length];
+                              var borderColor =
+                                  colorsBorder[index % colorsBorder.length];
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5.0, vertical: 5.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    // Navigation to UserProfileScreen
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => UserProfileScreen(
+                                            id: student.userId.toString()),
                                       ),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          if (isOdd) ...[
-                                            // Profile image appears on the right for odd indexes
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.7, // Adjust width as needed
-                                                  child: FittedBox(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    fit: BoxFit.scaleDown,
-                                                    child: Text(
-                                                      "${index + 1}. ${student.user!.name ?? "Anonymous"}",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        // fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                SizedBox(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.7, // Adjust width as needed
-                                                  child: FittedBox(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    fit: BoxFit.scaleDown,
-                                                    child: Text(
-                                                      student.city ??
-                                                          "Unknown School",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        color: Colors.white70,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  "Score: ${student.points}",
-                                                  style: GoogleFonts.poppins(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const Spacer(),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                    color: borderColor,
-                                                    width: 5),
-                                              ),
-                                              child: CircleAvatar(
-                                                radius: 30,
-                                                backgroundImage: student
-                                                            .user!.imageUrl !=
-                                                        null
-                                                    ? NetworkImage(
-                                                        student.user!.imageUrl!)
-                                                    : const AssetImage(
-                                                            'assets/images/profile1.png')
-                                                        as ImageProvider,
-                                              ),
-                                            ),
-                                          ] else ...[
-                                            // Profile image appears on the left for even indexes
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                    color: borderColor,
-                                                    width: 5),
-                                              ),
-                                              child: CircleAvatar(
-                                                radius: 30,
-                                                backgroundImage: student
-                                                            .user!.imageUrl !=
-                                                        null
-                                                    ? NetworkImage(
-                                                        student.user!.imageUrl!)
-                                                    : const AssetImage(
-                                                            'assets/images/profile1.png')
-                                                        as ImageProvider,
-                                              ),
-                                            ),
-                                            const Spacer(),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              children: [
-                                                SizedBox(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.7, // Adjust width as needed
-                                                  child: FittedBox(
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    fit: BoxFit.scaleDown,
-                                                    child: Text(
-                                                      "${index + 1}. ${student.user!.name ?? "Anonymous"}",
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                SizedBox(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.7, // Adjust width as needed
-                                                  child: FittedBox(
-                                                    fit: BoxFit.scaleDown,
-                                                    alignment:
-                                                        Alignment.centerRight,
-                                                    child: Text(
-                                                      student.schoolId
-                                                          .toString(),
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                        color: Colors.white70,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  "Score: ${student.points}",
-                                                  style: GoogleFonts.poppins(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ],
+                                    ).then((val) => refetchData());
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      top: 8.0,
+                                      bottom: 8,
+                                      left: isOdd ? 16 : 8,
+                                      right: isOdd ? 8 : 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: backgroundColor,
+                                      borderRadius: BorderRadius.only(
+                                        // Correctly alternate shapes based on isOdd condition
+                                        topRight: Radius.circular(
+                                            isOdd ? 60.0 : 12.0),
+                                        topLeft: Radius.circular(
+                                            isOdd ? 12.0 : 60.0),
+                                        bottomLeft: Radius.circular(
+                                            isOdd ? 12.0 : 60.0),
+                                        bottomRight: Radius.circular(
+                                            isOdd ? 60.0 : 12.0),
                                       ),
                                     ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        if (isOdd) ...[
+                                          // Profile image appears on the right for odd indexes
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7, // Adjust width as needed
+                                                child: FittedBox(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Text(
+                                                    "${index + 1}. ${student.user!.name ?? "Anonymous"}",
+                                                    style: GoogleFonts.poppins(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      // fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              Text(
+                                                "Score: ${student.points}",
+                                                style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const Spacer(),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: borderColor, width: 5),
+                                            ),
+                                            child: CircleAvatar(
+                                              radius: 30,
+                                              backgroundImage: student
+                                                          .user!.imageUrl !=
+                                                      null
+                                                  ? NetworkImage(
+                                                      student.user!.imageUrl!)
+                                                  : const AssetImage(
+                                                          'assets/images/profile1.png')
+                                                      as ImageProvider,
+                                            ),
+                                          ),
+                                        ] else ...[
+                                          // Profile image appears on the left for even indexes
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: borderColor, width: 5),
+                                            ),
+                                            child: CircleAvatar(
+                                              radius: 30,
+                                              backgroundImage: student
+                                                          .user!.imageUrl !=
+                                                      null
+                                                  ? NetworkImage(
+                                                      student.user!.imageUrl!)
+                                                  : const AssetImage(
+                                                          'assets/images/profile1.png')
+                                                      as ImageProvider,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7, // Adjust width as needed
+                                                child: FittedBox(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  fit: BoxFit.scaleDown,
+                                                  child: Text(
+                                                    "${index + 1}. ${student.user!.name ?? "Anonymous"}",
+                                                    style: GoogleFonts.poppins(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              Text(
+                                                "Score: ${student.points}",
+                                                style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ],
+                                    ),
                                   ),
-                                );
-                              },
-                            ),
+                                ),
+                              );
+                            },
                           ),
 
                           // remaining 7 leaderboard
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: ListView.builder(
                               padding: const EdgeInsets.only(top: 10),
                               shrinkWrap: true,
@@ -685,23 +641,35 @@ class HomeTabState extends State<HomeTab> {
                                     child: Container(
                                       height: 60,
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
-                                          border: Border.all(
-                                              width: 2,
-                                              color: const Color(0xFFCECACA))),
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        border: Border.all(
+                                            width: 1,
+                                            color: const Color(0xFFCECACA)),
+                                      ),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 18.0),
                                         child: Row(
                                           children: [
                                             Text(
-                                                "$currentIncrement. ${student.user!.name ?? "Anonymous"}",
-                                                style: GoogleFonts.poppins(
-                                                    color:
-                                                        const Color(0xFF151414),
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 16)),
+                                              "$currentIncrement. ${student.user!.name ?? "Anonymous"}",
+                                              style: GoogleFonts.poppins(
+                                                color: switch (
+                                                    currentIncrement) {
+                                                  4 => Colors.orange,
+                                                  5 => Colors.purple,
+                                                  6 => Colors.lightGreen,
+                                                  7 => Colors.pink,
+                                                  8 => Colors.brown,
+                                                  9 => Colors.green,
+                                                  10 => Colors.lightBlue,
+                                                  _ => const Color(0xFF151414),
+                                                },
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16,
+                                              ),
+                                            ),
                                             const Spacer(),
                                             Text(
                                                 student.points

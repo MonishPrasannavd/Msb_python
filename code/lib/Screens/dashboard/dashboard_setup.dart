@@ -92,12 +92,10 @@ class _DashboardSetupState extends State<DashboardSetup> {
     _pageController = PageController(initialPage: 0);
     _screens.addAll([
       HomeScreen(
-        onLogout: AuthUtils.handleLogout(context),
         key: homeScreenKey,
       ),
       const CategoriesScreen(),
       SchoolScreen(
-        onLogout: AuthUtils.handleLogout(context),
         key: schoolScreenKey,
       ),
       const BlogScreen(),

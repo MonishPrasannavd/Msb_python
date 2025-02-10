@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flexible_text/flexible_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:msb_app/Screens/competition/post%20story/post_feed_screen.dart';
-import 'package:msb_app/Screens/competition/quiz/quiz_screen.dart';
 import 'package:msb_app/models/dashboard.dart';
-import 'package:msb_app/models/submission.dart';
 import 'package:msb_app/providers/student_dashboard_provider.dart';
 import 'package:msb_app/utils/post.dart';
 
@@ -41,19 +39,12 @@ class _CompletionScreenState extends State<CompletionScreen> {
       FirebaseFirestore.instance.collection(FirestoreCollections.competitions);
 
   late PostFeedRepository postFeedRepository;
-  late Future<List<PostFeed>> _postsFuture;
-  late Future<List<CompetitionType>> _completionFuture;
   late StudentDashboardProvider studentDashboardProvider;
 
   @override
   void initState() {
     super.initState();
     postFeedRepository = PostFeedRepository();
-
-    ///this below code is to create Competition in database with Category.
-    // createCompetition();
-
-    fetchData();
   }
 
   Future<Competition?> createCompetitionByCategory(Competition entry) async {
@@ -94,8 +85,9 @@ class _CompletionScreenState extends State<CompletionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.scaffoldBackgroundColor,
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,7 +102,7 @@ class _CompletionScreenState extends State<CompletionScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 18),
             ),
-            SvgPicture.asset("assets/svg/dash_1.svg"),
+            SizedBox(width: 24),
           ],
         ),
       ),
@@ -137,8 +129,7 @@ class _CompletionScreenState extends State<CompletionScreen> {
                         // next(index);
                         PostUiUtils.videoControllers = {};
 
-                        Navigator.of(context, rootNavigator: false)
-                            .push(
+                        Navigator.of(context, rootNavigator: false).push(
                           MaterialPageRoute(
                               builder: (_) => CompletionDetailsListScreen(
                                   categoryId: widget.categoryId,
@@ -154,15 +145,12 @@ class _CompletionScreenState extends State<CompletionScreen> {
                                       "")),
                           //todo: Add list of competition
                           //postsFuture: getPostListForCompletionIndex(userSnapshot.data, index: index),)),
-                        )
-                            .then((value) {
-                          fetchData();
-                        });
+                        );
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Container(
-                          height: 110,
+                          height: 100,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
                             color: Colors.white,
@@ -178,45 +166,38 @@ class _CompletionScreenState extends State<CompletionScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
-                                child: Text(
-                                  widget.subcategories?[index].name ?? "",
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors.black87,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
+                              Expanded(
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          widget.subcategories?[index].name ??
+                                              "",
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.black87,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        Text(
+                                          "Grade 10", // Hardcoded Grade 10
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.black54,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Total Submissions: ${getTotalSubmissionForCompletionIndex(null, index: index)}",
-                                      style: GoogleFonts.poppins(
-                                        color: AppColors.black54,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      "Grade 10", // Hardcoded Grade 10
-                                      style: GoogleFonts.poppins(
-                                        color: AppColors.black54,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Spacer(),
                               Container(
                                 decoration: const BoxDecoration(
                                   color: Color(
@@ -227,22 +208,32 @@ class _CompletionScreenState extends State<CompletionScreen> {
                                   ),
                                 ),
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
+                                  horizontal: 16.0,
+                                  vertical: 8.0,
+                                ),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      "Submission Date: ${DateFormat('d MMM, y, hh:mm a').format(DateTime.parse(DateTime.now().toString()))}",
+                                    FlexibleText(
+                                      text:
+                                          "#Submission Date:# ${DateFormat('d MMM, y, hh:mm a').format(DateTime.parse(DateTime.now().toString()))}",
                                       style: GoogleFonts.poppins(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
                                         fontSize: 12,
                                       ),
+                                      richStyles: [
+                                        GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 12,
+                                        )
+                                      ],
                                     ),
                                     SvgPicture.asset(
                                       "assets/svg/right.svg",
-                                      height: 20,
+                                      height: 12,
                                       color: Colors
                                           .white, // Icon color matches the row background
                                     ),
@@ -311,12 +302,6 @@ class _CompletionScreenState extends State<CompletionScreen> {
           .toString();
     }
     return "";
-  }
-
-  void fetchData() {
-    _postsFuture = postFeedRepository.getPostsByCategoryId(
-        postCategory: widget.categoryName);
-    _completionFuture = getCompetitionByCategory(widget.categoryName);
   }
 
   void createCompetition() {

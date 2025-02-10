@@ -298,6 +298,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           decoration: kTextFieldDecoration.copyWith(
                             hintText: "Name",
                             labelText: "Name",
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Icon(
+                                Icons.person,
+                                color: AppColors.fontHint,
+                              ),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -330,6 +337,16 @@ class _SignUpPageState extends State<SignUpPage> {
                           decoration: kTextFieldDecoration.copyWith(
                             hintText: "Password",
                             labelText: "Password",
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: SvgPicture.asset(
+                                "assets/svg/password.svg",
+                                colorFilter: const ColorFilter.mode(
+                                  AppColors.fontHint,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -345,6 +362,16 @@ class _SignUpPageState extends State<SignUpPage> {
                           decoration: kTextFieldDecoration.copyWith(
                             hintText: "Confirm Password",
                             labelText: "Confirm Password",
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: SvgPicture.asset(
+                                "assets/svg/password.svg",
+                                colorFilter: const ColorFilter.mode(
+                                  AppColors.fontHint,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -365,6 +392,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           decoration: kTextFieldDecoration.copyWith(
                             labelText: "City",
                             hintText: "Enter city",
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Icon(
+                                Icons.place,
+                                color: AppColors.fontHint,
+                              ),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {

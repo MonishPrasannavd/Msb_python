@@ -58,6 +58,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _userAuthProvider = Provider.of<UserAuthProvider>(context, listen: false);
 
     _scrollController = ScrollController()..addListener(_scrollListener);
+    _schoolFuture = Future.delayed(Duration(milliseconds: 16));
 
     // getUser();
     loadAllSubmissions();
@@ -364,6 +365,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   //     .getOne(widget.id);
                   // _fetchPosts(() => postFeedRepository.getPostsByUserId(widget.id, includeHidden: false));
                 } else if (widget.type == "school") {
+                  _schoolFuture = Future.delayed(Duration(milliseconds: 16));
                   // _schoolFuture = schoolUserRepository.findBySchoolId(widget.id);
                   // _fetchPosts(() => postFeedRepository.getPostsBySchoolId(widget.id, includeHidden: false));
                 }
