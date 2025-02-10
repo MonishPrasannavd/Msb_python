@@ -57,6 +57,8 @@ class PostUiUtilsV2 {
 
     return GestureDetector(
       onTap: () async {
+        var currentPostType = getPostFeedType(post);
+        if(currentPostType == null || currentPostType == PostFeedType.text) return;
         await Navigator.push(
           context,
           MaterialPageRoute(

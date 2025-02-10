@@ -146,6 +146,7 @@ class _CompletionDetailsListScreenState
                   post,
                   (postId) async {
                     await CommentBottomSheet.show(context, postId: postId);
+                    await _fetchInitialSubmissions();
                   },
                   () => onLike(post, index: index),
                   onTap: _fetchInitialSubmissions,

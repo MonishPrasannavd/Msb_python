@@ -380,8 +380,10 @@ class _PublicTabState extends State<PublicTab> {
                               context,
                               index,
                               post,
-                              (postId) => CommentBottomSheet.show(context,
-                                  postId: post.id!),
+                              (postId) async {
+                                await CommentBottomSheet.show(context,
+                                    postId: post.id!);
+                              },
                               () => onLike(index: index),
                               followUser: () => onFollow(index: index),
                               currentUser: user,
