@@ -78,7 +78,7 @@ class SubmissionApiProvider extends ChangeNotifier {
     Map<String, dynamic> result;
 
     notifyListeners();
-    final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.GET_ALL_SUBMISSIONS);
+    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}?page=$page&limit=$limit");
 
     try {
       var data = {
