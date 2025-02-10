@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_branch_sdk/flutter_branch_sdk.dart';
+import 'package:msb_app/Screens/competition/completion_details_list_screen.dart';
 import 'package:msb_app/Screens/sign_in/sign_in_screen.dart';
 import 'package:msb_app/models/msbuser.dart';
 import 'package:msb_app/providers/competitions_provider.dart';
@@ -129,7 +130,7 @@ class __DeepLinkListenerBuilderState extends State<_DeepLinkListenerBuilder> {
   }
 
   void listenDeepLinkData(BuildContext context) {
-    streamSubscriptionDeepLink = FlutterBranchSdk.listSession().listen((data) {
+    streamSubscriptionDeepLink = FlutterBranchSdk.listSession().listen((data) async {
       debugPrint('data: $data');
       if (data['+clicked_branch_link'] == true) {
         String? postId, title, description;
@@ -139,6 +140,16 @@ class __DeepLinkListenerBuilderState extends State<_DeepLinkListenerBuilder> {
           description = data["\$og_description"];
         }
 
+        var token = await PrefsService.getToken();
+        if(token == null ) {
+          Navigator.push(
+            navigatorKey.currentContext!,
+            MaterialPageRoute(
+              builder: (context) => const SignInScreen(),
+            ),
+          );
+          return;
+        }
         Navigator.push(
           navigatorKey.currentContext!,
           MaterialPageRoute(

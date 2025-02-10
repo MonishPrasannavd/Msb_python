@@ -58,7 +58,7 @@ class PostUiUtilsV2 {
     return GestureDetector(
       onTap: () async {
         var currentPostType = getPostFeedType(post);
-        if(currentPostType == null || currentPostType == PostFeedType.text) return;
+        // if(currentPostType == null || currentPostType == PostFeedType.text) return;
         await Navigator.push(
           context,
           MaterialPageRoute(
@@ -169,11 +169,16 @@ class PostUiUtilsV2 {
                 //       builder: (context) => PostDetailScreen(post: post,),
                 //     ));
               },
-              child: Text(
-                post.title ?? "Default title",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Text(
+                  post.title ?? "Default title",
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),

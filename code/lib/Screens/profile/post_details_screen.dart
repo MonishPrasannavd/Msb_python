@@ -137,7 +137,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       case PostFeedType.text:
         return _buildTextPost(post);
       default:
-        return const Text("No content available");
+        return _buildTextPost(post);
     }
   }
 
