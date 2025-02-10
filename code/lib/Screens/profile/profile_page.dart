@@ -379,7 +379,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
                                         textStyle: GoogleFonts.poppins(
                                           color: AppColors.white,
                                           fontWeight: FontWeight.w500,
-                                          fontSize: 16,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
@@ -410,7 +410,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
                                         textStyle: GoogleFonts.poppins(
                                           color: AppColors.white,
                                           fontWeight: FontWeight.w500,
-                                          fontSize: 16,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
@@ -449,7 +449,7 @@ class ProfileScreenState extends State<ProfileScreen> with RouteAware {
                                     textStyle: GoogleFonts.poppins(
                                       color: AppColors.white,
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ),

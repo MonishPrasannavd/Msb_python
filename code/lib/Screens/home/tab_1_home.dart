@@ -797,7 +797,7 @@ class HomeTabState extends State<HomeTab> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const Padding(
-                                padding: EdgeInsets.all(20.0),
+                                padding: EdgeInsets.symmetric(vertical: 25.0, horizontal: 8.0),
                                 child: PublicTab(),
                               ),
                             ));
