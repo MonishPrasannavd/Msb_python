@@ -170,7 +170,7 @@ class PostUiUtilsV2 {
                 //     ));
               },
               child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
+                width: MediaQuery.of(context).size.width * 0.6,
                 child: Text(
                   post.title ?? "Default title",
                   maxLines: 2,
@@ -198,7 +198,7 @@ class PostUiUtilsV2 {
                 //     ));
               },
               child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
+                width: MediaQuery.of(context).size.width * 0.6,
                 child: Text(
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

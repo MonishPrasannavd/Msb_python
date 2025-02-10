@@ -271,7 +271,7 @@ class _PublicTabState extends State<PublicTab> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12.0,
-                  vertical: 10.0,
+                  vertical: 8.0,
                 ),
                 child: Column(
                   children: [
@@ -383,6 +383,7 @@ class _PublicTabState extends State<PublicTab> {
                               (postId) async {
                                 await CommentBottomSheet.show(context,
                                     postId: post.id!);
+                                await _fetchInitialSubmissions();
                               },
                               () => onLike(index: index),
                               followUser: () => onFollow(index: index),
