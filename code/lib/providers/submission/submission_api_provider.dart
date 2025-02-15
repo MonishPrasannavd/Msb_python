@@ -67,11 +67,11 @@ class SubmissionApiProvider extends ChangeNotifier {
 
   Future<Map<String, dynamic>> getAllSubmissions({
     int? categoryId,
-    subCategoryId,
-    submissionId,
-    userId,
-    schoolId,
-    gradeId,
+    int? subCategoryId,
+    int? submissionId,
+    int? userId,
+    int? schoolId,
+    int? gradeId,
     int? page = 1,
     int? limit = 10,
   }) async {

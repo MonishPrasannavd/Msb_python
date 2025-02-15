@@ -27,6 +27,7 @@ class AppUrl {
   static const String BASE_URL = 'http://74.208.221.19:5566';
   static const String AUTHENTICATION = '/pre/login';
   static const String SIGNUP = '/pre/register';
+  static const String FORGOT_PASSWORD = '/pre/forgot-password';
   static const String GET_PATIENT_BY_ID = '/PatientData/GetPatientByID';
   static const String PATIENT_ID = 'patientID';
   static const String SUBMIT_SPOT_CHECK = '/SpotCheck/SubmitSpotCheck';

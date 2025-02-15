@@ -278,4 +278,40 @@ class UserAuthProvider with ChangeNotifier {
     }
     return result;
   }
+
+
+  Future<Map<String, dynamic>> resetPassword(String email) async {
+    Map<String, dynamic> result;
+
+    Map<String, dynamic> requestBody = {
+      'email': email,
+    };
+    notifyListeners();
+
+    final headers = {
+      'accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
+    final uri = Uri.parse(AppUrl.BASE_URL + AppUrl.FORGOT_PASSWORD);
+    Response response = await post(
+      uri,
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      var encodedString = jsonDecode(response.body.toString());
+
+      notifyListeners();
+
+      result = {'status': true, 'message': encodedString['message'] ?? 'Successful'};
+    } else {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      var message = responseData['detail'];
+      notifyListeners();
+      result = {'status': false, 'message': message, 'user': null};
+    }
+    return result;
+  }
+
 }

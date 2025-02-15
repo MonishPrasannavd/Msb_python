@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:msb_app/providers/user_auth_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../../utils/colours.dart';
 
@@ -17,19 +19,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
-  Future<void> sendPasswordResetEmail() async {
+  Future<void> sendPasswordResetEmail(UserAuthProvider authProvider) async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
 
       try {
-        await FirebaseAuth.instance.sendPasswordResetEmail(
-          email: emailController.text.trim(),
-        );
+        // await FirebaseAuth.instance.sendPasswordResetEmail(
+        //   email: emailController.text.trim(),
+        // );
+
+        var response = await authProvider.resetPassword(emailController.text.trim());
 
         Fluttertoast.showToast(
-          msg: "Password reset email sent!",
+          msg: response['message'] ?? "Password reset email sent!",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,
           backgroundColor: Colors.green,
@@ -69,71 +73,77 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Forgot Password"),
+        title: Text("Forgot Password", style: TextStyle(color: AppColors.white),),
         backgroundColor: AppColors.primary,
+        toolbarTextStyle: TextStyle(color: AppColors.white),
+        iconTheme: IconThemeData(color: AppColors.white), // This makes the back arrow white
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Enter your registered email address to receive a password reset link.",
-                style: GoogleFonts.poppins(fontSize: 16, color: AppColors.black),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  hintText: "Email Address",
-                  labelText: "Email Address",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
+      body: Consumer<UserAuthProvider>(builder: (context, authProvider, child) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Enter your registered email address to receive a password reset link.",
+                  style: GoogleFonts.poppins(fontSize: 16, color: AppColors.black),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter your email address.";
-                  }
-                  if (!RegExp(r"^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-                      .hasMatch(value)) {
-                    return "Please enter a valid email address.";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : sendPasswordResetEmail,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    hintText: "Email Address",
+                    labelText: "Email Address",
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(
-                    color: Colors.white,
-                  )
-                      : Text(
-                    "Send Reset Link",
-                    style: GoogleFonts.poppins(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter your email address.";
+                    }
+                    if (!RegExp(r"^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                        .hasMatch(value)) {
+                      return "Please enter a valid email address.";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      isLoading ? null : sendPasswordResetEmail(authProvider);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: isLoading
+                        ? const CircularProgressIndicator(
                       color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                    )
+                        : Text(
+                      "Send Reset Link",
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
