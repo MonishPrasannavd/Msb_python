@@ -502,6 +502,35 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
               const SizedBox(height: 15),
             ],
 
+            /// top posts v2
+            if(schoolDashboard?.topLikeSubmissions != null && schoolDashboard!.topLikeSubmissions!.isNotEmpty) ...[
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Popular ',
+                      style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    TextSpan(
+                      text: 'Posts 2',
+                      style: GoogleFonts.poppins(
+                          color: AppColors.purple,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: MsbPostsCarouselV2(posts: schoolDashboard!.topLikeSubmissions!, showLikes: true,),
+              ),
+              const SizedBox(height: 15),
+            ],
+
             /// Popular post
             if (popularPosts.isNotEmpty) ...[
               RichText(

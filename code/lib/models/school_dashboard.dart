@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert';
 
+import 'package:msb_app/models/submission.dart';
+
 part 'school_dashboard.g.dart';
 
 @JsonSerializable()
@@ -16,7 +18,7 @@ class SchoolDashboard {
   @JsonKey(name: "top_students")
   List<TopStudent>? topStudents;
   @JsonKey(name: "top_like_submissions")
-  List<TopLikeSubmission>? topLikeSubmissions;
+  List<Submission>? topLikeSubmissions;
 
   SchoolDashboard({
     this.studentsCount,
@@ -33,7 +35,7 @@ class SchoolDashboard {
     int? submissionsLikes,
     double? avgPoints,
     List<TopStudent>? topStudents,
-    List<TopLikeSubmission>? topLikeSubmissions,
+    List<Submission>? topLikeSubmissions,
   }) =>
       SchoolDashboard(
         studentsCount: studentsCount ?? this.studentsCount,

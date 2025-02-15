@@ -16,7 +16,7 @@ SchoolDashboard _$SchoolDashboardFromJson(Map<String, dynamic> json) =>
           ?.map((e) => TopStudent.fromJson(e as Map<String, dynamic>))
           .toList(),
       topLikeSubmissions: (json['top_like_submissions'] as List<dynamic>?)
-          ?.map((e) => TopLikeSubmission.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => Submission.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
