@@ -78,7 +78,17 @@ class SubmissionApiProvider extends ChangeNotifier {
     Map<String, dynamic> result;
 
     notifyListeners();
-    final uri = Uri.parse("${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}?page=$page&limit=$limit");
+    final uri = Uri.parse(
+        "${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}");
+
+    uri.queryParameters['page'] = page.toString();
+    uri.queryParameters['limit'] = limit.toString();
+    uri.queryParameters['category_id'] = categoryId.toString();
+    uri.queryParameters['sub_category_id'] = subCategoryId.toString();
+    uri.queryParameters['submission_id'] = submissionId.toString();
+    uri.queryParameters['user_id'] = userId.toString();
+    uri.queryParameters['school_id'] = schoolId.toString();
+    uri.queryParameters['grade_id'] = gradeId.toString();
 
     try {
       var data = {

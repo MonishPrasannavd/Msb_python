@@ -86,10 +86,11 @@ class UserAuthProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        var encodedString = jsonDecode(response.body.toString());
-        MsbUser user = MsbUser.fromJson(encodedString);
+        // var encodedString = jsonDecode(response.body.toString());
+        // MsbUser user = MsbUser.fromJson(encodedString);
         notifyListeners();
-        result = {'status': true, 'message': 'Successful', 'user': user};
+        // result = {'status': true, 'message': 'Successful', 'user': user};
+        result = {'status': true, 'message': 'Registration successful. Please verify via email.'};
       } else {
         final Map<String, dynamic> responseData = json.decode(response.body);
         var message = responseData['detail'];

@@ -6,8 +6,8 @@ import 'package:msb_app/models/school.dart';
 class MsbUser {
   final User? user;
   final Student student;
-  final String accessToken;
-  final String tokenType;
+  final String? accessToken;
+  final String? tokenType;
   final int commentsCount;
 
   MsbUser({

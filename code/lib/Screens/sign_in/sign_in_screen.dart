@@ -92,7 +92,7 @@ class _SignInScreenState extends State<SignInScreen> {
         await PrefsService.setUserId(user.user?.id.toString() ?? "");
         await PrefsService.setString(
             "nameEmail", user.user?.email.toString() ?? "");
-        await PrefsService.setToken(user.accessToken);
+        await PrefsService.setToken(user.accessToken!);
 
         AppUrl.addHeader("Authorization", "Bearer ${user.accessToken}");
 

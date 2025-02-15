@@ -653,7 +653,7 @@ class HomeTabState extends State<HomeTab> {
                                         child: Row(
                                           children: [
                                             Text(
-                                              "$currentIncrement. ${student.user!.name ?? "Anonymous"}",
+                                              "$currentIncrement. ${student.user?.name ?? "Anonymous"}",
                                               style: GoogleFonts.poppins(
                                                 color: switch (
                                                     currentIncrement) {
