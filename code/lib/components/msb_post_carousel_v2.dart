@@ -1,35 +1,44 @@
 import 'dart:async';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:msb_app/Screens/home/comment_bottom_sheet.dart';
 import 'package:msb_app/models/submission.dart';
+import 'package:msb_app/providers/submission/submission_api_provider.dart';
 import 'package:msb_app/utils/colours.dart';
+import 'package:msb_app/utils/post_v2.dart';
+import 'package:provider/provider.dart';
 
 class MsbPostsCarouselV2 extends StatefulWidget {
   final List<Submission> posts;
   final bool showLikes;
 
-  const MsbPostsCarouselV2(
-      {super.key, required this.posts, this.showLikes = true});
+  const MsbPostsCarouselV2({super.key, required this.posts, this.showLikes = true});
 
   @override
   State<MsbPostsCarouselV2> createState() => _MsbPostsCarouselV2State();
 }
 
 class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
+  late PageController _pageController;
   int _currentIndex = 0;
   late CachedVideoPlayerPlusController? _videoController;
   bool _isOverlayVisible = false; // Tracks the visibility of video controls
   Timer? _overlayTimer; // Timer to auto-hide the overlay
+
+  late SubmissionApiProvider submissionApiProvider;
+
   @override
   void initState() {
     super.initState();
+    submissionApiProvider = Provider.of<SubmissionApiProvider>(context, listen: false);
     if (widget.posts.isEmpty) {
       throw ArgumentError("Posts list cannot be empty");
     }
-    _initializeVideoController();
+    _pageController = PageController(initialPage: _currentIndex);
   }
 
   @override
@@ -39,356 +48,60 @@ class _MsbPostsCarouselV2State extends State<MsbPostsCarouselV2> {
     super.dispose();
   }
 
-  void _initializeVideoController() {
-    if (widget.posts[_currentIndex].category?.categoryType?.name == 'video' &&
-        widget.posts[_currentIndex].mediaUrl != null) {
-      _videoController = CachedVideoPlayerPlusController.networkUrl(
-        Uri.parse(widget.posts[_currentIndex].mediaUrl!),
-      )..initialize().then((_) {
-          setState(() {});
-        }).catchError((error) {
-          debugPrint("Video initialization error: $error");
-        });
-    } else {
-      _videoController = null;
-    }
-  }
-
-  void _toggleOverlay() {
+  void _onPageChanged(int index) {
     setState(() {
-      _isOverlayVisible = !_isOverlayVisible;
+      _currentIndex = index;
     });
-
-    if (_isOverlayVisible) {
-      _startOverlayHideTimer();
-    }
-  }
-
-  void _startOverlayHideTimer() {
-    _overlayTimer?.cancel();
-    _overlayTimer = Timer(const Duration(seconds: 3), () {
-      if (_isOverlayVisible) {
-        setState(() {
-          _isOverlayVisible = false;
-        });
-      }
-    });
-  }
-
-  Widget _buildOverlayControls() {
-    return Container(
-      color: Colors.black45,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: Icon(
-              _videoController!.value.isPlaying
-                  ? Icons.pause
-                  : Icons.play_arrow,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              setState(() {
-                if (_videoController!.value.isPlaying) {
-                  _videoController!.pause();
-                } else {
-                  _videoController!.play();
-                }
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              _videoController!.value.volume > 0
-                  ? Icons.volume_up
-                  : Icons.volume_off,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              setState(() {
-                _videoController!
-                    .setVolume(_videoController!.value.volume > 0 ? 0 : 1);
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.replay, color: Colors.white),
-            onPressed: () {
-              _videoController!.seekTo(Duration.zero);
-              _videoController!.play();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMediaContent(Submission post) {
-    if (post.category?.categoryType?.name == 'image' &&
-        post.mediaUrl != null &&
-        post.mediaUrl!.isNotEmpty) {
-      return GestureDetector(
-        onLongPress: () => _showImagePreview(post.mediaUrl!),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 8.0,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16.0),
-            child: CachedNetworkImage(
-              imageUrl: post.mediaUrl!,
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 250,
-            ),
-          ),
-        ),
-      );
-    } else if (post.category?.categoryType?.name == 'video' &&
-        _videoController != null &&
-        _videoController!.value.isInitialized) {
-      return GestureDetector(
-        onTap: () {
-          _toggleOverlay();
-        },
-        child: _videoController!.value.isInitialized
-            ? Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    width: double.infinity, // Adjust width as needed
-                    height: 250, // Set a fixed height
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 8.0,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16.0),
-                      child: AspectRatio(
-                        aspectRatio: _videoController!.value.aspectRatio,
-                        child: CachedVideoPlayerPlus(_videoController!),
-                      ),
-                    ),
-                  ),
-                  if (_isOverlayVisible) ...[
-                    _buildOverlayControls(),
-                  ]
-                ],
-              )
-            : const CircularProgressIndicator(),
-      );
-    } else if (post.category?.categoryType?.name == 'text') {
-      return Container(
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(16.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 8.0,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        width: double.infinity,
-        height: 250,
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Text(
-            post.description ?? "No description available",
-            style: GoogleFonts.poppins(fontSize: 14, color: Colors.black),
-          ),
-        ),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
-
-  void _showImagePreview(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Dialog(
-            backgroundColor: Colors.black,
-            child: InteractiveViewer(
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildLikesIndicator(Submission post) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(
-          Icons.favorite,
-          color: AppColors.purple,
-          size: 18,
-        ),
-        const SizedBox(width: 5),
-        Text(
-          post.likesCount.toString(),
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildIndicator(Submission post) {
-    return SizedBox(
-      height: 100,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Previous Button
-          SizedBox(
-            width: 50,
-            height: 80,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0)),
-                shadowColor: Colors.black.withValues(alpha: 0.5),
-                elevation: 10,
-                backgroundColor:
-                    _currentIndex > 0 ? Colors.purple : Colors.grey[300],
-              ),
-              onPressed: _currentIndex > 0
-                  ? () {
-                      setState(() {
-                        _currentIndex =
-                            (_currentIndex - 1) % widget.posts.length;
-                        _initializeVideoController();
-                      });
-                    }
-                  : null,
-              child: const Icon(Icons.arrow_back_ios,
-                  size: 20, color: Colors.white),
-            ),
-          ),
-
-          // Title, Description, and Likes
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      post.title ?? "No Title",
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      "By ${post.user?.name ?? "Anonymous"}",
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  if (widget.showLikes) ...[_buildLikesIndicator(post)]
-                ],
-              ),
-            ),
-          ),
-
-          // Next Button
-          SizedBox(
-            width: 50,
-            height: 80,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0)),
-                shadowColor: Colors.black.withValues(alpha: 1),
-                elevation: 12,
-                backgroundColor: _currentIndex < widget.posts.length - 1
-                    ? Colors.purple
-                    : Colors.grey[300],
-              ),
-              onPressed: _currentIndex < widget.posts.length - 1
-                  ? () {
-                      setState(() {
-                        _currentIndex =
-                            (_currentIndex + 1) % widget.posts.length;
-                        _initializeVideoController();
-                      });
-                    }
-                  : null,
-              child: const Icon(Icons.arrow_forward_ios,
-                  size: 20, color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.posts.isEmpty) {
-      return const Center(
-        child: Text("No posts available"),
-      );
-    }
+    return Consumer<SubmissionApiProvider>(builder: (context, submissionApiProvider, child) {
+      if (widget.posts.isEmpty) {
+        return const Center(
+          child: Text("No posts available"),
+        );
+      }
 
-    final Submission currentPost = widget.posts[_currentIndex];
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: _buildMediaContent(currentPost),
+      return Expanded(
+        child: CarouselSlider.builder(
+          itemCount: widget.posts.length,
+          itemBuilder: (context, index, realIndex) {
+            final Submission currentPost = widget.posts[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: PostUiUtilsV2.buildPostTile(
+                context,
+                index,
+                currentPost,
+                (int index) {
+                  CommentBottomSheet.show(context, postId: currentPost.id!);
+                },
+                () => onLike(
+                  currentPost.id!,
+                ),
+              ),
+            );
+          },
+          options: CarouselOptions(
+            autoPlay: true, scrollDirection: Axis.horizontal, viewportFraction: 1.0,
+            height: MediaQuery.of(context).size.height / 1.25, // Makes it take full screen height
+          ),
         ),
-        const SizedBox(height: 12),
-        _buildIndicator(currentPost),
-      ],
-    );
+      );
+    });
+  }
+
+  Future<void> onLike(int index) async {
+    var post = widget.posts[index];
+    final likes = post.likesCount ?? 0;
+    final userHasLiked = post.isLiked ?? false;
+    setState(() {
+      widget.posts[index] = widget.posts[index].copyWith(
+        isLiked: !userHasLiked,
+        likesCount: likes + (userHasLiked ? -1 : 1),
+      );
+    });
+    submissionApiProvider.toggleLike(post!.id!);
   }
 }

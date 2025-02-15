@@ -524,38 +524,10 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: MsbPostsCarouselV2(posts: schoolDashboard!.topLikeSubmissions!, showLikes: true,),
-              ),
-              const SizedBox(height: 15),
-            ],
-
-            /// Popular post
-            if (popularPosts.isNotEmpty) ...[
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Popular ',
-                      style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    TextSpan(
-                      text: 'Posts',
-                      style: GoogleFonts.poppins(
-                          color: AppColors.purple,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: MsbPostsCarousel(posts: popularPosts),
+              Row(
+                children: [
+                  MsbPostsCarouselV2(posts: schoolDashboard!.topLikeSubmissions!, showLikes: true,),
+                ],
               ),
               const SizedBox(height: 15),
             ],
