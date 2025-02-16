@@ -156,16 +156,16 @@ class _SchoolDetailPageState extends State<SchoolDetailPage> {
                           ],
                         ),
                         const Spacer(),
-                        SvgPicture.asset(
-                          "assets/svg/chat.svg",
-                          height: 36,
-                          color: const Color(0xFFCDA1F7),
-                        ),
-                        SvgPicture.asset(
-                          "assets/svg/notification.svg",
-                          height: 36,
-                          color: const Color(0xFFCDA1F7),
-                        ),
+                        // SvgPicture.asset(
+                        //   "assets/svg/chat.svg",
+                        //   height: 36,
+                        //   color: const Color(0xFFCDA1F7),
+                        // ),
+                        // SvgPicture.asset(
+                        //   "assets/svg/notification.svg",
+                        //   height: 36,
+                        //   color: const Color(0xFFCDA1F7),
+                        // ),
                         const SizedBox(width: 5),
                         Container(
                           decoration: const BoxDecoration(
