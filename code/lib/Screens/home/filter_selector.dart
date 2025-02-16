@@ -9,7 +9,7 @@ import '../../providers/master/master_provider.dart';
 
 class FilterSelector extends StatelessWidget {
   final PostFilter? selectedFilter;
-  final Function(PostFilter, {int? schoolId, int? gradeId, int? userId}) onFilterChange;
+  final Function(PostFilter, {int? schoolId, int? gradeId}) onFilterChange;
 
   const FilterSelector({
     super.key,
@@ -21,19 +21,24 @@ class FilterSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<PostFilter>(
       onSelected: (PostFilter choice) async {
-        if (choice == PostFilter.school) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        final user = userProvider.user.student;
+
+        if (choice == PostFilter.myClass) {
+          // Pass logged-in user's schoolId and gradeId
+          onFilterChange(PostFilter.myClass, schoolId: user.schoolId, gradeId: user.gradeId);
+        } else if (choice == PostFilter.mySchool) {
+          // Pass only logged-in user's schoolId
+          onFilterChange(PostFilter.mySchool, schoolId: user.schoolId);
+        } else if (choice == PostFilter.otherSchools) {
+          // Let user select a school and class
           int? selectedSchool = await _selectSchool(context);
           if (selectedSchool != null) {
-            onFilterChange(PostFilter.school, schoolId: selectedSchool);
+            int? selectedGrade = await _selectGrade(context);
+            if (selectedGrade != null) {
+              onFilterChange(PostFilter.otherSchools, schoolId: selectedSchool, gradeId: selectedGrade);
+            }
           }
-        } else if (choice == PostFilter.grade) {
-          int? selectedGrade = await _selectGrade(context);
-          if (selectedGrade != null) {
-            onFilterChange(PostFilter.grade, gradeId: selectedGrade);
-          }
-        } else if (choice == PostFilter.myPosts) {
-          final userId = Provider.of<UserProvider>(context, listen: false).user.user!.id;
-          onFilterChange(PostFilter.myPosts, userId: userId);
         } else {
           onFilterChange(choice);
         }
@@ -58,16 +63,14 @@ class FilterSelector extends StatelessWidget {
 
   String _getFilterText(PostFilter filter) {
     switch (filter) {
+      case PostFilter.myClass:
+        return "My Class";
+      case PostFilter.mySchool:
+        return "My School";
+      case PostFilter.otherSchools:
+        return "Other Schools";
       case PostFilter.all:
         return "All Submissions";
-      case PostFilter.myPosts:
-        return "My Posts";
-      case PostFilter.school:
-        return "Filter by School";
-      case PostFilter.grade:
-        return "Filter by Grade";
-      default:
-        return "";
     }
   }
 
@@ -81,14 +84,14 @@ class FilterSelector extends StatelessWidget {
           content: schools.isEmpty
               ? Text("No schools available")
               : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: schools.map((school) {
-              return ListTile(
-                title: Text(school.name!),
-                onTap: () => Navigator.pop(context, school.id), // Ensure ID is an int
-              );
-            }).toList(),
-          ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: schools.map((school) {
+                    return ListTile(
+                      title: Text(school.name!),
+                      onTap: () => Navigator.pop(context, school.id),
+                    );
+                  }).toList(),
+                ),
         );
       },
     );
@@ -104,14 +107,14 @@ class FilterSelector extends StatelessWidget {
           content: grades.isEmpty
               ? Text("No grades available")
               : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: grades.map((grade) {
-              return ListTile(
-                title: Text(grade.name!),
-                onTap: () => Navigator.pop(context, grade.id), // Ensure ID is an int
-              );
-            }).toList(),
-          ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: grades.map((grade) {
+                    return ListTile(
+                      title: Text(grade.name!),
+                      onTap: () => Navigator.pop(context, grade.id),
+                    );
+                  }).toList(),
+                ),
         );
       },
     );

@@ -270,22 +270,26 @@ class _PublicTabState extends State<PublicTab> {
     await _fetchFilteredSubmissions(
       schoolId: schoolId,
       gradeId: gradeId,
-      userId: userId,
+      // userId: userId,
     );
   }
 
   Future<void> _fetchFilteredSubmissions({
     int? schoolId,
     int? gradeId,
-    int? userId,
   }) async {
     setState(() => _isFetchingMore = true);
 
     final response = await _submissionApiProvider.getAllSubmissions(
       page: _currentPage,
-      schoolId: filter == PostFilter.school ? schoolId : null,
-      gradeId: filter == PostFilter.grade ? gradeId : null,
-      userId: filter == PostFilter.myPosts ? userId : null,
+      schoolId: (filter == PostFilter.all) ? null
+          : (filter == PostFilter.mySchool || filter == PostFilter.myClass || filter == PostFilter.otherSchools)
+          ? schoolId
+          : null,
+      gradeId: (filter == PostFilter.all) ? null
+          : (filter == PostFilter.myClass || filter == PostFilter.otherSchools)
+          ? gradeId
+          : null,
     );
 
     if (response['submissions'] != null && response['submissions'].isNotEmpty) {
@@ -299,6 +303,7 @@ class _PublicTabState extends State<PublicTab> {
 
     setState(() => _isFetchingMore = false);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -395,8 +400,8 @@ class _PublicTabState extends State<PublicTab> {
                   Expanded(
                     child: FlexibleText(
                       text: switch (filter) {
-                        PostFilter.grade => "Class ${user.student.grade!.name!}",
-                        PostFilter.school => "${user.student.school?.name?.split(',').first}",
+                        PostFilter.myClass => "Class ${user.student.grade!.name!}",
+                        PostFilter.mySchool => "${user.student.school?.name?.split(',').first}",
                         PostFilter.all => "All Submissions",
                         _ =>"All Submissions",
                       },

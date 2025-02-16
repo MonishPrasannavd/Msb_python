@@ -79,16 +79,19 @@ class SubmissionApiProvider extends ChangeNotifier {
 
     notifyListeners();
     final uri = Uri.parse(
-        "${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}");
+        "${AppUrl.BASE_URL}${AppUrl.GET_ALL_SUBMISSIONS}",
+    );
 
-    uri.queryParameters['page'] = page.toString();
-    uri.queryParameters['limit'] = limit.toString();
-    uri.queryParameters['category_id'] = categoryId.toString();
-    uri.queryParameters['sub_category_id'] = subCategoryId.toString();
-    uri.queryParameters['submission_id'] = submissionId.toString();
-    uri.queryParameters['user_id'] = userId.toString();
-    uri.queryParameters['school_id'] = schoolId.toString();
-    uri.queryParameters['grade_id'] = gradeId.toString();
+    final uriWithParams = uri.replace(queryParameters: {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      if (categoryId != null) 'category_id': categoryId.toString(),
+      if (subCategoryId != null) 'sub_category_id': subCategoryId.toString(),
+      if (submissionId != null) 'submission_id': submissionId.toString(),
+      if (userId != null) 'user_id': userId.toString(),
+      if (schoolId != null) 'school_id': schoolId.toString(),
+      if (gradeId != null) 'grade_id': gradeId.toString(),
+    });
 
     try {
       var data = {
@@ -101,7 +104,7 @@ class SubmissionApiProvider extends ChangeNotifier {
         "school_id": schoolId,
         "grade_id": gradeId
       };
-      var response = await post(uri, headers: AppUrl.headers, body: jsonEncode(data));
+      var response = await post(uriWithParams, headers: AppUrl.headers, body: jsonEncode(data));
       if (response.statusCode == 200) {
         var encodedString = jsonDecode(response.body.toString());
         var submissions = List.castFrom(encodedString['data']).map((e) => Submission.fromJson(e)).toList();
